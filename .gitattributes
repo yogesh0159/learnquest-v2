@@ -1,0 +1,16 @@
+# Windows batch files must keep CRLF line endings wherever the repository is checked out (cmd.exe needs them).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+# Shell scripts must keep LF (Linux / macOS / GitHub Actions).
+*.sh text eol=lf
+gradlew text eol=lf
+# Never touch binary files (3D models, images, WebAssembly, icons).
+*.glb binary
+*.wasm binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.jar binary
+*.sqlite binary
