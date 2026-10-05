@@ -1,7 +1,7 @@
 {
- "version": "a73d9bd92a51",
+ "version": "a0b5d3c16dbf",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3227951,
+ "shellBytes": 3278714,
  "packBytes": 54912780,
  "shell": [
   {
@@ -65,6 +65,11 @@
    "bytes": 3915
   },
   {
+   "url": "/css/home.css",
+   "hash": "c80d76268e70",
+   "bytes": 12502
+  },
+  {
    "url": "/css/jungle-local-preview.css",
    "hash": "493f3544f93d",
    "bytes": 15837
@@ -101,8 +106,8 @@
   },
   {
    "url": "/index.html",
-   "hash": "b32a4e4682f7",
-   "bytes": 4315
+   "hash": "1d4d9fdcf041",
+   "bytes": 10451
   },
   {
    "url": "/js/api.js",
@@ -430,6 +435,11 @@
    "bytes": 5961
   },
   {
+   "url": "/js/home-3d.js",
+   "hash": "c014b42a7fcb",
+   "bytes": 25989
+  },
+  {
    "url": "/js/i18n.js",
    "hash": "82c6c22f9728",
    "bytes": 1637
@@ -611,8 +621,8 @@
   },
   {
    "url": "/",
-   "hash": "b32a4e4682f7",
-   "bytes": 4315
+   "hash": "1d4d9fdcf041",
+   "bytes": 10451
   }
  ],
  "offlinePack": [

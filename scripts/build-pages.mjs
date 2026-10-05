@@ -34,7 +34,7 @@ const mf = path.join(out, "manifest.webmanifest"); const m = JSON.parse(fs.readF
 
 // links to pages that need the backend (or are developer tools) do not exist here: point them at the game, or drop them
 const DEAD = "(?:explorer|profile-setup|reference-studio|parent|parent-dashboard|dashboard|child-login|rewards|tasks|realworld-missions|world-jungle|world-maths_kingdom|jungle-game|maths-kingdom-game|asset-gallery)";
-for (const page of PAGES.filter((p) => p.endsWith(".html"))) { const f = path.join(out, page); if (!fs.existsSync(f)) continue; let s = fs.readFileSync(f, "utf8");
+for (const page of [...PAGES, "index.html"].filter((p) => p.endsWith(".html"))) { const f = path.join(out, page); if (!fs.existsSync(f)) continue; let s = fs.readFileSync(f, "utf8");
   s = s.replace(new RegExp(`\\s*<p>\\s*<a href="/?${DEAD}\\.html">[^<]*</a>\\s*</p>`, "g"), "");                                  // a whole line that only links to a missing page
   s = s.replace(new RegExp(`href="/?${DEAD}\\.html"`, "g"), 'href="jungle-local-preview.html"').replace("&larr; Hub", "&larr; Game").replace("\u2190 Back to Profile", "\u2190 Back to the game");
   fs.writeFileSync(f, s); }

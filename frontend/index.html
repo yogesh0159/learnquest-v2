@@ -9,92 +9,136 @@
 <meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
 <title>LearnQuest — Learn. Unlock. Adventure.</title>
+<meta name="description" content="LearnQuest: a 3D jungle adventure where every question opens the path. Maths, patterns, spelling, science and shapes in English, Hindi and Marathi. Works on phones, tablets, laptops and offline.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/components.css">
-<style>
-  .hero {
-    position: relative;
-    padding: 40px 24px 80px;
-    text-align: center;
-    overflow: hidden;
-  }
-  .hero-emoji-row { font-size: 2.2rem; margin-bottom: 18px; letter-spacing: 8px; }
-  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); max-width: 720px; margin: 0 auto 0.4em; }
-  .hero p.sub { max-width: 520px; margin: 0 auto 28px; font-size: 1.05rem; }
-  .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-  .canopy-strip {
-    height: 90px;
-    background: linear-gradient(180deg, transparent, var(--canopy) 85%);
-    position: relative;
-    margin-top: -50px;
-  }
-  .features {
-    background: var(--canopy);
-    padding: 60px 24px 70px;
-  }
-  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 22px; }
-  .feature-card {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: var(--radius-lg);
-    padding: 26px 22px;
-    color: var(--white);
-  }
-  .feature-card .emoji { font-size: 2rem; margin-bottom: 12px; }
-  .feature-card h3 { color: var(--white); }
-  .feature-card p { color: rgba(255,255,255,0.75); margin: 0; }
-  footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
-</style>
+<link rel="stylesheet" href="css/home.css">
+<script type="importmap">{ "imports": { "three": "/vendor/three/three.module.js" } }</script>
 <script src="/js/lq-platform.js"></script>
 <script src="/js/pwa.js" defer></script>
 </head>
-<body>
-  <div class="screen">
-    <header class="topbar">
-      <div class="brand"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></div>
-      <div class="lang-switch">
-        <button data-lang="en">EN</button>
-        <button data-lang="hi">हि</button>
-        <button data-lang="mr">मर</button>
-      </div>
-    </header>
+<body class="home">
+<div class="screen">
 
-    <section class="hero">
-      <div class="hero-emoji-row">🌳 🐒 🦜 🐯 🌴</div>
+  <header class="nav" id="nav">
+    <a class="brand" href="#top"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how" data-h="nav_how">How it works</a>
+      <a href="#team" data-h="nav_team">Explorers</a>
+      <a href="#platforms" data-h="nav_platforms">Play anywhere</a>
+    </nav>
+    <div class="lang-switch">
+      <button data-lang="en">EN</button>
+      <button data-lang="hi">हि</button>
+      <button data-lang="mr">मर</button>
+    </div>
+  </header>
+
+  <!-- ============================== HERO (live 3D scene on good devices, illustration otherwise) ============================== -->
+  <section class="hero3d" id="top">
+    <div class="sky" aria-hidden="true"><i class="sun"></i><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i></div>
+    <svg class="hero-art" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="hillA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd48a"/><stop offset="1" stop-color="#3f9e55"/></linearGradient>
+        <linearGradient id="hillB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55b868"/><stop offset="1" stop-color="#2b7d44"/></linearGradient>
+        <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9d9a8"/><stop offset="1" stop-color="#b79a5e"/></linearGradient>
+        <radialGradient id="coin" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff4b0"/><stop offset=".6" stop-color="#ffc83a"/><stop offset="1" stop-color="#c8901a"/></radialGradient>
+      </defs>
+      <path d="M0 560 C220 470 380 520 560 480 C760 436 900 520 1100 470 C1300 420 1450 500 1600 460 L1600 900 L0 900Z" fill="url(#hillA)"/>
+      <path d="M0 640 C260 560 420 620 640 580 C860 540 1020 620 1220 580 C1400 548 1520 590 1600 570 L1600 900 L0 900Z" fill="url(#hillB)"/>
+      <g fill="#2a6b3a"><rect x="210" y="430" width="22" height="170" rx="8"/><circle cx="221" cy="410" r="82"/><circle cx="170" cy="450" r="58"/><circle cx="276" cy="452" r="60"/>
+        <rect x="1300" y="410" width="24" height="190" rx="8"/><circle cx="1312" cy="388" r="90"/><circle cx="1256" cy="432" r="60"/><circle cx="1368" cy="436" r="64"/>
+        <rect x="470" y="520" width="16" height="110" rx="6"/><circle cx="478" cy="508" r="52"/><rect x="1110" y="510" width="16" height="116" rx="6"/><circle cx="1118" cy="496" r="54"/></g>
+      <g transform="translate(300 0)"><path d="M690 900 L910 900 L832 560 L768 560Z" fill="url(#road)"/>
+      <path d="M710 900 L800 560" stroke="#fff6d6" stroke-opacity=".55" stroke-width="3" stroke-dasharray="26 22" fill="none"/>
+      <path d="M890 900 L800 560" stroke="#fff6d6" stroke-opacity=".55" stroke-width="3" stroke-dasharray="26 22" fill="none"/>
+      <g><circle cx="800" cy="640" r="16" fill="url(#coin)"/><circle cx="780" cy="700" r="22" fill="url(#coin)"/><circle cx="830" cy="770" r="30" fill="url(#coin)"/><circle cx="760" cy="850" r="40" fill="url(#coin)"/></g>
+      <g font-family="Baloo 2, Segoe UI, sans-serif" font-weight="800" fill="#7a4a06" text-anchor="middle"><text x="780" y="708" font-size="24">?</text><text x="830" y="781" font-size="34">?</text><text x="760" y="864" font-size="46">?</text></g></g>
+    </svg>
+    <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-load" id="heroLoad" hidden><i></i></div>
+
+    <div class="hero-copy reveal in">
+      <span class="pill"><b>v2</b> <span data-h="eyebrow">Now with a friendly teacher</span></span>
       <h1 data-i18n="home_hero_title">Learn. Unlock. Adventure.</h1>
-      <p class="sub" data-i18n="home_hero_sub">Every lesson opens a new gate in the jungle.</p>
+      <p class="sub" data-i18n="home_hero_sub">Every lesson opens a new gate in the jungle. Play, learn Maths, English & GK, and become a Jungle Legend.</p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="child-login.html" data-i18n="home_cta_child">I'm a Kid — Let's Play!</a>
         <a class="btn btn-ghost" href="parent.html" data-i18n="home_cta_parent">I'm a Grown-up</a>
       </div>
-    </section>
-    <div class="canopy-strip"></div>
+      <ul class="trust" aria-label="Highlights">
+        <li><b>3</b> <span data-h="trust_langs">languages</span></li>
+        <li><b>6</b> <span data-h="trust_subjects">subjects</span></li>
+        <li><b>4K</b> <span data-h="trust_quality">smart quality</span></li>
+        <li><b>✓</b> <span data-h="trust_offline">works offline</span></li>
+      </ul>
+    </div>
+    <span class="mode-chip" id="modeChip" aria-live="polite"><i></i><span data-h="chip_light">Light mode</span></span>
+    <a class="scroll-hint" href="#how" aria-label="Scroll"><i></i></a>
+  </section>
 
-    <section class="features">
-      <div class="container feature-grid">
-        <div class="feature-card">
-          <div class="emoji">🎮</div>
-          <h3 data-i18n="home_feature_1_title">Real Games</h3>
-          <p data-i18n="home_feature_1_body">Not worksheets — a jungle world with coins, gates and boss battles.</p>
-        </div>
-        <div class="feature-card">
-          <div class="emoji">🔒</div>
-          <h3 data-i18n="home_feature_2_title">Learning Gates</h3>
-          <p data-i18n="home_feature_2_body">Answer questions correctly to unlock the path forward.</p>
-        </div>
-        <div class="feature-card">
-          <div class="emoji">📊</div>
-          <h3 data-i18n="home_feature_3_title">Parent Insights</h3>
-          <p data-i18n="home_feature_3_body">See progress, accuracy and weak topics at a glance.</p>
-        </div>
+  <!-- ============================== HOW IT WORKS ============================== -->
+  <section class="block" id="how">
+    <div class="container">
+      <h2 class="sec-title reveal" data-h="how_title">How the adventure works</h2>
+      <div class="steps">
+        <article class="glass tilt reveal"><span class="num">1</span><div class="ico">🏃</div><h3 data-h="how_1_t">Run &amp; collect</h3><p data-h="how_1_b">Dash through the jungle, dodge rocks and collect golden coins.</p></article>
+        <article class="glass tilt reveal"><span class="num">2</span><div class="ico">❓</div><h3 data-h="how_2_t">Answer at the board</h3><p data-h="how_2_b">Run through the right lane to answer Maths, patterns, spelling, science and shapes.</p></article>
+        <article class="glass tilt reveal"><span class="num">3</span><div class="ico">🧑‍🏫</div><h3 data-h="how_3_t">A teacher helps you</h3><p data-h="how_3_b">A friendly teacher runs behind you. Caught? Answer her rescue question and run free!</p></article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer>LearnQuest · Phase 1 prototype</footer>
-  </div>
+  <div class="canopy-strip"></div>
+
+  <!-- ============================== FEATURES (dark canopy) ============================== -->
+  <section class="features">
+    <div class="container feature-grid">
+      <div class="feature-card reveal"><div class="emoji">🎮</div><h3 data-i18n="home_feature_1_title">Real Games</h3><p data-i18n="home_feature_1_body">Not worksheets — a jungle world with coins, gates and boss battles.</p></div>
+      <div class="feature-card reveal"><div class="emoji">🔒</div><h3 data-i18n="home_feature_2_title">Learning Gates</h3><p data-i18n="home_feature_2_body">Answer questions correctly to unlock the path forward.</p></div>
+      <div class="feature-card reveal"><div class="emoji">📊</div><h3 data-i18n="home_feature_3_title">Parent Insights</h3><p data-i18n="home_feature_3_body">See progress, accuracy and weak topics at a glance.</p></div>
+    </div>
+  </section>
+
+  <!-- ============================== TEAM ============================== -->
+  <section class="block team" id="team">
+    <div class="container">
+      <h2 class="sec-title reveal" data-h="team_title">Meet the explorers</h2>
+      <div class="cast">
+        <article class="char tilt reveal"><div class="disc d1"><span>🧒</span></div><h3 data-h="team_boy">Boy explorer</h3><p data-h="team_boy_b">Quick, brave and always ready to run.</p></article>
+        <article class="char tilt reveal"><div class="disc d2"><span>👧</span></div><h3 data-h="team_girl">Girl explorer</h3><p data-h="team_girl_b">Light on her feet, sharp with every answer.</p></article>
+        <article class="char tilt reveal"><div class="disc d3"><span>🧑‍🏫</span></div><h3 data-h="team_teacher">The Teacher</h3><p data-h="team_teacher_b">Cap, glasses and a book. Asks, helps and cheers you on.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PLATFORMS ============================== -->
+  <section class="block platforms" id="platforms">
+    <div class="container">
+      <h2 class="sec-title reveal" data-h="plat_title">Play anywhere</h2>
+      <p class="sec-sub reveal" data-h="plat_sub">One game for phones, tablets, laptops and desktops. Install it and play offline.</p>
+      <ul class="chips reveal">
+        <li>🌐 Web</li><li>🤖 Android</li><li>🍎 iPhone &amp; iPad</li><li>🪟 Windows</li><li>🍏 Mac</li><li>🐧 Linux</li>
+      </ul>
+      <p class="sec-note reveal" data-h="plat_note">The picture quality adapts to your device, up to 4K.</p>
+    </div>
+  </section>
+
+  <!-- ============================== FINAL CALL ============================== -->
+  <section class="final">
+    <div class="container reveal">
+      <h2 data-h="cta_title">Ready to run?</h2>
+      <p><a class="btn btn-primary btn-lg" href="jungle-local-preview.html" data-h="cta_btn">▶ Play Jungle Run</a></p>
+      <p class="mini"><a href="selftest.html" data-h="cta_speed">Check my device speed</a> · <a href="character-lab.html" data-h="cta_lab">3D lab</a></p>
+    </div>
+  </section>
+
+  <footer>LearnQuest · Phase 1 prototype</footer>
+</div>
 
 <script src="js/i18n.js"></script>
+<script type="module" src="js/home-3d.js"></script>
 </body>
 </html>

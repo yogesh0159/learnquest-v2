@@ -1,0 +1,106 @@
+/* LearnQuest premium home page: glass UI over a live 3D jungle (or an illustration on light devices). */
+:root { --h-green:#2fbf6a; --h-deep:#103a26; --h-gold:#ffc83a; --h-ink:#12331f; }
+html { scroll-behavior:smooth; scroll-padding-top:76px; }
+body.home { margin:0; background:#fff8e1; color:var(--h-ink); overflow-x:hidden; }
+body.home .screen { min-height:100vh; }
+.container { width:min(1120px, 92vw); margin:0 auto; }
+
+/* ---------------------------------------------------------------- glass navigation */
+.nav { position:fixed; top:max(10px, env(safe-area-inset-top)); left:50%; transform:translateX(-50%); width:min(1120px, 94vw); z-index:50; display:flex; align-items:center; gap:18px; padding:8px 14px;
+  background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.7); border-radius:999px; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4); box-shadow:0 10px 30px rgba(16,58,38,.14); transition:background .3s, box-shadow .3s; }
+.nav.scrolled { background:rgba(255,255,255,.86); box-shadow:0 12px 34px rgba(16,58,38,.2); }
+.nav .brand { display:flex; align-items:center; gap:10px; font-family:"Baloo 2","Segoe UI",sans-serif; font-weight:800; font-size:1.25rem; color:var(--h-deep); text-decoration:none; }
+.nav-links { display:flex; gap:6px; margin-left:auto; }
+.nav-links a { padding:8px 14px; border-radius:999px; color:var(--h-deep); text-decoration:none; font-weight:600; font-size:.95rem; transition:background .2s; }
+.nav-links a:hover { background:rgba(47,191,106,.16); }
+.nav .lang-switch { margin-left:4px; }
+@media (max-width:760px) { .nav-links { display:none; } .nav .lang-switch { margin-left:auto; } }
+
+/* ---------------------------------------------------------------- hero */
+.hero3d { position:relative; min-height:100vh; min-height:100svh; display:flex; align-items:center; overflow:hidden; isolation:isolate;
+  background:linear-gradient(180deg,#8fe0ff 0%,#c9f3dd 52%,#fff2bd 100%); }
+.sky { position:absolute; inset:0; z-index:-3; pointer-events:none; }
+.sky .sun { position:absolute; right:14%; top:12%; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle,#fffbe0 0 38%,#ffe27a 58%,rgba(255,226,122,0) 72%); filter:blur(1px); animation:sunpulse 7s ease-in-out infinite; }
+.sky .cloud { position:absolute; height:46px; width:150px; border-radius:50px; background:rgba(255,255,255,.85); filter:blur(.6px); animation:drift linear infinite; }
+.sky .cloud::before, .sky .cloud::after { content:""; position:absolute; background:inherit; border-radius:50%; }
+.sky .cloud::before { width:64px; height:64px; left:22px; top:-30px; } .sky .cloud::after { width:50px; height:50px; right:26px; top:-22px; }
+.sky .c1 { top:16%; left:-20%; animation-duration:70s; } .sky .c2 { top:30%; left:-30%; animation-duration:95s; animation-delay:-30s; transform:scale(.75); opacity:.8; } .sky .c3 { top:9%; left:-25%; animation-duration:120s; animation-delay:-60s; transform:scale(.55); opacity:.7; }
+@keyframes drift { to { left:115%; } } @keyframes sunpulse { 50% { transform:scale(1.08); opacity:.9; } }
+.hero-art { position:absolute; inset:0; width:100%; height:100%; z-index:-2; }
+.hero-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:-1; opacity:0; transition:opacity .9s ease; touch-action:pan-y; }
+body[data-home3d="on"] .hero-canvas { opacity:1; }
+body[data-home3d="on"] .hero-art { opacity:0; transition:opacity .9s ease; }
+.hero-load { position:absolute; left:50%; bottom:92px; width:min(240px,50vw); height:5px; border-radius:5px; background:rgba(255,255,255,.55); transform:translateX(-50%); z-index:2; overflow:hidden; }
+.hero-load i { display:block; height:100%; width:0; background:linear-gradient(90deg,#2fbf6a,#ffc83a); transition:width .25s; }
+
+.hero-copy { position:relative; z-index:2; width:min(560px, 92vw); margin-left:max(4vw, calc((100vw - 1120px) / 2)); padding:110px 0 90px; }
+.hero-copy::before { content:""; position:absolute; inset:92px -28px 60px -28px; z-index:-1; border-radius:36px; background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.28)); border:1px solid rgba(255,255,255,.7); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 24px 60px rgba(16,58,38,.16); }
+.pill { display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 8px; border-radius:999px; background:rgba(255,255,255,.8); border:1px solid rgba(47,191,106,.35); font-weight:700; font-size:.88rem; color:var(--h-deep); }
+.pill b { background:linear-gradient(135deg,#2fbf6a,#18884a); color:#fff; padding:2px 9px; border-radius:999px; }
+.hero-copy h1 { margin:.35em 0 .2em; font-family:"Baloo 2","Segoe UI",sans-serif; font-weight:800; line-height:1.02; font-size:clamp(2.5rem, 6.4vw, 4.6rem); background:linear-gradient(120deg,#0d3b25 10%,#1f9d57 55%,#e9a400 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero-copy .sub { margin:0 0 24px; font-size:clamp(1rem,1.6vw,1.2rem); line-height:1.55; color:#244a35; }
+.hero-ctas { display:flex; gap:14px; flex-wrap:wrap; }
+.hero3d .btn, .final .btn { border-radius:999px; font-weight:800; padding:14px 26px; transition:transform .18s, box-shadow .18s; }
+.hero3d .btn-primary, .final .btn-primary { background:linear-gradient(180deg,#ffd45a,#ffab12); color:#4a2e00; border:0; box-shadow:0 10px 0 #c7800a, 0 18px 34px rgba(199,128,10,.45); position:relative; }
+.hero3d .btn-primary:hover, .final .btn-primary:hover { transform:translateY(-3px); box-shadow:0 13px 0 #c7800a, 0 24px 40px rgba(199,128,10,.5); }
+.hero3d .btn-primary:active, .final .btn-primary:active { transform:translateY(5px); box-shadow:0 4px 0 #c7800a, 0 8px 18px rgba(199,128,10,.4); }
+.hero3d .btn-ghost { background:rgba(255,255,255,.85); border:2px solid rgba(16,58,38,.18); color:var(--h-deep); }
+.hero3d .btn-ghost:hover { background:#fff; transform:translateY(-3px); }
+.btn-lg { font-size:1.2rem; padding:18px 36px !important; }
+.trust { list-style:none; display:flex; flex-wrap:wrap; gap:8px 18px; margin:26px 0 0; padding:0; color:#244a35; font-weight:600; font-size:.95rem; }
+.trust b { color:#0d7a3e; font-family:"Baloo 2",sans-serif; font-size:1.2rem; }
+.mode-chip { position:absolute; right:max(16px,3vw); bottom:22px; z-index:3; display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:rgba(16,58,38,.62); color:#eaffef; font-size:.8rem; font-weight:700; backdrop-filter:blur(8px); }
+.mode-chip i { width:8px; height:8px; border-radius:50%; background:#ffc83a; }
+body[data-home3d="on"] .mode-chip i { background:#46f08b; box-shadow:0 0 10px #46f08b; }
+.scroll-hint { position:absolute; left:50%; bottom:20px; width:26px; height:42px; border:2px solid rgba(16,58,38,.45); border-radius:16px; transform:translateX(-50%); z-index:3; }
+.scroll-hint i { position:absolute; left:50%; top:8px; width:4px; height:8px; margin-left:-2px; border-radius:2px; background:var(--h-deep); animation:wheel 1.6s infinite; }
+@keyframes wheel { 0% { opacity:0; transform:translateY(0); } 30% { opacity:1; } 100% { opacity:0; transform:translateY(14px); } }
+
+/* wide screens: the copy sits on the left and the runner on the right.  Phones: the 3D scene fills the top, the copy sits below it. */
+@media (max-width:860px) {
+  .hero3d { display:block; min-height:0; padding-top:min(52svh, 430px); }
+  .hero-canvas, .hero-art { bottom:auto; height:min(60svh, 500px); -webkit-mask-image:linear-gradient(#000 78%, transparent); mask-image:linear-gradient(#000 78%, transparent); }
+  .hero-load { bottom:auto; top:calc(min(60svh, 500px) - 34px); }
+  .hero-copy { margin:0 auto; padding:0 0 76px; }
+  .hero-copy::before { inset:-16px -14px 52px -14px; }
+  .mode-chip { display:none; }
+  .scroll-hint { display:none; }
+}
+
+/* ---------------------------------------------------------------- sections */
+.block { padding:84px 0; position:relative; }
+.sec-title { text-align:center; font-family:"Baloo 2","Segoe UI",sans-serif; font-weight:800; font-size:clamp(1.8rem,4vw,2.8rem); margin:0 0 34px; color:var(--h-deep); }
+.sec-sub { text-align:center; max-width:640px; margin:-14px auto 26px; font-size:1.1rem; color:#355c45; }
+.sec-note { text-align:center; margin-top:22px; color:#4a6f59; }
+.steps, .cast { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:24px; }
+.glass { position:relative; padding:30px 26px 28px; border-radius:26px; background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(255,255,255,.62)); border:1px solid rgba(255,255,255,.9); box-shadow:0 18px 44px rgba(16,58,38,.14); }
+.glass .num { position:absolute; top:-16px; left:22px; width:38px; height:38px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,#2fbf6a,#18884a); color:#fff; font-weight:800; font-family:"Baloo 2",sans-serif; box-shadow:0 8px 16px rgba(24,136,74,.4); }
+.glass .ico { font-size:2.6rem; margin-bottom:6px; } .glass h3 { margin:.2em 0; color:var(--h-deep); font-family:"Baloo 2",sans-serif; font-size:1.4rem; } .glass p { margin:0; color:#355c45; line-height:1.55; }
+.canopy-strip { height:90px; background:linear-gradient(180deg,transparent,var(--canopy, #1b4d38) 85%); position:relative; margin-top:-10px; }
+.features { background:var(--canopy, #1b4d38); padding:56px 24px 76px; }
+.feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:22px; }
+.feature-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:24px; padding:28px 24px; color:#fff; transition:transform .25s, background .25s; }
+.feature-card:hover { transform:translateY(-6px); background:rgba(255,255,255,.14); }
+.feature-card .emoji { font-size:2.2rem; margin-bottom:10px; } .feature-card h3 { color:#fff; margin:.2em 0; } .feature-card p { color:rgba(255,255,255,.78); margin:0; }
+.team { background:linear-gradient(180deg,#fff8e1,#e6f7e6); }
+.char { text-align:center; padding:34px 22px 30px; border-radius:28px; background:#fff; box-shadow:0 18px 44px rgba(16,58,38,.12); border:1px solid rgba(47,191,106,.18); }
+.char .disc { width:118px; height:118px; margin:0 auto 14px; border-radius:50%; display:grid; place-items:center; font-size:3.6rem; box-shadow:inset 0 -10px 22px rgba(0,0,0,.14), 0 14px 26px rgba(16,58,38,.2); animation:bob 3.6s ease-in-out infinite; }
+.char:nth-child(2) .disc { animation-delay:-1.2s; } .char:nth-child(3) .disc { animation-delay:-2.4s; }
+.disc.d1 { background:radial-gradient(circle at 35% 30%,#bfe8ff,#4aa8f0); } .disc.d2 { background:radial-gradient(circle at 35% 30%,#ffd6ea,#f06aa8); } .disc.d3 { background:radial-gradient(circle at 35% 30%,#fff0b0,#f2a81d); }
+@keyframes bob { 50% { transform:translateY(-8px); } }
+.char h3 { margin:.2em 0; font-family:"Baloo 2",sans-serif; font-size:1.4rem; color:var(--h-deep); } .char p { margin:0; color:#4a6f59; }
+.platforms { background:linear-gradient(180deg,#e6f7e6,#d3f0ff); }
+.chips { list-style:none; display:flex; flex-wrap:wrap; justify-content:center; gap:12px; padding:0; margin:0; }
+.chips li { padding:12px 22px; border-radius:999px; background:#fff; border:1px solid rgba(16,58,38,.12); font-weight:700; box-shadow:0 8px 20px rgba(16,58,38,.1); transition:transform .2s; } .chips li:hover { transform:translateY(-4px) scale(1.04); }
+.final { padding:84px 0 70px; text-align:center; color:#fff; background:radial-gradient(ellipse at 50% 0%,#2a8a58 0%,#103a26 70%); }
+.final h2 { color:#fff; text-shadow:0 4px 18px rgba(0,0,0,.35); font-family:"Baloo 2",sans-serif; font-weight:800; font-size:clamp(2rem,5vw,3.4rem); margin:0 0 20px; }
+.final .mini { margin-top:22px; opacity:.85; } .final .mini a { color:#cfffe0; }
+footer { text-align:center; padding:24px; color:var(--text-muted,#5b7a66); font-size:.85rem; background:#0c2a1c; color:#9fc7ad; }
+
+/* ---------------------------------------------------------------- motion */
+.reveal { opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { opacity:1; transform:none; }
+.steps .reveal:nth-child(2), .cast .reveal:nth-child(2) { transition-delay:.12s; } .steps .reveal:nth-child(3), .cast .reveal:nth-child(3) { transition-delay:.24s; }
+.tilt { transform-style:preserve-3d; will-change:transform; }
+.no-js .reveal { opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .reveal { opacity:1; transform:none; transition:none; } .sky .cloud, .sky .sun, .char .disc, .scroll-hint i { animation:none; } }
