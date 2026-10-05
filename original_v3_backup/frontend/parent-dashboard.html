@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .insight-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:12px; }
+  .insight-card { padding:14px; border:1px solid rgba(43,111,73,.12); border-radius:16px; background:linear-gradient(180deg,#fff,#f8fcf9); }
+  .insight-card strong { display:block; font-family:var(--font-display); font-size:1.35rem; color:var(--canopy); }
+  .insight-card span { font-size:.82rem; color:var(--muted); }
+  .plan-callout { margin-top:14px; padding:14px 16px; border-radius:16px; background:linear-gradient(135deg,rgba(71,151,96,.12),rgba(238,184,79,.13)); border:1px solid rgba(43,111,73,.1); }
+  .plan-callout b { color:var(--canopy); }
+  .focus-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .focus-chip { padding:7px 10px; border-radius:999px; background:#fff4e5; border:1px solid #efd6ae; font-size:.8rem; font-weight:700; }
+  .strength-chip { padding:7px 10px; border-radius:999px; background:#ecf8ef; border:1px solid #c7e7cf; font-size:.8rem; font-weight:700; }
+  .child-chip { display:flex; align-items:center; gap:7px; }
+  .task-review-actions { display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end; }
+  .task-state { font-size:.78rem;font-weight:800;padding:5px 9px;border-radius:999px;white-space:nowrap; }
+  .task-state.pending { background:#f1f3f2;color:#59645d; }
+  .task-state.submitted { background:#fff1d7;color:#795312; }
+  .task-state.completed { background:#e8f7ed;color:#245d38; }
+  @media (max-width:760px) { .insight-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <div class="brand"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="lang-switch">
+          <button data-lang="en">EN</button>
+          <button data-lang="hi">हि</button>
+          <button data-lang="mr">मर</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn" data-i18n="dashboard_logout">Log Out</button>
+      </div>
+    </header>
+
+    <main class="container mt-24" style="flex:1; padding-bottom: 60px;">
+      <div class="flex-between">
+        <h2 data-i18n="parent_dashboard_title">Parent Dashboard</h2>
+        <a class="btn btn-primary btn-sm" href="profile-setup.html" data-i18n="parent_add_child">+ Add Child</a>
+      </div>
+
+      <div class="child-tabs" id="childTabs"></div>
+      <p id="noChildren" class="muted hidden" data-i18n="parent_no_children">No child profiles yet.</p>
+
+      <div id="dashboardContent" class="hidden">
+        <div class="stat-grid" id="statGrid"></div>
+
+        <div class="card mt-24" id="learningPlanCard">
+          <div class="flex-between" style="gap:12px;align-items:flex-start;">
+            <div>
+              <div style="font-size:.72rem;font-weight:900;letter-spacing:.08em;color:var(--leaf);">WEEKLY LEARNING COACH</div>
+              <h3 style="margin-top:4px;">🧠 This week's learning plan</h3>
+            </div>
+            <span class="badge" id="momentumBadge">Building routine</span>
+          </div>
+          <div class="insight-grid" id="weeklyInsights"></div>
+          <div id="planGuidance"></div>
+        </div>
+
+        <div class="card mt-24">
+          <h3>🎮 Adventure Runner Progress</h3>
+          <div id="runnerSummary" class="stat-grid"></div>
+          <div id="runnerLevels" class="mt-16"></div>
+        </div>
+
+        <div class="card mt-24">
+          <h3>🌍 RealWorld Mission Evidence</h3>
+          <p class="muted">Attempts and skill accuracy from world interactions, reported separately from coins and cosmetics.</p>
+          <div id="missionEvidence"></div>
+        </div>
+
+        <div class="card mt-24">
+          <h3 data-i18n="parent_subject_progress">Subject Progress</h3>
+          <div id="subjectBars"></div>
+        </div>
+
+        <div class="card mt-24">
+          <h3 data-i18n="parent_weak_topics">Topics to Practice</h3>
+          <div id="weakTopics"></div>
+        </div>
+
+        <div class="card mt-24">
+          <h3 data-i18n="parent_add_task_title">Assign a Task</h3>
+          <p class="muted" style="margin-top:-6px;">Turn a real-world responsibility or study goal into an in-game reward. The child submits it, then you approve before coins are released.</p>
+          <form id="taskForm">
+            <div class="field">
+              <label data-i18n="parent_task_name">Task Title</label>
+              <input type="text" id="taskTitle" maxlength="160" required>
+            </div>
+            <div class="field">
+              <label data-i18n="parent_task_desc">Description</label>
+              <input type="text" id="taskDesc" maxlength="1000">
+            </div>
+            <div class="field">
+              <label data-i18n="parent_task_reward_type">Reward Type</label>
+              <select id="taskRewardType">
+                <option value="coins" data-i18n="parent_task_reward_coins">Coins</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="parent_task_reward_value">Reward Value</label>
+              <input type="number" id="taskRewardValue" min="1" max="10000" value="100" required>
+            </div>
+            <button type="submit" class="btn btn-primary" data-i18n="parent_task_assign">Assign Task</button>
+          </form>
+
+          <div id="taskList" class="mt-24"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/character-presets.js"></script>
+<script>
+  requireParentAuth();
+  document.getElementById("logoutBtn").onclick = () => { clearSession(); window.location.href = "index.html"; };
+
+  let children = [];
+  let selectedChildId = null;
+  let dashboardData = null;
+  let taskList = [];
+
+  const characterIcon = (value) => window.LQCharacters ? LQCharacters.icon(value) : (value || "🧒🏽");
+
+  async function loadChildren() {
+    const res = await api.childList();
+    children = res.children;
+    if (children.length === 0) {
+      document.getElementById("noChildren").classList.remove("hidden");
+      document.getElementById("dashboardContent").classList.add("hidden");
+      return;
+    }
+    document.getElementById("noChildren").classList.add("hidden");
+    if (!selectedChildId) selectedChildId = children[0].id;
+    renderTabs();
+    await loadDashboard();
+  }
+
+  function renderTabs() {
+    const tabs = document.getElementById("childTabs");
+    tabs.innerHTML = "";
+    children.forEach((c) => {
+      const chip = document.createElement("div");
+      chip.className = "child-chip" + (c.id === selectedChildId ? " active" : "");
+      chip.textContent = `${characterIcon(c.avatar)} ${c.name}`;
+      chip.onclick = async () => { selectedChildId = c.id; renderTabs(); await loadDashboard(); };
+      tabs.appendChild(chip);
+    });
+  }
+
+  async function loadDashboard() {
+    dashboardData = await api.parentDashboard(selectedChildId);
+    const taskRes = await api.parentTaskList(selectedChildId);
+    taskList = taskRes.tasks;
+    document.getElementById("dashboardContent").classList.remove("hidden");
+    renderDashboard();
+  }
+
+  function renderLearningPlan() {
+    const plan = dashboardData.learningPlan || {
+      weekly: { questionsAttempted:0, questionsCorrect:0, gameMinutes:0, activeDays:0, accuracy:null },
+      focusTopics: [], strongSubjects: [], momentum:"building", dailyPracticeMinutes:10, hasEnoughData:false,
+    };
+    const weekly = plan.weekly;
+    const momentumText = plan.momentum === "strong" ? "🔥 Strong momentum" : plan.momentum === "needs_routine" ? "🌱 Build a routine" : "📈 Building momentum";
+    document.getElementById("momentumBadge").textContent = momentumText;
+    document.getElementById("weeklyInsights").innerHTML = `
+      <div class="insight-card"><strong>${weekly.activeDays || 0}/7</strong><span>Active days</span></div>
+      <div class="insight-card"><strong>${weekly.questionsAttempted || 0}</strong><span>Questions practised</span></div>
+      <div class="insight-card"><strong>${weekly.accuracy == null ? "—" : weekly.accuracy + "%"}</strong><span>Learning accuracy</span></div>
+      <div class="insight-card"><strong>${weekly.gameMinutes || 0}m</strong><span>Learning-game time</span></div>
+    `;
+
+    const focus = plan.focusTopics || [];
+    const strong = plan.strongSubjects || [];
+    let html = `<div class="plan-callout"><b>Recommended routine:</b> ${plan.dailyPracticeMinutes || 10} focused minutes per day. `;
+    if (!plan.hasEnoughData) html += `Complete a few more learning gates so LearnQuest can personalise recommendations with better evidence.`;
+    else if (focus.length) html += `Prioritise the focus topics below before increasing game difficulty.`;
+    else html += `No major weak topic is visible in the current data. Keep practice varied and consistent.`;
+    html += `</div>`;
+    if (focus.length) {
+      html += `<div style="margin-top:12px;"><b>🎯 Focus next</b><div class="focus-list">${focus.map((f) => `<span class="focus-chip">${f.subject}: ${f.topic} · ${f.accuracy}%</span>`).join("")}</div></div>`;
+    }
+    if (strong.length) {
+      html += `<div style="margin-top:12px;"><b>🌟 Current strengths</b><div class="focus-list">${strong.map((s) => `<span class="strength-chip">${s.subject} · ${s.accuracy}%</span>`).join("")}</div></div>`;
+    }
+    document.getElementById("planGuidance").innerHTML = html;
+  }
+
+  function renderDashboard() {
+    const d = dashboardData;
+    document.getElementById("statGrid").innerHTML = `
+      <div class="card-flat center"><div style="font-size:1.6rem;">${characterIcon(d.child.avatar)} ${d.child.name}</div><div class="muted">Explorer</div></div>
+      <div class="card-flat center"><div style="font-size:1.6rem;">⭐ ${d.child.xp}</div><div class="muted">XP</div></div>
+      <div class="card-flat center"><div style="font-size:1.6rem;">🪙 ${d.child.coins}</div><div class="muted">${t("dashboard_coins")}</div></div>
+      <div class="card-flat center"><div style="font-size:1.6rem;">${d.overallAccuracy !== null ? d.overallAccuracy + "%" : "—"}</div><div class="muted">${t("parent_overall_accuracy")}</div></div>
+    `;
+
+    renderLearningPlan();
+
+    const runner = d.runner || { totalRuns: 0, obstaclesDodged: 0, bestScore: 0, bestStars: 0, levels: [] };
+    document.getElementById("runnerSummary").innerHTML = `
+      <div class="card-flat center"><div style="font-size:1.45rem;">🏃 ${runner.totalRuns}</div><div class="muted">Runs</div></div>
+      <div class="card-flat center"><div style="font-size:1.45rem;">🪨 ${runner.obstaclesDodged}</div><div class="muted">Dodged</div></div>
+      <div class="card-flat center"><div style="font-size:1.45rem;">🏆 ${runner.bestScore}</div><div class="muted">Best Score</div></div>
+      <div class="card-flat center"><div style="font-size:1.45rem;">${"⭐".repeat(runner.bestStars || 0) || "—"}</div><div class="muted">Best Stars</div></div>`;
+    document.getElementById("runnerLevels").innerHTML = runner.levels.length
+      ? runner.levels.map(l => `<div class="task-row"><div><div class="muted" style="font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;">${l.world_name || "Adventure World"}</div><b>Level ${l.level_number}: ${l.name}</b><div class="muted" style="font-size:.82rem;">${"⭐".repeat(l.best_stars)}${"☆".repeat(Math.max(0,3-l.best_stars))} · 🧠 ${l.best_accuracy}% · ${l.runs_completed} completed runs</div></div><div>🏆 ${l.best_score}</div></div>`).join("")
+      : `<p class="muted">No 3D runner activity yet.</p>`;
+
+    const missionEvidence = d.realWorldMissions || [];
+    document.getElementById("missionEvidence").innerHTML = missionEvidence.length
+      ? missionEvidence.map(m => `<div class="task-row"><div><b>${m.missionId.replaceAll("_", " ")} · ${m.skill.replaceAll("_", " ")}</b><div class="muted" style="font-size:.82rem;">${m.attempts} attempts · ${m.correct} correct · ${m.mistakes} explained mistakes · ${m.sessionsCompleted} completed sessions</div></div><div style="font:800 1.2rem var(--font-display);">${m.accuracy}%</div></div>`).join("")
+      : `<p class="muted">No RealWorld mission activity yet.</p>`;
+
+    const bars = document.getElementById("subjectBars");
+    bars.innerHTML = "";
+    if (d.subjectStats.length === 0) bars.innerHTML = `<p class="muted">Complete learning gates to build a subject progress profile.</p>`;
+    d.subjectStats.forEach((s) => {
+      const row = document.createElement("div");
+      row.className = "subject-bar-row";
+      row.innerHTML = `
+        <div class="label-row"><span>${s.subject}</span><span>${s.accuracy !== null ? s.accuracy + "%" : "—"}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${s.accuracy || 0}%"></div></div>
+      `;
+      bars.appendChild(row);
+    });
+
+    const weak = document.getElementById("weakTopics");
+    weak.innerHTML = d.weakTopics.length
+      ? d.weakTopics.map((w) => `<span class="weak-topic-chip">⚠️ ${w.subject || "Learning"}: ${w.topic} (${w.accuracy}%)</span>`).join("")
+      : `<p class="muted">No repeated weak topic detected yet.</p>`;
+
+    renderTaskList();
+  }
+
+  async function reviewTask(taskId, decision) {
+    const result = await api.parentReviewTask(taskId, decision);
+    if (decision === "approve") {
+      showToast(result.alreadyApproved ? "✅ Already approved" : `✅ Approved · +${result.rewardValue || 0} coins released`);
+    } else {
+      showToast("↩️ Sent back to child");
+    }
+    const [taskRes, freshDashboard] = await Promise.all([
+      api.parentTaskList(selectedChildId),
+      api.parentDashboard(selectedChildId),
+    ]);
+    taskList = taskRes.tasks;
+    dashboardData = freshDashboard;
+    renderDashboard();
+  }
+
+  function renderTaskList() {
+    const list = document.getElementById("taskList");
+    list.innerHTML = "";
+    if (!taskList.length) {
+      list.innerHTML = `<p class="muted">No parent tasks assigned yet.</p>`;
+      return;
+    }
+    taskList.forEach((task) => {
+      const row = document.createElement("div");
+      row.className = "task-row";
+      let actions = `<span class="task-state pending">⏳ In progress</span>`;
+      if (task.status === "submitted") {
+        actions = `<div class="task-review-actions"><button type="button" class="btn btn-primary btn-sm" data-review="approve">Approve +${task.reward_value} 🪙</button><button type="button" class="btn btn-ghost btn-sm" data-review="reject">Send back</button></div>`;
+      } else if (task.status === "completed") {
+        actions = `<span class="task-state completed">✅ Approved</span>`;
+      }
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:700;">${task.title}</div>
+          <div class="muted" style="font-size:0.85rem;">${task.description || ""}</div>
+          <div class="muted" style="font-size:.78rem;margin-top:4px;">Reward: 🪙 ${task.reward_value}</div>
+        </div>
+        <div>${actions}</div>
+      `;
+      row.querySelectorAll("button[data-review]").forEach((button) => {
+        button.onclick = async () => {
+          const decision = button.dataset.review;
+          row.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+          try { await reviewTask(task.id, decision); }
+          catch (err) { showToast(err.message); row.querySelectorAll("button").forEach((b) => { b.disabled = false; }); }
+        };
+      });
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("taskForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await api.parentAssignTask({
+      childId: selectedChildId,
+      title: document.getElementById("taskTitle").value,
+      description: document.getElementById("taskDesc").value,
+      rewardType: document.getElementById("taskRewardType").value,
+      rewardValue: Number(document.getElementById("taskRewardValue").value),
+    });
+    e.target.reset();
+    document.getElementById("taskRewardValue").value = 100;
+    showToast("✅ Task assigned!");
+    const taskRes = await api.parentTaskList(selectedChildId);
+    taskList = taskRes.tasks;
+    renderTaskList();
+  });
+
+  document.addEventListener("lq:i18n-ready", () => { if (dashboardData) renderDashboard(); });
+  document.addEventListener("lq:lang-changed", () => { if (dashboardData) renderDashboard(); });
+  loadChildren();
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" /><title>LearnQuest self-check &amp; speed test</title>
+<link rel="stylesheet" href="/css/explorer.css" />
+<style> #wrap { display:grid; grid-template-columns:minmax(320px,640px) 1fr; gap:16px; padding:16px; align-items:start; } iframe { width:100%; aspect-ratio:16/9; border:3px solid #3b2a12; border-radius:12px; background:#000; } #out table { width:100%; } #sum { font-size:18px; font-weight:800; margin:6px 0; } td.p { color:#1b7a42; font-weight:800; } td.f { color:#c0261b; font-weight:800; } td.i { color:#6b5200; font-weight:800; } @media (max-width:900px) { #wrap { grid-template-columns:1fr; } }</style><script src="/js/lq-platform.js"></script>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+<div id="wrap">
+  <div><h1>Self-check &amp; speed test</h1><p>Tests the <b>real game</b> on this computer inside the window below. It uses a private sandbox: your profile is never changed. Keep this tab visible while it runs (about 1&ndash;2 minutes).</p>
+    <div class="row"><button class="primary" id="go">Start self-check</button><button id="copy" disabled>Copy report</button><a class="btn" href="/explorer.html">&larr; Hub</a></div>
+    <iframe id="game" title="game under test"></iframe></div>
+  <div id="out"><div id="sum">Not started.</div><div id="bench"></div><table class="kv wide" id="res"></table><pre class="log" id="sys"></pre></div>
+</div>
+<script type="importmap">{ "imports": { "three": "/vendor/three/three.module.js" } }</script>
+<script type="module" src="/js/selftest.js"></script>
+</body></html>

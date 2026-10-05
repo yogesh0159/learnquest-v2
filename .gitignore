@@ -1,0 +1,23 @@
+node_modules/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+
+# --- not for GitHub ---
+# original 3D master files (328 MB): only needed to regenerate the runtime models; keep them in a backup or Git LFS
+source_assets/
+# build outputs
+site/
+mobile/www/
+mobile/node_modules/
+mobile/android/app/src/main/assets/public/
+mobile/ios/App/App/public/
+desktop/app/
+desktop/dist/
+desktop/node_modules/
+*.log

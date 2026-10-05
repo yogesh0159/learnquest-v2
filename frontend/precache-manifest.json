@@ -1,0 +1,695 @@
+{
+ "version": "a73d9bd92a51",
+ "assetsVersion": "3f57bd94ff04",
+ "shellBytes": 3227951,
+ "packBytes": 54912780,
+ "shell": [
+  {
+   "url": "/asset-gallery.html",
+   "hash": "40a441dc50c7",
+   "bytes": 3062
+  },
+  {
+   "url": "/assets/icons/apple-touch-icon.png",
+   "hash": "d2b8277c1575",
+   "bytes": 12689
+  },
+  {
+   "url": "/assets/icons/favicon-32.png",
+   "hash": "6bd73ef94a2a",
+   "bytes": 2331
+  },
+  {
+   "url": "/assets/icons/favicon.ico",
+   "hash": "b5eafac05b75",
+   "bytes": 7066
+  },
+  {
+   "url": "/assets/icons/icon-192.png",
+   "hash": "81647b70fa87",
+   "bytes": 20830
+  },
+  {
+   "url": "/assets/icons/icon-512.png",
+   "hash": "ef28fb8260f7",
+   "bytes": 57509
+  },
+  {
+   "url": "/assets/icons/icon-maskable-512.png",
+   "hash": "c4fd75648217",
+   "bytes": 37226
+  },
+  {
+   "url": "/character-lab.html",
+   "hash": "cbff266200b5",
+   "bytes": 4163
+  },
+  {
+   "url": "/child-login.html",
+   "hash": "12699ab656f1",
+   "bytes": 3388
+  },
+  {
+   "url": "/css/character-lab.css",
+   "hash": "d571afe3b6da",
+   "bytes": 5304
+  },
+  {
+   "url": "/css/components.css",
+   "hash": "48b8609a0f8b",
+   "bytes": 12024
+  },
+  {
+   "url": "/css/explorer.css",
+   "hash": "e0841180dc38",
+   "bytes": 3915
+  },
+  {
+   "url": "/css/jungle-local-preview.css",
+   "hash": "493f3544f93d",
+   "bytes": 15837
+  },
+  {
+   "url": "/css/jungle-runner.css",
+   "hash": "3d154224a67c",
+   "bytes": 10152
+  },
+  {
+   "url": "/css/realworld-missions.css",
+   "hash": "8f1e0c649325",
+   "bytes": 4761
+  },
+  {
+   "url": "/css/reference-studio.css",
+   "hash": "41cb354c6dbc",
+   "bytes": 4928
+  },
+  {
+   "url": "/css/tokens.css",
+   "hash": "31137f704c4b",
+   "bytes": 2975
+  },
+  {
+   "url": "/dashboard.html",
+   "hash": "b30ef0d573a8",
+   "bytes": 6287
+  },
+  {
+   "url": "/explorer.html",
+   "hash": "459d04381b7f",
+   "bytes": 9703
+  },
+  {
+   "url": "/index.html",
+   "hash": "b32a4e4682f7",
+   "bytes": 4315
+  },
+  {
+   "url": "/js/api.js",
+   "hash": "0232ce3b9ec9",
+   "bytes": 5021
+  },
+  {
+   "url": "/js/asset-gallery.js",
+   "hash": "502fc0d1ffd2",
+   "bytes": 8609
+  },
+  {
+   "url": "/js/character-lab.js",
+   "hash": "34af68e6359c",
+   "bytes": 9657
+  },
+  {
+   "url": "/js/character-presets.js",
+   "hash": "812db37d35cb",
+   "bytes": 1372
+  },
+  {
+   "url": "/js/explorer.js",
+   "hash": "5e7f2c83cdce",
+   "bytes": 25674
+  },
+  {
+   "url": "/js/game/character-controller.js",
+   "hash": "93ba24d6f796",
+   "bytes": 10504
+  },
+  {
+   "url": "/js/game/core/asset-manager.js",
+   "hash": "b4a0625feddf",
+   "bytes": 722
+  },
+  {
+   "url": "/js/game/core/collision-system.js",
+   "hash": "c09dfffef391",
+   "bytes": 1637
+  },
+  {
+   "url": "/js/game/core/game-loop.js",
+   "hash": "d13297b45376",
+   "bytes": 1030
+  },
+  {
+   "url": "/js/game/core/input-controller.js",
+   "hash": "f47c9b6a88aa",
+   "bytes": 2909
+  },
+  {
+   "url": "/js/game/core/learning-focus.js",
+   "hash": "815b15d59656",
+   "bytes": 2713
+  },
+  {
+   "url": "/js/game/core/package.json",
+   "hash": "50faeb965b15",
+   "bytes": 23
+  },
+  {
+   "url": "/js/game/core/performance-manager.js",
+   "hash": "250d45875749",
+   "bytes": 5202
+  },
+  {
+   "url": "/js/game/core/reward-system.js",
+   "hash": "38815659c120",
+   "bytes": 599
+  },
+  {
+   "url": "/js/game/jungle-run/achievements.js",
+   "hash": "f0c449ab37ce",
+   "bytes": 2270
+  },
+  {
+   "url": "/js/game/jungle-run/adaptive-resolution.js",
+   "hash": "bb2cb9486926",
+   "bytes": 2851
+  },
+  {
+   "url": "/js/game/jungle-run/animation-aliases.js",
+   "hash": "2bf0feb56b9b",
+   "bytes": 3258
+  },
+  {
+   "url": "/js/game/jungle-run/animation-controller.js",
+   "hash": "bffe85bc7cf1",
+   "bytes": 7451
+  },
+  {
+   "url": "/js/game/jungle-run/app-lifecycle.js",
+   "hash": "7fa59a42bc14",
+   "bytes": 4709
+  },
+  {
+   "url": "/js/game/jungle-run/asset-manager.js",
+   "hash": "41619927b73d",
+   "bytes": 12476
+  },
+  {
+   "url": "/js/game/jungle-run/audio-manager.js",
+   "hash": "4eaec435ab13",
+   "bytes": 7049
+  },
+  {
+   "url": "/js/game/jungle-run/biome-data.js",
+   "hash": "ef7aa34e0885",
+   "bytes": 1930
+  },
+  {
+   "url": "/js/game/jungle-run/biome-manager.js",
+   "hash": "d8cf705cea00",
+   "bytes": 4272
+  },
+  {
+   "url": "/js/game/jungle-run/camera-rig.js",
+   "hash": "7e8d237deb81",
+   "bytes": 1741
+  },
+  {
+   "url": "/js/game/jungle-run/collectible-manager.js",
+   "hash": "fbfcd6a88b34",
+   "bytes": 3932
+  },
+  {
+   "url": "/js/game/jungle-run/collision-manager.js",
+   "hash": "a2208c756438",
+   "bytes": 2324
+  },
+  {
+   "url": "/js/game/jungle-run/config.js",
+   "hash": "8ab8c41e3121",
+   "bytes": 7471
+  },
+  {
+   "url": "/js/game/jungle-run/debug-panel.js",
+   "hash": "7b3d98c4071c",
+   "bytes": 4071
+  },
+  {
+   "url": "/js/game/jungle-run/device-profile.js",
+   "hash": "ab5b3a7ad392",
+   "bytes": 9392
+  },
+  {
+   "url": "/js/game/jungle-run/environment-manager.js",
+   "hash": "dcc080fb44ac",
+   "bytes": 8709
+  },
+  {
+   "url": "/js/game/jungle-run/fx-manager.js",
+   "hash": "a69f339bbf9e",
+   "bytes": 2274
+  },
+  {
+   "url": "/js/game/jungle-run/game-manager.js",
+   "hash": "edfec3f338c0",
+   "bytes": 49470
+  },
+  {
+   "url": "/js/game/jungle-run/hud.js",
+   "hash": "6560a0f06703",
+   "bytes": 3620
+  },
+  {
+   "url": "/js/game/jungle-run/i18n.js",
+   "hash": "5b00b01aa531",
+   "bytes": 42714
+  },
+  {
+   "url": "/js/game/jungle-run/native-core.js",
+   "hash": "b67d095081a5",
+   "bytes": 4882
+  },
+  {
+   "url": "/js/game/jungle-run/native-reference.js",
+   "hash": "3042661b323a",
+   "bytes": 3925
+  },
+  {
+   "url": "/js/game/jungle-run/obstacle-manager.js",
+   "hash": "d145188a1a91",
+   "bytes": 3014
+  },
+  {
+   "url": "/js/game/jungle-run/package.json",
+   "hash": "29d143c64c00",
+   "bytes": 21
+  },
+  {
+   "url": "/js/game/jungle-run/player-controller.js",
+   "hash": "036b11a926cc",
+   "bytes": 7326
+  },
+  {
+   "url": "/js/game/jungle-run/powerup-manager.js",
+   "hash": "c888d08dbe62",
+   "bytes": 2846
+  },
+  {
+   "url": "/js/game/jungle-run/profile.js",
+   "hash": "d498bc3f755b",
+   "bytes": 4650
+  },
+  {
+   "url": "/js/game/jungle-run/question-banks.js",
+   "hash": "2b42b7eb7ba8",
+   "bytes": 2608
+  },
+  {
+   "url": "/js/game/jungle-run/question-generator.js",
+   "hash": "ff726c76f0f5",
+   "bytes": 8067
+  },
+  {
+   "url": "/js/game/jungle-run/question-i18n.js",
+   "hash": "43af63c5f08f",
+   "bytes": 1726
+  },
+  {
+   "url": "/js/game/jungle-run/question-manager.js",
+   "hash": "a44b4bab8090",
+   "bytes": 12924
+  },
+  {
+   "url": "/js/game/jungle-run/question-service.js",
+   "hash": "e9be2fec3af1",
+   "bytes": 1226
+  },
+  {
+   "url": "/js/game/jungle-run/report.js",
+   "hash": "57631c525b1c",
+   "bytes": 1947
+  },
+  {
+   "url": "/js/game/jungle-run/rng.js",
+   "hash": "3d7b5f267766",
+   "bytes": 1002
+  },
+  {
+   "url": "/js/game/jungle-run/root-motion.js",
+   "hash": "e9da567be0e7",
+   "bytes": 2608
+  },
+  {
+   "url": "/js/game/jungle-run/sound-recipes.js",
+   "hash": "030cb8a6a1b2",
+   "bytes": 9604
+  },
+  {
+   "url": "/js/game/jungle-run/spawn-director.js",
+   "hash": "5e777091e06f",
+   "bytes": 2882
+  },
+  {
+   "url": "/js/game/jungle-run/speech.js",
+   "hash": "3af7b508b710",
+   "bytes": 785
+  },
+  {
+   "url": "/js/game/jungle-run/teacher-brain.js",
+   "hash": "7ca4dbaa3698",
+   "bytes": 5204
+  },
+  {
+   "url": "/js/game/jungle-run/teacher-manager.js",
+   "hash": "227c1f5c8be7",
+   "bytes": 14669
+  },
+  {
+   "url": "/js/game/jungle-run/textures.js",
+   "hash": "d7bd7f7f419c",
+   "bytes": 2629
+  },
+  {
+   "url": "/js/game/jungle-run/track-manager.js",
+   "hash": "818cbf27b04c",
+   "bytes": 5894
+  },
+  {
+   "url": "/js/game/jungle-run/tutorial.js",
+   "hash": "98cfb82e4c16",
+   "bytes": 2299
+  },
+  {
+   "url": "/js/game/jungle/endless-path.js",
+   "hash": "d41fb9772c51",
+   "bytes": 5127
+  },
+  {
+   "url": "/js/game/jungle/gltf-cache.js",
+   "hash": "a02f387ae262",
+   "bytes": 1469
+  },
+  {
+   "url": "/js/game/jungle/jungle-config.js",
+   "hash": "a1a52db3e395",
+   "bytes": 1612
+  },
+  {
+   "url": "/js/game/jungle/package.json",
+   "hash": "29d143c64c00",
+   "bytes": 21
+  },
+  {
+   "url": "/js/game/jungle/prop-library.js",
+   "hash": "d333e56879b6",
+   "bytes": 1832
+  },
+  {
+   "url": "/js/game/learning/mission-system.js",
+   "hash": "a45d4f0df2fe",
+   "bytes": 1470
+  },
+  {
+   "url": "/js/game/reference-explorer.mjs",
+   "hash": "1080bf6b7ebc",
+   "bytes": 12724
+  },
+  {
+   "url": "/js/gate.js",
+   "hash": "a3c258b68289",
+   "bytes": 5961
+  },
+  {
+   "url": "/js/i18n.js",
+   "hash": "82c6c22f9728",
+   "bytes": 1637
+  },
+  {
+   "url": "/js/jungle-local-preview.js",
+   "hash": "0823f07496e6",
+   "bytes": 16198
+  },
+  {
+   "url": "/js/jungle-runner.js",
+   "hash": "ccb999d5dcd2",
+   "bytes": 62818
+  },
+  {
+   "url": "/js/kingdom-runner.js",
+   "hash": "74093404891f",
+   "bytes": 65165
+  },
+  {
+   "url": "/js/legacy/jungle-local-preview.legacy.js",
+   "hash": "89b15cb1d262",
+   "bytes": 6947
+  },
+  {
+   "url": "/js/lq-platform.js",
+   "hash": "9c8bf3ef4adb",
+   "bytes": 3808
+  },
+  {
+   "url": "/js/pwa.js",
+   "hash": "a102e2d1741a",
+   "bytes": 4661
+  },
+  {
+   "url": "/js/realworld-missions.js",
+   "hash": "a51c559b958e",
+   "bytes": 5801
+  },
+  {
+   "url": "/js/reference-studio.js",
+   "hash": "0b39df1222d9",
+   "bytes": 2751
+  },
+  {
+   "url": "/js/selftest.js",
+   "hash": "912fed7e4701",
+   "bytes": 20159
+  },
+  {
+   "url": "/jungle-game.html",
+   "hash": "786dc7d95c8f",
+   "bytes": 6427
+  },
+  {
+   "url": "/jungle-local-preview.html",
+   "hash": "9c47a7b639c1",
+   "bytes": 6937
+  },
+  {
+   "url": "/locales/en.json",
+   "hash": "bb724bfd88ae",
+   "bytes": 4334
+  },
+  {
+   "url": "/locales/hi.json",
+   "hash": "097b11137fc2",
+   "bytes": 7159
+  },
+  {
+   "url": "/locales/mr.json",
+   "hash": "543c1ef686cc",
+   "bytes": 7052
+  },
+  {
+   "url": "/manifest.webmanifest",
+   "hash": "fa56232f2ea6",
+   "bytes": 1267
+  },
+  {
+   "url": "/maths-kingdom-game.html",
+   "hash": "fa1aa286fba3",
+   "bytes": 7023
+  },
+  {
+   "url": "/offline.html",
+   "hash": "010ea3bf48cd",
+   "bytes": 1155
+  },
+  {
+   "url": "/parent-dashboard.html",
+   "hash": "df6af2b48bac",
+   "bytes": 17519
+  },
+  {
+   "url": "/parent.html",
+   "hash": "ef63bb2ef8d1",
+   "bytes": 5186
+  },
+  {
+   "url": "/profile-setup.html",
+   "hash": "2c44c902b4b6",
+   "bytes": 9140
+  },
+  {
+   "url": "/realworld-missions.html",
+   "hash": "80130acf3a71",
+   "bytes": 2338
+  },
+  {
+   "url": "/reference-studio.html",
+   "hash": "80ac79fb9c50",
+   "bytes": 6555
+  },
+  {
+   "url": "/rewards.html",
+   "hash": "ca46de3a2752",
+   "bytes": 4783
+  },
+  {
+   "url": "/selftest.html",
+   "hash": "c84c08a91ffb",
+   "bytes": 2183
+  },
+  {
+   "url": "/tasks.html",
+   "hash": "730ea2c8b64a",
+   "bytes": 4400
+  },
+  {
+   "url": "/wasm/lq_core.wasm",
+   "hash": "afe73d232bef",
+   "bytes": 2886
+  },
+  {
+   "url": "/world-jungle.html",
+   "hash": "582742fac854",
+   "bytes": 7247
+  },
+  {
+   "url": "/world-maths_kingdom.html",
+   "hash": "c1ec8a8850d4",
+   "bytes": 8237
+  },
+  {
+   "url": "/vendor/three-addons/environments/RoomEnvironment.js",
+   "hash": "1592f6727ae7",
+   "bytes": 4960
+  },
+  {
+   "url": "/vendor/three-addons/utils/SkeletonUtils.js",
+   "hash": "a4c7861cc81c",
+   "bytes": 11535
+  },
+  {
+   "url": "/vendor/three-addons/controls/OrbitControls.js",
+   "hash": "e4280c429014",
+   "bytes": 40504
+  },
+  {
+   "url": "/vendor/three-addons/loaders/GLTFLoader.js",
+   "hash": "f437f2763317",
+   "bytes": 114959
+  },
+  {
+   "url": "/vendor/three-addons/utils/BufferGeometryUtils.js",
+   "hash": "43c0e51cfea5",
+   "bytes": 37621
+  },
+  {
+   "url": "/vendor/three/three.module.js",
+   "hash": "56130de5030c",
+   "bytes": 650153
+  },
+  {
+   "url": "/vendor/three/three.core.js",
+   "hash": "421d56ccb3ca",
+   "bytes": 1443056
+  },
+  {
+   "url": "/",
+   "hash": "b32a4e4682f7",
+   "bytes": 4315
+  }
+ ],
+ "offlinePack": [
+  {
+   "url": "/assets/jungle/runtime/Boy_Final_Animated.rt.glb",
+   "hash": "42d2f2d18d90",
+   "bytes": 6281116
+  },
+  {
+   "url": "/assets/jungle/runtime/Bridge.lod.rt.glb",
+   "hash": "764902abf907",
+   "bytes": 1939244
+  },
+  {
+   "url": "/assets/jungle/runtime/Bridge.rt.glb",
+   "hash": "93bf0c9f2f30",
+   "bytes": 2003340
+  },
+  {
+   "url": "/assets/jungle/runtime/Coin.rt.glb",
+   "hash": "255951adc059",
+   "bytes": 329088
+  },
+  {
+   "url": "/assets/jungle/runtime/Girl_Mia_Animated.rt.glb",
+   "hash": "39f7163a604f",
+   "bytes": 21052656
+  },
+  {
+   "url": "/assets/jungle/runtime/Golden_Enigma.rt.glb",
+   "hash": "0ec33864cc7a",
+   "bytes": 1539948
+  },
+  {
+   "url": "/assets/jungle/runtime/Stone_Sanctua.lod.rt.glb",
+   "hash": "242cb037f6ab",
+   "bytes": 2376140
+  },
+  {
+   "url": "/assets/jungle/runtime/Stone_Sanctua.rt.glb",
+   "hash": "272d867fa4b3",
+   "bytes": 2477804
+  },
+  {
+   "url": "/assets/jungle/runtime/bush_cluster.lod.rt.glb",
+   "hash": "2ea9a3d37c87",
+   "bytes": 2334756
+  },
+  {
+   "url": "/assets/jungle/runtime/bush_cluster.rt.glb",
+   "hash": "4853f68dfedc",
+   "bytes": 2468772
+  },
+  {
+   "url": "/assets/jungle/runtime/jungle_temple_tourch.lod.rt.glb",
+   "hash": "f2b5c2c42023",
+   "bytes": 987044
+  },
+  {
+   "url": "/assets/jungle/runtime/jungle_temple_tourch.rt.glb",
+   "hash": "8115bcee91d4",
+   "bytes": 1078464
+  },
+  {
+   "url": "/assets/jungle/runtime/question_board.rt.glb",
+   "hash": "b59bf23c00a9",
+   "bytes": 3355192
+  },
+  {
+   "url": "/assets/jungle/runtime/tree.lod.rt.glb",
+   "hash": "bb236879827e",
+   "bytes": 3284284
+  },
+  {
+   "url": "/assets/jungle/runtime/tree.rt.glb",
+   "hash": "e4be9f1e4c43",
+   "bytes": 3404932
+  }
+ ]
+}

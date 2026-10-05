@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+<title>My Tasks — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .task-status { display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:999px;font-size:.78rem;font-weight:800;white-space:nowrap; }
+  .task-status.waiting { background:#fff4db;color:#76520d;border:1px solid #eed49c; }
+  .task-status.approved { background:#e9f7ed;color:#245d38;border:1px solid #c6e6ce; }
+  .task-note { margin-top:8px;font-size:.8rem;line-height:1.35;color:var(--muted); }
+</style>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <a class="brand" href="dashboard.html"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></a>
+    </header>
+
+    <main class="container mt-24" style="flex:1; max-width:640px; padding-bottom: 60px;">
+      <h2 data-i18n="tasks_title">My Tasks</h2>
+      <p class="muted">Finish a real-world or study task, then send it to your parent for approval. Rewards unlock only after they approve it.</p>
+      <div id="taskList"></div>
+      <p id="emptyMsg" class="muted hidden" data-i18n="tasks_empty">No tasks yet — check back soon!</p>
+    </main>
+  </div>
+
+<script src="js/i18n.js"></script>
+<script src="js/lq-platform.js"></script>
+<script src="js/api.js"></script>
+<script>
+  requireChildAuth();
+  let tasks = [];
+
+  function render() {
+    const list = document.getElementById("taskList");
+    list.innerHTML = "";
+    if (tasks.length === 0) {
+      document.getElementById("emptyMsg").classList.remove("hidden");
+      return;
+    }
+    document.getElementById("emptyMsg").classList.add("hidden");
+    tasks.forEach((task) => {
+      const row = document.createElement("div");
+      row.className = "card-flat mt-24";
+      const rewardLabel = `🪙 +${task.reward_value}`;
+      const actionHtml = task.status === "completed"
+        ? `<span class="task-status approved">✅ Parent approved</span>`
+        : task.status === "submitted"
+          ? `<span class="task-status waiting">⏳ Waiting for approval</span>`
+          : `<button class="btn btn-primary btn-sm" data-id="${task.id}">I did it — ask parent</button>`;
+      row.innerHTML = `
+        <div class="flex-between" style="gap:16px;align-items:flex-start;">
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-family:var(--font-display);">${task.title}</div>
+            <div class="muted" style="font-size:0.9rem;">${task.description || ""}</div>
+            <div style="margin-top:6px; font-weight:700; color:var(--sunbeam-deep);">${rewardLabel}</div>
+            ${task.status === "submitted" ? `<div class="task-note">Your reward is reserved until your parent confirms the task.</div>` : ""}
+          </div>
+          <div>${actionHtml}</div>
+        </div>
+      `;
+      const button = row.querySelector("button[data-id]");
+      if (button) {
+        button.onclick = async () => {
+          button.disabled = true;
+          try {
+            await api.completeTask(task.id);
+            showToast("✅ Sent to your parent for approval");
+            await load();
+          } catch (err) {
+            showToast(err.message);
+            button.disabled = false;
+          }
+        };
+      }
+      list.appendChild(row);
+    });
+  }
+
+  async function load() {
+    const res = await api.myTasks();
+    tasks = res.tasks;
+    render();
+  }
+
+  document.addEventListener("lq:i18n-ready", () => { if (tasks.length || document.readyState) load(); });
+  load();
+</script>
+</body>
+</html>

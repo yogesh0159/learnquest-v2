@@ -1,0 +1,10 @@
+LearnQuest Node 24 Upgrade - Static Verification
+
+Expected runtime: Node.js 24.x
+Expected npm: 11.x
+Backend native DB dependency: better-sqlite3 ^13.0.3
+Local Jungle preview installs Three.js only and skips backend postinstall.
+Full project helper: SETUP_FULL_PROJECT_NODE24.bat
+Jungle helper: START_JUNGLE_LOCAL.bat
+
+Static checks are run before packaging. A true Node 24 native install must be completed on the Windows machine because this build environment is not Node 24/Windows.

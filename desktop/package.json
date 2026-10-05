@@ -1,0 +1,30 @@
+{
+  "name": "learnquest-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LearnQuest Jungle Run - desktop app (Windows, macOS, Linux)",
+  "author": "LearnQuest",
+  "main": "main.js",
+  "scripts": {
+    "prepare-app": "node prepare.mjs",
+    "start": "npm run prepare-app && electron .",
+    "pack": "npm run prepare-app && electron-builder --dir",
+    "dist:win": "npm run prepare-app && electron-builder --win",
+    "dist:mac": "npm run prepare-app && electron-builder --mac",
+    "dist:linux": "npm run prepare-app && electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.learnquest.junglerun",
+    "productName": "LearnQuest Jungle Run",
+    "files": ["main.js", "preload.js", "server.js", "app/**/*", "package.json"],
+    "directories": { "output": "dist", "buildResources": "build" },
+    "win": { "target": ["nsis", "portable"], "icon": "build/icon.ico" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "mac": { "target": ["dmg", "zip"], "category": "public.app-category.education", "icon": "build/icon.icns" },
+    "linux": { "target": ["AppImage", "deb"], "category": "Education", "icon": "build/icon.png" }
+  }
+}

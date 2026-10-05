@@ -1,0 +1,69 @@
+{
+  "title": "LearnQuest reference build",
+  "reference": "learnquest-target.png",
+  "sha256": "c54721e43b536d6b2666f3194d23a83377803e5eadf6ef16cbbc8b5e4f04c319",
+  "branch": "upgrade/realworld-v1",
+  "currentArt": "prototype",
+  "milestones": [
+    {
+      "id": "M01",
+      "title": "Reference & review workspace",
+      "status": "complete",
+      "description": "Preserved target, visual analysis, comparison tools and acceptance roadmap."
+    },
+    {
+      "id": "M02",
+      "title": "Final character art",
+      "status": "in_progress",
+      "description": "Boy four-view art reference v1 created. Actual sculpted mesh, skinning and Girl art still pending."
+    },
+    {
+      "id": "M03",
+      "title": "Rigging & animation",
+      "status": "pending",
+      "description": "Smooth skinning, ten target actions, Land and polished transitions."
+    },
+    {
+      "id": "M04",
+      "title": "Jungle Run slice",
+      "status": "pending",
+      "description": "Reference camera, stone runway, foliage, ruins and arithmetic gate."
+    },
+    {
+      "id": "M05",
+      "title": "Word Bridge world",
+      "status": "pending",
+      "description": "Wood platforms, water, spelling tiles and validated progression."
+    },
+    {
+      "id": "M06",
+      "title": "Maths Kingdom slice",
+      "status": "pending",
+      "description": "Luminous castle, purple-blue atmosphere and maths challenges."
+    },
+    {
+      "id": "M07",
+      "title": "HUD, learning & victory",
+      "status": "pending",
+      "description": "Hearts, stars, parchment questions and server-confirmed Continue."
+    },
+    {
+      "id": "M08",
+      "title": "Levels, sound & polish",
+      "status": "pending",
+      "description": "Authored routes, tutorials, accessibility and original/licensed audio."
+    },
+    {
+      "id": "M09",
+      "title": "Performance & device QA",
+      "status": "pending",
+      "description": "Real-phone profiling, recovery and full gameplay tests."
+    },
+    {
+      "id": "M10",
+      "title": "Preview acceptance & release",
+      "status": "pending",
+      "description": "Reference comparisons, Railway checks, final ZIP and release review."
+    }
+  ]
+}

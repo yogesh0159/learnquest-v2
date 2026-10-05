@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#071a13">
+<title>LearnQuest Jungle Local Preview</title>
+<link rel="stylesheet" href="css/jungle-local-preview.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <div id="stage"></div>
+  <header class="hud">
+    <div>
+      <div class="eyebrow">LOCAL ONLY · JUNGLE ASSET LAB</div>
+      <h1>LearnQuest Jungle Run</h1>
+      <div class="meta"><span id="assetStatus">Loading path…</span><span>6.6m × 12m</span><span>lanes -2.2 / 0 / +2.2</span></div>
+    </div>
+    <div class="actions">
+      <button id="pauseBtn" type="button">Pause</button>
+      <button id="resetBtn" type="button">Reset camera</button>
+    </div>
+  </header>
+
+  <aside class="panel">
+    <strong>Local test controls</strong>
+    <label>Speed <input id="speed" type="range" min="0" max="18" value="8" step="0.5"><span id="speedOut">8.0 m/s</span></label>
+    <div class="lane-buttons">
+      <button data-lane="0">Left</button><button data-lane="1" class="active">Center</button><button data-lane="2">Right</button>
+    </div>
+    <p>Arrow keys / A-D change lanes. Mouse drag rotates the inspection camera. The real GLB path is recycled endlessly.</p>
+  </aside>
+
+  <div class="future-strip">
+    <span class="ready">✓ Path ready</span>
+    <span>Tree slot</span><span>Bush slot</span><span>Torch slot</span><span>Coin slot</span><span>Rock slot</span><span>Math gate slot</span>
+  </div>
+</div>
+<script type="module" src="js/jungle-local-preview.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RealWorld Missions — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/realworld-missions.css">
+</head>
+<body><div class="mission-shell">
+  <header class="mission-topbar"><a href="dashboard.html">← LearnQuest worlds</a><div class="mission-evidence" id="evidence"><span class="evidence-pill">Attempts 0</span><span class="evidence-pill">Correct 0</span><span class="evidence-pill">Mistakes 0</span></div></header>
+  <main class="mission-main">
+    <div class="mission-intro"><h1>🌍 RealWorld Missions</h1><p id="ageCopy">Choose a place, solve its real problem and watch the world respond. Learning progress is saved for your grown-up.</p></div>
+    <div class="mission-picker" id="missionPicker" aria-label="Choose a mission"></div>
+    <section class="play-area" id="playArea" aria-live="polite">
+      <div class="world-scene scene-market" id="worldScene"><div class="scene-art" id="sceneArt"></div><div class="scene-caption" id="sceneCaption">Choose a mission to begin</div></div>
+      <div class="interaction-panel" id="interactionPanel"><div class="completion"><div class="trophy">🧭</div><h2>Your next real-world challenge is waiting</h2><p>Use touch, mouse, or keys 1–3 to make choices.</p></div></div>
+    </section>
+  </main>
+</div><script src="js/api.js"></script><script type="module" src="js/realworld-missions.js"></script></body></html>

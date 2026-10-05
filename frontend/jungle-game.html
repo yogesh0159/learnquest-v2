@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+<meta name="theme-color" content="#071a13">
+<title>Jungle Runner 3D — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/jungle-runner.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/three.module.js"
+  }
+}
+</script>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+<div id="runnerApp">
+  <div id="threeHost" aria-label="3D Jungle Runner game"></div>
+
+  <div class="runner-topbar">
+    <a class="runner-back" href="world-jungle.html" aria-label="Back to Jungle World">← Back</a>
+    <div class="runner-center-hud">
+      <div class="runner-level-line">
+        <div class="runner-pill"><span id="levelBadge">🌿 Level</span></div>
+        <div class="runner-pill">🏆 <strong id="scoreHud">0</strong></div>
+        <div class="runner-pill">🪙 <strong id="coinHud">0</strong></div>
+        <div class="runner-pill">🔑 <strong id="keyHud">0</strong></div>
+        <div class="runner-pill hide-mobile">⚡ <strong id="speedHud">1.0x</strong></div>
+      </div>
+      <div class="runner-progress-wrap" aria-label="Level progress"><div id="progressBar"></div></div>
+    </div>
+    <div style="display:flex;gap:7px;">
+      <button id="soundBtn" class="runner-icon-btn" type="button" aria-label="Toggle sound">🔊</button>
+      <button id="pauseBtn" class="runner-icon-btn" type="button" aria-label="Pause game">⏸</button>
+    </div>
+  </div>
+
+  <section id="missionCard" aria-live="polite">
+    <div class="eyebrow">CURRENT MISSION</div>
+    <div id="missionText">Loading jungle mission…</div>
+    <div id="missionStats">🔑 0/0 · 🪙 0/0</div>
+  </section>
+
+  <section id="questionPanel" aria-live="assertive">
+    <div id="questionTopic">KNOWLEDGE GATE</div>
+    <div id="questionText">Choose the correct lane</div>
+    <div id="questionOptions" class="question-options"></div>
+    <div class="learning-focus-controls">
+      <strong id="thinkTimeStatus" role="status">🧠 Read &amp; think</strong>
+      <button id="readyBtn" class="ready-btn" type="button" disabled>Lock Answer &amp; Continue</button>
+    </div>
+    <div id="answerHint">Move LEFT / CENTER / RIGHT before the gate reaches you.</div>
+  </section>
+
+  <div id="comboToast">🔥 Combo x2</div>
+
+  <div id="feedbackFlash" role="status" aria-live="assertive">
+    <div class="big" id="feedbackIcon">✅</div>
+    <strong id="feedbackTitle">Correct!</strong>
+    <p id="feedbackText"></p>
+  </div>
+
+  <div id="controls" aria-label="Game controls">
+    <div class="ctrl-stack">
+      <button id="leftBtn" class="runner-ctrl" type="button" aria-label="Move left">⬅<small>LEFT</small></button>
+      <button id="jumpBtn" class="runner-ctrl primary" type="button" aria-label="Jump">⬆<small>JUMP</small></button>
+      <button id="slideBtn" class="runner-ctrl primary" type="button" aria-label="Slide">⬇<small>SLIDE</small></button>
+      <button id="rightBtn" class="runner-ctrl" type="button" aria-label="Move right">➡<small>RIGHT</small></button>
+    </div>
+  </div>
+
+  <div id="loadingBadge">🌿 Building your 3D jungle…</div>
+
+  <div id="startOverlay" class="runner-overlay">
+    <div class="runner-modal">
+      <div style="font-size:42px;">🌴🏃‍♂️💨</div>
+      <h1 id="introTitle">LearnQuest Jungle Runner</h1>
+      <p class="sub" id="introSubtitle">A fast 3-lane jungle adventure where every move matters.</p>
+      <div class="runner-modal-grid">
+        <div class="how-card"><div class="icon">⬅️➡️</div><b>Change lane</b><span>Arrow / A D / swipe</span></div>
+        <div class="how-card"><div class="icon">⬆️</div><b>Jump</b><span>Up / W / Space</span></div>
+        <div class="how-card"><div class="icon">⬇️</div><b>Slide</b><span>Down / S</span></div>
+        <div class="how-card"><div class="icon">🧠</div><b>Learn & survive</b><span>Choose answer lanes</span></div>
+      </div>
+      <div class="card-flat" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff;">
+        <b id="introMission">Mission:</b>
+        <div style="margin-top:4px;font-family:Mukta,sans-serif;opacity:.88;">Avoid logs, branches, rocks and pits. A wrong movement causes a crash unless your shield saves you. Collect keys and answer learning gates to unlock the next level.</div>
+      </div>
+      <div class="runner-action-row">
+        <button id="startBtn" class="runner-big-btn" type="button" disabled>Preparing…</button>
+        <a class="runner-big-btn secondary" href="world-jungle.html" style="display:inline-flex;align-items:center;text-decoration:none;">Back to Map</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="pauseOverlay" class="runner-overlay hidden">
+    <div class="runner-modal" style="max-width:460px;text-align:center;">
+      <div style="font-size:44px;">⏸️</div>
+      <h2>Run Paused</h2>
+      <p class="sub">Your jungle is waiting.</p>
+      <div class="runner-action-row" style="justify-content:center;">
+        <button id="resumeBtn" class="runner-big-btn" type="button">Resume Run</button>
+        <a class="runner-big-btn secondary" href="world-jungle.html" style="display:inline-flex;align-items:center;text-decoration:none;">Exit</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="runner-overlay hidden">
+    <div class="runner-modal" id="resultModal"></div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/lq-platform.js"></script>
+<script src="js/api.js"></script>
+<script src="js/character-presets.js"></script>
+<script type="module" src="js/jungle-runner.js"></script>
+</body>
+</html>

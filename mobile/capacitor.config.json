@@ -1,0 +1,13 @@
+{
+  "appId": "com.learnquest.junglerun",
+  "appName": "LearnQuest",
+  "webDir": "www",
+  "backgroundColor": "#cfeedd",
+  "server": { "androidScheme": "https", "iosScheme": "capacitor" },
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false, "backgroundColor": "#cfeedd" },
+  "ios": { "contentInset": "never", "backgroundColor": "#cfeedd", "allowsLinkPreview": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 1200, "launchAutoHide": true, "backgroundColor": "#2fbf6a", "showSpinner": false },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#2fbf6a", "overlaysWebView": true }
+  }
+}

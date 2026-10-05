@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "units": "meters",
+  "track": {
+    "width": 6.6,
+    "height": 0.4,
+    "length": 12,
+    "surfaceOffset": 0.18,
+    "lanes": [
+      -2.2,
+      0,
+      2.2
+    ]
+  },
+  "assets": [
+    {
+      "id": "path_straight_01",
+      "status": "ready",
+      "file": "path/Path_Straight_01.glb",
+      "purpose": "Primary modular straight jungle temple path"
+    },
+    {
+      "id": "tree_01",
+      "status": "pending",
+      "file": "foliage/Jungle_Tree_01.glb",
+      "purpose": "Tall path-side jungle tree"
+    },
+    {
+      "id": "bush_01",
+      "status": "pending",
+      "file": "foliage/Jungle_Bush_01.glb",
+      "purpose": "Dense path-side bush cluster"
+    },
+    {
+      "id": "plant_01",
+      "status": "pending",
+      "file": "foliage/Jungle_Plant_01.glb",
+      "purpose": "Broad leaf foreground plant"
+    },
+    {
+      "id": "torch_01",
+      "status": "pending",
+      "file": "props/Jungle_Torch_01.glb",
+      "purpose": "Temple torch / warm path light"
+    },
+    {
+      "id": "rock_01",
+      "status": "pending",
+      "file": "obstacles/Jungle_Rock_01.glb",
+      "purpose": "Mossy decorative rock / obstacle base"
+    },
+    {
+      "id": "question_coin_01",
+      "status": "pending",
+      "file": "collectibles/Question_Coin_01.glb",
+      "purpose": "Learning collectible"
+    },
+    {
+      "id": "math_gate_01",
+      "status": "pending",
+      "file": "gates/Math_Gate_01.glb",
+      "purpose": "World-space learning gate/sign frame"
+    }
+  ],
+  "futurePathVariants": [
+    "path/Path_Straight_02.glb",
+    "path/Path_Straight_03.glb",
+    "path/Path_Left_90_01.glb",
+    "path/Path_Right_90_01.glb",
+    "path/Path_Broken_01.glb",
+    "path/Path_Question_Zone_01.glb"
+  ],
+  "runtimeAssets": {
+    "dir": "assets/jungle/runtime",
+    "note": "Optimised runtime copies (WebP textures, simplified heavy meshes). Untouched originals live in learnquest/source_assets/."
+  }
+}

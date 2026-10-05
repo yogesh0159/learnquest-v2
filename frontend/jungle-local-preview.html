@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+  <title>LearnQuest Jungle Run - Local 3D</title>
+  <link rel="stylesheet" href="/css/jungle-local-preview.css" />
+  <script type="importmap">{ "imports": { "three": "/vendor/three/three.module.js" } }</script>
+<script src="/js/lq-platform.js"></script>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+  <canvas id="scene" aria-label="LearnQuest Jungle Run 3D view"></canvas>
+
+  <div id="speedLines" aria-hidden="true"></div>
+  <div id="hud" hidden>
+    <div class="chips">
+      <div class="chip score"><span class="lbl" data-i18n="hud.score">Score</span><b id="hudScore">0</b></div>
+      <div class="chip"><span class="ico coin"></span><b id="hudCoins">0</b></div>
+      <div class="chip"><span class="ico enigma"></span><b id="hudTokens">0</b></div>
+      <div class="chip"><span class="lbl" data-i18n="hud.distance">Distance</span><b id="hudDistance">0 m</b></div>
+      <div class="chip hearts" id="hudHearts" aria-label="Lives"></div>
+      <div class="chip combo" id="hudCombo" hidden></div>
+      <div class="chip streak" id="hudStreak" hidden></div>
+      <div class="chip multi" id="hudMulti" hidden></div>
+    </div>
+    <button id="pauseBtn" class="round" aria-label="Pause">II</button>
+    <div id="hudPower" hidden></div>
+    <div id="coach" hidden><span id="coachStep"></span><b id="coachText"></b><button id="coachSkip" data-i18n="coach.skip">Skip</button></div>
+    <div id="touchPad" aria-label="Touch controls"><button id="tLeft" aria-label="Left">&#9664;</button><button id="tRight" aria-label="Right">&#9654;</button><button id="tJump" aria-label="Jump">&#11014;</button><button id="tSlide" aria-label="Slide">&#11015;</button></div>
+    <div id="questionBanner" hidden><span class="qlbl" data-i18n="q.label">Question</span><span id="questionText"></span><span class="qhint" data-i18n="q.hint">Run through the lane with the answer!</span></div>
+    <div id="toast" class="toast" hidden></div>
+    <div class="hint" data-i18n="hint.keys">&larr; &rarr; / A D: lanes &nbsp; &uarr; / W / Space: jump &nbsp; &darr; / S: slide &nbsp; P: pause &nbsp; M: sound &nbsp; F2: lab</div>
+  </div>
+
+  <section id="loadingScreen" class="screen">
+    <div class="card"><h1 data-i18n="load.title">LearnQuest Jungle Run</h1><div class="bar"><i id="loadBar"></i></div><p id="loadText">Loading assets...</p><pre id="loadDevice"></pre></div>
+  </section>
+
+  <section id="menuScreen" class="screen" hidden>
+    <div class="card">
+      <h1 data-i18n="menu.title">Jungle Run</h1><p data-i18n="menu.sub">Collect coins, answer the questions by running through the right lane!</p>
+      <div class="picker langrow" id="langRow" aria-label="Language"><button class="choice" data-lang="en">English</button><button class="choice" data-lang="hi">हिन्दी</button><button class="choice" data-lang="mr">मराठी</button></div>
+      <p id="menuStats" class="stat"></p>
+      <p id="qualityBadge" class="stat"></p>
+      <div class="picker"><button class="choice" data-character="boy" data-i18n="menu.boy">Boy explorer</button><button class="choice" data-character="girl" data-i18n="menu.girl">Girl explorer</button></div>
+      <button id="playBtn" class="primary" data-i18n="menu.play">Play</button>
+      <details id="settingsBox"><summary data-i18n="menu.settings">Settings &amp; rewards</summary><div id="settingsBody"></div></details>
+      <p class="small"><span data-i18n="menu.enter">Press Enter to start</span> &middot; <a href="#" id="labBtn" data-i18n="menu.lab">Lab view</a></p>
+    </div>
+  </section>
+
+  <section id="pauseScreen" class="screen" hidden><div class="card"><h1 data-i18n="pause.title">Paused</h1><button id="resumeBtn" class="primary" data-i18n="pause.resume">Resume</button></div></section>
+
+  <section id="gameOverScreen" class="screen" hidden>
+    <div class="card"><h1 data-i18n="over.title">Great run!</h1><div id="overStats" class="stats"></div><div id="overAch"></div><div id="overReview"></div><button id="againBtn" class="primary" data-i18n="over.again">Play again</button><p class="small" data-i18n="over.enter">Press Enter to restart</p></div>
+  </section>
+
+  <section id="errorBox" class="screen error" hidden><div class="card"><h1>Something went wrong</h1><pre id="errorText"></pre><p class="small">Open the browser console (F12) for details.</p></div></section>
+
+  <aside id="labPanel">
+    <div class="labrow"><b>Lab</b><button id="labClose">Close (F2)</button></div>
+    <details open id="labCharBox"><summary>Characters &amp; animations</summary>
+      <div id="labChars" class="labrow"></div>
+      <label>Animation <select id="labClip"></select></label>
+      <div class="labrow"><button id="labPlayClip">Play</button><button id="labStopClip">Back to idle</button><label><input type="checkbox" id="labLoop" checked /> loop</label></div>
+      <label>Clip speed <input id="labClipSpeed" type="range" min="0.2" max="2.5" step="0.1" value="1" /> <span id="labClipSpeedVal">x1.0</span></label>
+      <label><input type="checkbox" id="labOrigRoot" /> original root motion (shows the drift removed for gameplay)</label>
+      <div class="labrow">View: <button data-view="front">Front</button><button data-view="back">Back</button><button data-view="side">Side</button><button data-view="top">Top</button></div>
+      <pre id="labRig"></pre>
+    </details>
+    <details><summary>World &amp; audio</summary>
+      <label>Speed <input id="labSpeed" type="range" min="0.2" max="2" step="0.1" value="1" /> <span id="labSpeedVal">x1.0</span></label>
+      <label>Quality <select id="labQuality"><option value="high">high</option><option value="balanced">balanced</option><option value="low">low</option></select></label>
+      <label>Music <input id="labMusic" type="range" min="0" max="1" step="0.05" value="0.55" /></label>
+      <label>Effects <input id="labSfx" type="range" min="0" max="1" step="0.05" value="0.9" /></label>
+    </details>
+    <div id="labStats"></div>
+  </aside>
+  <div id="printReport"></div>
+  <button id="fsBtn" class="round sound" aria-label="Fullscreen" title="Fullscreen" hidden>&#x26F6;</button>
+  <button id="soundBtn" class="round sound" aria-label="Sound on/off (M)" title="Sound on/off (M)">&#128266;</button>
+  <script type="module" src="/js/jungle-local-preview.js"></script>
+</body>
+</html>

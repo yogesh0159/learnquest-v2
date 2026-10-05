@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+<title>Jungle Runner Map — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  body { background:#edf6e9; }
+  .jungle-bg { min-height:calc(100vh - 76px); background:radial-gradient(circle at 50% 0,#dff4d4 0,#eef5df 36%,#fff7e7 100%); padding-bottom:60px; }
+  .hero { padding:26px 16px 12px; text-align:center; }
+  .hero h1 { margin:0; font-size:clamp(28px,5vw,46px); }
+  .hero p { margin:7px auto 0; max-width:680px; color:var(--muted); }
+  .runner-badge { display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:#143f31;color:#fff;font-weight:800;font-size:.82rem;margin-bottom:8px; }
+  .map-shell { max-width:940px; margin:0 auto; padding:0 18px; }
+  .level-list { display:grid; gap:12px; position:relative; }
+  .level-list::before { content:""; position:absolute; left:34px; top:35px; bottom:35px; width:5px; border-radius:999px; background:linear-gradient(#65b77d,#e7bd69,#c4634f); opacity:.45; }
+  .level-card { position:relative; display:grid; grid-template-columns:70px 1fr auto; gap:14px; align-items:center; padding:14px 16px 14px 10px; border-radius:22px; background:rgba(255,255,255,.88); border:1px solid rgba(27,76,55,.12); box-shadow:0 8px 20px rgba(50,74,56,.08); }
+  .level-card.locked { filter:saturate(.5); opacity:.68; }
+  .level-card.boss { background:linear-gradient(135deg,#fff0dd,#fde5dc); border-color:rgba(192,72,49,.24); }
+  .node { z-index:2; width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:#fff;border:3px solid #cbd6ca;font-size:1.4rem;font-weight:900;box-shadow:0 6px 0 rgba(28,69,49,.12); }
+  .completed .node { border-color:#3ca36b;background:#e7f7ec; }
+  .unlocked .node { border-color:#f0b94d;background:#fff7d8; }
+  .boss .node { border-color:#df654e;background:#ffeae5; }
+  .level-main { min-width:0; }
+  .level-title { font-size:1.1rem;font-weight:900;line-height:1.1; }
+  .level-meta { display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;font-size:.78rem;color:var(--muted); }
+  .stars { letter-spacing:1px;color:#e3a51e;font-weight:900; }
+  .play-btn { min-width:116px; min-height:44px; border:none;border-radius:15px;padding:0 14px;background:#174f3c;color:#fff;font:800 .9rem "Baloo 2";cursor:pointer; }
+  .play-btn:hover { transform:translateY(-1px); }
+  .play-btn:disabled { background:#a7aaa4;cursor:not-allowed; }
+  .legend { display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0 18px;font-size:.8rem; }
+  .legend span { display:inline-flex;align-items:center;gap:5px; }
+  .dot { width:11px;height:11px;border-radius:50%;display:inline-block; }
+  @media(max-width:650px){ .level-card{grid-template-columns:58px 1fr;}.node{width:48px;height:48px}.play-btn{grid-column:2;width:100%;}.level-list::before{left:31px}.hero{padding-top:18px} }
+</style>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+<div class="screen">
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></a>
+    <div class="lang-switch"><button data-lang="en">EN</button><button data-lang="hi">हि</button><button data-lang="mr">मर</button></div>
+  </header>
+  <main class="jungle-bg">
+    <section class="hero">
+      <div class="runner-badge">🎮 THREE.JS 3D RUNNER</div>
+      <h1>🌳 Jungle Runner Adventure</h1>
+      <p>Auto-run through a 3-lane jungle trail. Dodge, jump, slide, collect keys and choose the correct learning lane before the gate reaches you.</p>
+    </section>
+    <div class="legend"><span><i class="dot" style="background:#3ca36b"></i>Completed</span><span><i class="dot" style="background:#f0b94d"></i>Ready</span><span><i class="dot" style="background:#aaa"></i>Locked</span><span><i class="dot" style="background:#df654e"></i>Boss</span></div>
+    <div class="map-shell"><div id="levelList" class="level-list"></div></div>
+  </main>
+</div>
+<script src="js/i18n.js"></script>
+<script src="js/lq-platform.js"></script>
+<script src="js/api.js"></script>
+<script>
+requireChildAuth();
+let state=null;
+const missions={
+  1:"Runner tutorial · 1 key · Maths gates",2:"Coconut dodge · 2 keys · Maths gates",3:"River trail · 2 keys · English gates",4:"Ruins traps · 3 keys · GK gates",5:"Waterfall speed-up · 3 keys · Maths gates",6:"Vine bridge · slide focus · English gates",7:"Dark cave hazards · GK gates",8:"Mountain rocks · Maths gates",9:"Temple traps · English gates",10:"Jungle Guardian boss · 8 gates"
+};
+function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+function render(){
+  const list=document.getElementById("levelList"); list.innerHTML="";
+  state.jungleLevels.forEach(level=>{
+    const locked=level.status==="locked", completed=level.status==="completed", boss=Number(level.is_boss||0)===1;
+    const stars=level.best_stars?"⭐".repeat(level.best_stars)+"☆".repeat(3-level.best_stars):"☆☆☆";
+    const card=document.createElement("article");card.className=`level-card ${locked?"locked":completed?"completed":"unlocked"} ${boss?"boss":""}`;
+    const name=level[`name_${getLang()}`]||level.name_en;
+    card.innerHTML=`
+      <div class="node">${locked?"🔒":boss?"🐯":level.level_number}</div>
+      <div class="level-main"><div class="level-title">${esc(name)}</div><div class="level-meta"><span>${esc(missions[level.level_number]||"Jungle mission")}</span><span class="stars">${stars}</span>${level.best_score?`<span>🏆 ${level.best_score}</span>`:""}${level.best_accuracy?`<span>🧠 ${level.best_accuracy}%</span>`:""}</div></div>
+      <button class="play-btn" ${locked?"disabled":""}>${locked?"Locked":completed?"Run Again":"Start Run"}</button>`;
+    const btn=card.querySelector("button");if(!locked)btn.onclick=()=>location.href=`jungle-game.html?level=${encodeURIComponent(level.id)}`;
+    list.appendChild(card);
+  });
+}
+async function load(){try{state=await api.childMe();render();}catch(e){document.getElementById("levelList").innerHTML=`<div class="card"><h3>Could not load Jungle World</h3><p>${esc(e.message)}</p><a class="btn btn-primary" href="dashboard.html">Back</a></div>`;}}
+document.addEventListener("lq:i18n-ready",()=>state&&render());document.addEventListener("lq:lang-changed",async()=>{try{await api.childUpdate({language:getLang()});}catch(e){}load();});load();
+</script>
+</body>
+</html>

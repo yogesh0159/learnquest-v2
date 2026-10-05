@@ -1,0 +1,19 @@
+TEST EVERYTHING: double-click START_EXPLORER_ALL.bat  ->  Explorer Hub opens (see EXPLORER_GUIDE.md)
+LearnQuest Jungle Run 3D - local quick start (Windows, Node.js 24)
+
+1. Extract the ZIP anywhere.
+2. Open  LearnQuest_Jungle_Local_Node24_WindowsFix_v3\learnquest
+3. Double-click  START_JUNGLE_LOCAL.bat
+   - checks Node (24 or newer), installs Three.js only if it is missing
+   - starts the local server and opens http://127.0.0.1:5177/jungle-local-preview.html
+   - keep the black window open while you play (Ctrl+C stops it)
+4. Press Enter / Play.  Controls: arrows or A/D = lanes, Up/W/Space = jump, Down/S = slide, P = pause, M = sound on/off, F2 = lab view.
+
+In the menu: open 'Settings & rewards' to pick Grade, Subjects, read-aloud, trail and see achievements.
+First run: a short tutorial teaches the controls (Skip button available). On phones/tablets use the on-screen buttons or swipe.
+Parents: Settings & rewards -> Progress report (Print / save report).
+Lab view (F2): choose Boy / Girl, play any animation clip, switch camera views.
+
+Slow computer?  Use  ...jungle-local-preview.html?quality=low   or   ?character=boy
+Another port?   set JUNGLE_PORT=5178  before running the BAT.
+Reports: IMPLEMENTATION_REPORT.md, ASSET_INVENTORY.md, TEST_REPORT.md

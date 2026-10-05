@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .greeting-row { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+  .avatar-circle {
+    width: 60px; height: 60px; border-radius: 50%; background: var(--leaf-light);
+    display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+    box-shadow: var(--shadow-pop);
+  }
+  .quick-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <div class="brand"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="lang-switch">
+          <button data-lang="en">EN</button>
+          <button data-lang="hi">हि</button>
+          <button data-lang="mr">मर</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn" data-i18n="dashboard_logout">Log Out</button>
+      </div>
+    </header>
+
+    <main class="container mt-24" style="flex:1; padding-bottom: 60px;">
+      <div class="greeting-row">
+        <div class="avatar-circle" id="avatarCircle">🧒🏽</div>
+        <div>
+          <h2 id="greeting" style="margin-bottom:2px;">Hi!</h2>
+          <div class="stat-row" id="statRow"></div>
+        </div>
+      </div>
+
+      <div class="quick-links">
+        <a class="btn btn-primary btn-sm" href="realworld-missions.html">🌍 RealWorld Missions</a>
+        <a class="btn btn-ghost btn-sm" href="rewards.html">🎁 <span data-i18n="dashboard_rewards_link">Reward Shop</span></a>
+        <a class="btn btn-ghost btn-sm" href="tasks.html">✅ <span data-i18n="dashboard_tasks_link">My Tasks</span></a>
+      </div>
+
+      <h3 class="mt-32" data-i18n="dashboard_worlds_title">Choose Your World</h3>
+      <div class="world-grid" id="worldGrid"></div>
+    </main>
+  </div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/character-presets.js"></script>
+<script>
+  requireChildAuth();
+
+  document.getElementById("logoutBtn").onclick = () => { clearSession(); window.location.href = "index.html"; };
+
+  let state = null;
+
+  function render() {
+    if (!state) return;
+    const c = state.child;
+    document.getElementById("avatarCircle").textContent = window.LQCharacters ? LQCharacters.icon(c.avatar) : c.avatar;
+    document.getElementById("greeting").textContent = t("dashboard_greeting", { name: c.name });
+    document.getElementById("statRow").innerHTML = `
+      <div class="stat-pill xp"><span class="icon">⭐</span>${c.xp} ${t("dashboard_xp")}</div>
+      <div class="stat-pill coins"><span class="icon">🪙</span>${c.coins} ${t("dashboard_coins")}</div>
+      <div class="stat-pill"><span class="icon">🏆</span>${t("dashboard_level")} ${c.overall_level}</div>
+      <div class="stat-pill streak"><span class="icon">🔥</span>${c.streak_count} ${t("dashboard_streak")}</div>
+    `;
+
+    const grid = document.getElementById("worldGrid");
+    grid.innerHTML = "";
+    state.worlds.forEach((w) => {
+      const implemented = Number(w.is_active || 0) === 1;
+      const unlocked = Number(w.is_unlocked || 0) === 1;
+      const playable = implemented && unlocked;
+      const div = document.createElement("div");
+      div.className = `world-card ${playable ? w.id : implemented ? "world-locked" : "locked"}`;
+      const total = Number(w.total_levels || 0);
+      const done = Number(w.completed_levels || 0);
+      const percent = total ? Math.round((done / total) * 100) : 0;
+      const lang = getLang();
+      const unlockCopy = lang === "hi"
+        ? "🌳 Jungle Guardian को हराकर unlock करें"
+        : lang === "mr"
+          ? "🌳 Jungle Guardian हरवून unlock करा"
+          : "🌳 Defeat the Jungle Guardian to unlock";
+      const badge = playable
+        ? t("dashboard_enter_world")
+        : implemented
+          ? unlockCopy
+          : t("dashboard_coming_soon");
+      div.innerHTML = `
+        <div class="emoji">${w.emoji}</div>
+        <h3>${w[`name_${lang}`] || w.name_en}</h3>
+        <div class="badge">${badge}</div>
+        ${implemented && total ? `<div class="world-progress">${done}/${total} levels complete<div class="world-progress-track"><div class="world-progress-fill" style="width:${percent}%"></div></div></div>` : ""}
+      `;
+      if (playable) {
+        div.setAttribute("role", "link");
+        div.tabIndex = 0;
+        div.onclick = () => window.location.href = `world-${w.id}.html`;
+        div.onkeydown = (event) => { if (event.key === "Enter" || event.key === " ") div.click(); };
+      }
+      grid.appendChild(div);
+    });
+  }
+
+  async function load() {
+    try {
+      state = await api.childMe();
+      render();
+    } catch (err) {
+      document.getElementById("worldGrid").innerHTML = `<div class="card"><h3>Could not load game worlds</h3><p class="error-text">${err.message}</p><button class="btn btn-primary" onclick="location.reload()">Retry</button></div>`;
+    }
+  }
+
+  document.addEventListener("lq:i18n-ready", () => { if (state) render(); });
+  document.addEventListener("lq:lang-changed", async () => {
+    try { await api.childUpdate({ language: getLang() }); } catch (e) {}
+    load();
+  });
+
+  load();
+</script>
+</body>
+</html>

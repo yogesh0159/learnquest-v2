@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+  <title>LearnQuest Explorer Hub - test everything</title>
+  <link rel="stylesheet" href="/css/explorer.css" />
+  <script type="importmap">{ "imports": { "three": "/vendor/three/three.module.js" } }</script>
+<script src="/js/lq-platform.js"></script>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+<header>
+  <h1>LearnQuest Explorer Hub</h1>
+  <p>One place to open, test and inspect <b>everything</b> on this computer. Nothing here is sent anywhere.</p>
+  <div id="badges"><span class="badge" id="bServer">server...</span><span class="badge" id="bApi">backend...</span><span class="badge" id="bGpu">graphics...</span><span class="badge" id="bProfile">profile...</span></div>
+  <nav id="tabs"></nav>
+</header>
+<main>
+
+<section data-tab="Start here" id="tab-start">
+  <h2>All pages</h2>
+  <p class="note" id="startNote"></p>
+  <div id="pageGrid" class="grid"></div>
+</section>
+
+<section data-tab="Demo accounts" id="tab-accounts">
+  <h2>Parent &amp; child accounts</h2>
+  <p>Creates a ready-made family through the real sign-up API (safe to press again), then signs you in with one click.</p>
+  <div class="row"><button class="primary" id="mkFamily">Create / repair demo family</button><button id="signOut">Sign out</button></div>
+  <pre id="famLog" class="log">Not run yet.</pre>
+  <div id="famLinks" class="row"></div>
+  <table class="kv" id="creds"><tr><th>Parent</th><td>demo.parent@learnquest.local &nbsp;/&nbsp; Demo@1234</td></tr><tr><th>Children (PIN 1234)</th><td>Aarav (8) &middot; Mia (5) &middot; Riya (11)</td></tr></table>
+</section>
+
+<section data-tab="Jungle Run" id="tab-run">
+  <h2>Open Jungle Run with the settings you want to test</h2>
+  <div class="form">
+    <label>Explorer <select id="rChar"><option value="">saved choice</option><option>boy</option><option>girl</option></select></label>
+    <label>Language <select id="rLang"><option value="">saved / browser</option><option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option></select></label>
+    <label>Graphics <select id="rQual"><option value="">automatic</option><option>high</option><option>balanced</option><option>low</option></select></label>
+    <label>Grade <select id="rGrade"><option value="">saved</option><option>1</option><option>2</option><option>3</option></select></label>
+    <label>Subjects <select id="rSubj"><option value="">saved</option><option value="math">Math</option><option value="patterns">Patterns</option><option value="spelling">Spelling</option><option value="science">Science</option><option value="shapes">Shapes</option><option value="math,patterns,spelling,science,shapes">All five</option></select></label>
+    <label>Start world <select id="rBiome"><option value="0">Sunny Jungle</option><option value="600">Golden Sunset</option><option value="1200">Firefly Night</option><option value="1800">Misty Dawn</option></select></label>
+    <label>Lives <select id="rLives"><option value="">3</option><option>5</option><option>9</option></select></label>
+    <label class="chk"><input type="checkbox" id="rTools" checked /> test tools panel (F9)</label>
+    <label class="chk"><input type="checkbox" id="rGod" /> god mode</label>
+    <label class="chk"><input type="checkbox" id="rTut" /> force first-run tutorial</label>
+    <label class="chk"><input type="checkbox" id="rTouch" /> touch buttons</label>
+    <label class="chk"><input type="checkbox" id="rLab" /> open Lab view</label>
+  </div>
+  <div class="row"><a class="btn primary" id="rGo" target="_blank" href="#">Open Jungle Run &#8599;</a><code id="rUrl"></code></div>
+  <h3>Keys inside the game</h3>
+  <p class="keys"><kbd>F9</kbd> test tools &nbsp; <kbd>F2</kbd> Lab (characters &amp; animations) &nbsp; <kbd>M</kbd> sound &nbsp; <kbd>P</kbd> pause &nbsp; <kbd>&larr;</kbd><kbd>&rarr;</kbd> lanes &nbsp; <kbd>&uarr;</kbd>/<kbd>Space</kbd> jump &nbsp; <kbd>&darr;</kbd> slide</p>
+</section>
+
+<section data-tab="Profile" id="tab-profile">
+  <h2>Player profile (this browser)</h2>
+  <p>This is exactly what the game saves. Edit it, unlock everything, or start fresh &mdash; then open the game to see the effect.</p>
+  <div class="row"><button class="primary" id="pSave">Save changes</button><button id="pUnlock">Unlock everything</button><button id="pFresh" class="danger">Fresh new player</button><button id="pExport">Export JSON</button><label class="btn">Import JSON<input type="file" id="pImport" accept=".json" hidden /></label></div>
+  <div class="form" id="pForm"></div>
+  <h3>Achievements <small>(click to lock / unlock)</small></h3><div id="pAch" class="grid small"></div>
+  <h3>Progress report</h3><div id="pReport"></div>
+  <h3>Everything stored by LearnQuest in this browser</h3><pre id="pRaw" class="log"></pre>
+</section>
+
+<section data-tab="Sound" id="tab-sound">
+  <h2>Sound board</h2>
+  <p>Click any button (the first click unlocks audio in your browser).</p>
+  <div id="sfxGrid" class="grid small"></div>
+  <h3>Music</h3>
+  <div class="form"><label>Mood <select id="mMood"><option>run</option><option>quiz</option></select></label><label>Tempo <input type="range" id="mBpm" min="90" max="130" value="108" /> <span id="mBpmV">108</span> bpm</label><label>Music volume <input type="range" id="mVol" min="0" max="1" step="0.05" value="0.55" /></label><label>Effects volume <input type="range" id="sVol" min="0" max="1" step="0.05" value="0.9" /></label></div>
+  <div class="row"><button class="primary" id="mPlay">Play music</button><button id="mStop">Stop</button></div>
+</section>
+
+<section data-tab="Questions" id="tab-questions">
+  <h2>Question lab</h2>
+  <div class="form"><label>Subject <select id="qSubj"></select></label><label>Grade <select id="qGrade"><option>1</option><option>2</option><option>3</option></select></label><label>Right answers so far <input type="number" id="qProg" value="0" min="0" max="40" /></label><label>How many <input type="number" id="qN" value="12" min="1" max="60" /></label></div>
+  <div class="row"><button class="primary" id="qGo">Generate</button><span id="qInfo"></span></div>
+  <table class="kv wide" id="qTable"></table>
+</section>
+
+<section data-tab="Device" id="tab-device">
+  <h2>This device &amp; automatic quality</h2>
+  <p>The game analyses the device (graphics card, memory, CPU, screen size, refresh rate), tests the real game at 4K / 2K / Full HD / HD / minimal, and keeps the best level that stays smooth. Result is remembered for this exact device.</p>
+  <div class="row"><button class="primary" id="devRun">Analyse now</button><button id="devClear" class="danger">Forget the saved result (re-test at next start)</button></div>
+  <table class="kv" id="devTable"></table><pre class="log" id="devReasons"></pre>
+</section>
+
+<section data-tab="Backend engine" id="tab-engine">
+  <h2>Game engine on the server (Python / JavaScript)</h2>
+  <p>The backend runs the same engine as the game: it can re-create any question from a seed, check an answer without trusting the browser, and analyse a device. A Python worker is used when Python is installed and passes its self-test; otherwise JavaScript answers (identical results).</p>
+  <div class="row"><button class="primary" id="enStatus">Engine status</button><button id="enDevice">Analyse THIS device on the server</button><button id="enBench">Speed: JavaScript vs Python</button></div>
+  <table class="kv" id="enTable"></table>
+  <h3>Questions made and checked by the server</h3>
+  <div class="form"><label>Subject <select id="enSubj"></select></label><label>Level <select id="enLevel"><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>Seed <input type="number" id="enSeed" value="42"></label></div>
+  <div class="row"><button id="enQs">Get 5 questions</button><span id="enMsg"></span></div>
+  <div id="enQuestions"></div>
+</section>
+
+<section data-tab="3D assets" id="tab-assets">
+  <h2>3D asset gallery &amp; characters</h2>
+  <p>Every model used by the game, runtime copy and original source side by side, with animation clips.</p>
+  <div class="row"><a class="btn primary" href="/asset-gallery.html" target="_blank">Open 3D gallery &#8599;</a><a class="btn" href="/jungle-local-preview.html?lab=1&tools=1" target="_blank">Characters &amp; animations (Lab) &#8599;</a><a class="btn" href="/character-lab.html" target="_blank">Original 3D Explorer Lab &#8599;</a></div>
+</section>
+
+<section data-tab="Self-check" id="tab-check">
+  <h2>Self-check &amp; speed test</h2>
+  <p>Runs about 25 automatic checks of the real game on <b>your</b> computer and measures real frame rate for each graphics level. It uses a private sandbox: your profile is not touched.</p>
+  <div class="row"><a class="btn primary" href="/selftest.html" target="_blank">Open self-check &#8599;</a></div>
+</section>
+
+<section data-tab="Documents" id="tab-docs">
+  <h2>Documents</h2>
+  <div class="row" id="docBtns"></div><pre id="docView" class="log tall">Pick a document.</pre>
+</section>
+
+</main>
+<script type="module" src="/js/explorer.js"></script>
+</body>
+</html>

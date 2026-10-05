@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#071a13">
+<title>3D Explorer Lab — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/character-lab.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div class="lab-shell">
+  <header class="lab-topbar">
+    <a class="brand" href="profile-setup.html"><span class="leaf-badge">LQ</span><span>LearnQuest</span></a>
+    <a class="btn btn-ghost btn-sm" href="profile-setup.html">← Back to Profile</a>
+  </header>
+
+  <main class="lab-layout">
+    <section class="lab-stage-card">
+      <div id="characterStage" class="lab-stage" aria-label="3D explorer preview"></div>
+      <div class="stage-badge" id="assetBadge">Loading explorer…</div>
+      <div class="stage-help">Drag to rotate · Mouse wheel / pinch to zoom</div>
+    </section>
+
+    <aside class="lab-panel">
+      <div>
+        <div class="eyebrow">LEARNQUEST EXPLORERS</div>
+        <h1>3D Explorer Lab</h1>
+        <p><a href="reference-studio.html">Target reference &amp; development roadmap ↗</a></p>
+        <p class="muted">Meet your adventure companions. Explore their outfits and try every move before your next run.</p>
+      </div>
+
+      <div class="selector-grid" id="presetButtons"></div>
+
+      <div class="lab-section">
+        <h3>Animation states</h3>
+        <div class="state-grid" id="stateButtons">
+          <button type="button" data-state="idle">Idle</button>
+          <button type="button" data-state="run" >Run</button>
+          <button type="button" data-state="sprint">Sprint</button>
+          <button type="button" data-state="jump">Jump</button>
+          <button type="button" data-state="land">Land</button>
+          <button type="button" data-state="fall">Fall</button>
+          <button type="button" data-state="turnLeft">Turn left</button>
+          <button type="button" data-state="turnRight">Turn right</button>
+          <button type="button" data-state="gesture">Wave</button>
+          <button type="button" data-state="slide">Slide</button>
+          <button type="button" data-state="dodgeLeft">Dodge left</button>
+          <button type="button" data-state="dodgeRight">Dodge right</button>
+          <button type="button" data-state="hit">Hit</button>
+          <button type="button" data-state="victory">Victory</button>
+        </div>
+      </div>
+
+      <div class="lab-section lab-info">
+        <h3>Preview controls</h3>
+        <div class="view-controls"><button type="button" id="frontView">Front</button><button type="button" id="backView">Back</button><button type="button" id="rotateView" aria-pressed="false">Auto rotate</button></div>
+        <p id="clipInfo" class="muted" aria-live="polite">Loading character…</p>
+      </div>
+
+      <div class="lab-callout">
+        <strong>Ready for adventure</strong>
+        <span>Khaki explorer outfits, hiking boots and backpacks inspired by your character references. Boy wears an orange scarf; Girl has a ponytail.</span>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script src="js/character-presets.js"></script>
+<script type="module" src="js/character-lab.js"></script>
+</body>
+</html>

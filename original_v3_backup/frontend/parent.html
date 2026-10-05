@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Access — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .auth-wrap { max-width: 420px; margin: 40px auto; padding: 0 20px; width: 100%; }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></a>
+      <div class="lang-switch">
+        <button data-lang="en">EN</button>
+        <button data-lang="hi">हि</button>
+        <button data-lang="mr">मर</button>
+      </div>
+    </header>
+
+    <div class="auth-wrap">
+      <div class="card">
+        <h2 class="center" data-i18n="parent_auth_title">Parent Access</h2>
+
+        <div class="tabs">
+          <button id="tabLogin" class="active" data-i18n="parent_tab_login">Log In</button>
+          <button id="tabSignup" data-i18n="parent_tab_signup">Sign Up</button>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label data-i18n="parent_email_label">Email</label>
+            <input type="email" id="loginEmail" required>
+          </div>
+          <div class="field">
+            <label data-i18n="parent_password_label">Password</label>
+            <input type="password" id="loginPassword" required>
+          </div>
+          <div id="loginError" class="error-text hidden" data-i18n="parent_auth_error"></div>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="parent_login_button">Log In</button>
+        </form>
+
+        <form id="signupForm" class="hidden">
+          <div class="field">
+            <label data-i18n="parent_name_label">Your Name</label>
+            <input type="text" id="signupName" required>
+          </div>
+          <div class="field">
+            <label data-i18n="parent_email_label">Email</label>
+            <input type="email" id="signupEmail" required>
+          </div>
+          <div class="field">
+            <label data-i18n="parent_password_label">Password</label>
+            <input type="password" id="signupPassword" minlength="6" required>
+          </div>
+          <div id="signupError" class="error-text hidden"></div>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="parent_signup_button">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  const tabLogin = document.getElementById("tabLogin");
+  const tabSignup = document.getElementById("tabSignup");
+  const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+
+  tabLogin.onclick = () => {
+    tabLogin.classList.add("active"); tabSignup.classList.remove("active");
+    loginForm.classList.remove("hidden"); signupForm.classList.add("hidden");
+  };
+  tabSignup.onclick = () => {
+    tabSignup.classList.add("active"); tabLogin.classList.remove("active");
+    signupForm.classList.remove("hidden"); loginForm.classList.add("hidden");
+  };
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("loginError");
+    errEl.classList.add("hidden");
+    try {
+      const data = await api.parentLogin({
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value,
+      });
+      saveSession(data.token, "parent");
+      window.location.href = "parent-dashboard.html";
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove("hidden");
+    }
+  });
+
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("signupError");
+    errEl.classList.add("hidden");
+    try {
+      const data = await api.parentSignup({
+        name: document.getElementById("signupName").value,
+        email: document.getElementById("signupEmail").value,
+        password: document.getElementById("signupPassword").value,
+      });
+      saveSession(data.token, "parent");
+      window.location.href = "profile-setup.html";
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove("hidden");
+    }
+  });
+</script>
+</body>
+</html>

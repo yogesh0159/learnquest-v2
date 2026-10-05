@@ -1,0 +1,34 @@
+LEARNQUEST JUNGLE — LOCAL QUICK START (NODE 24) — v3
+
+Node requirement: Node.js 24.x
+
+JUNGLE-ONLY (recommended while building assets):
+1. Extract this ZIP fully first. Do not run the BAT from inside the ZIP preview.
+2. Open the extracted learnquest folder.
+3. Double-click START_JUNGLE_LOCAL.bat
+4. On first run it installs ONLY root Three.js with npm --ignore-scripts.
+5. It does NOT install SQLite/database/backend native packages.
+6. Keep the black command window open while testing.
+7. Browser opens:
+   http://127.0.0.1:5177/jungle-local-preview.html
+
+MANUAL FALLBACK (if the BAT is blocked by Windows policy/security software):
+Open CMD in the extracted learnquest folder and run:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run jungle:local
+Then open:
+  http://127.0.0.1:5177/jungle-local-preview.html
+
+FULL PROJECT SETUP (later, when API/database testing is needed):
+1. Double-click SETUP_FULL_PROJECT_NODE24.bat
+2. This installs root + backend dependencies and runs project checks.
+
+v3 FIX:
+- Fixed Windows BAT nested-quote/path error: "The filename, directory name, or volume label syntax is incorrect."
+- Local server now runs in the same command window.
+- Browser opener is separate and uses 127.0.0.1 for reliable Windows loopback access.
+
+Current real 3D path asset:
+frontend/assets/jungle/path/Path_Straight_01.glb
+Dimensions: 6.6m W x 0.4m H x 12m L
+Lanes: X -2.2 / 0 / +2.2

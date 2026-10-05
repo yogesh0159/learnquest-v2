@@ -1,0 +1,14 @@
+LearnQuest Jungle Local v3 launcher fix
+
+Fixed issue seen on Windows 10:
+  The filename, directory name, or volume label syntax is incorrect.
+
+Cause:
+  The previous START_JUNGLE_LOCAL.bat used nested quotes in START + CMD /K around a path.
+
+Fix:
+  - npm run jungle:local now runs directly in the current BAT window.
+  - Browser launch runs separately via PowerShell after 2 seconds.
+  - Browser target changed to 127.0.0.1:5177 for reliable local loopback.
+
+No GitHub, Railway, database, or production files are contacted by this local preview launcher.

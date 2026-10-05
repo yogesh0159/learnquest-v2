@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" />
+<title>Create Child Profile — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .wrap { max-width: 560px; margin: 30px auto 60px; padding: 0 20px; width: 100%; }
+  .success-box { text-align: center; }
+  .id-display {
+    background: var(--canopy); color: var(--white); border-radius: var(--radius-md);
+    padding: 16px; font-family: var(--font-display); font-size: 1.1rem; margin: 16px 0; word-break: break-all;
+  }
+  .character-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:8px; }
+  .character-option {
+    appearance:none; border:2px solid rgba(36,95,65,.14); background:linear-gradient(180deg,#fff,#f5fbf7);
+    border-radius:20px; padding:18px 12px; cursor:pointer; text-align:center; transition:.18s ease;
+    box-shadow:0 10px 28px rgba(20,67,45,.08); color:inherit; font:inherit;
+  }
+  .character-option:hover { transform:translateY(-2px); border-color:rgba(36,95,65,.38); }
+  .character-option.selected { border-color:var(--leaf); box-shadow:0 0 0 4px rgba(54,130,86,.12),0 12px 30px rgba(20,67,45,.12); }
+  .character-avatar { font-size:4rem; line-height:1; display:block; margin-bottom:9px; filter:drop-shadow(0 8px 8px rgba(0,0,0,.08)); }
+  .character-title { display:block; font-family:var(--font-display); font-weight:800; font-size:1.08rem; }
+  .character-note { display:block; font-size:.86rem; opacity:.68; margin-top:4px; line-height:1.25; }
+  .privacy-note { margin-top:10px; font-size:.82rem; opacity:.68; line-height:1.4; }
+  .preview-row { display:flex; justify-content:center; margin-top:12px; }
+  @media (max-width:420px) { .character-grid { gap:10px; } .character-option { padding:15px 8px; } .character-avatar { font-size:3.35rem; } }
+</style>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <a class="brand" href="parent-dashboard.html"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></a>
+      <div class="lang-switch">
+        <button data-lang="en">EN</button>
+        <button data-lang="hi">हि</button>
+        <button data-lang="mr">मर</button>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="card" id="formCard">
+        <h2 class="center" data-i18n="profile_setup_title">Create a Child Profile</h2>
+        <form id="profileForm">
+          <div class="field">
+            <label data-i18n="profile_name_label">Child's Name</label>
+            <input type="text" id="pName" required>
+          </div>
+          <div class="field">
+            <label data-i18n="profile_age_label">Age</label>
+            <input type="number" id="pAge" min="4" max="12" required>
+          </div>
+          <div class="field">
+            <label data-i18n="profile_class_label">Class (optional)</label>
+            <input type="text" id="pClass" placeholder="e.g. Class 3">
+          </div>
+          <div class="field">
+            <label data-i18n="profile_language_label">Language</label>
+            <select id="pLanguage">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="mr">मराठी (Marathi)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Choose your 3D explorer</label>
+            <div class="character-grid" id="characterGrid" role="radiogroup" aria-label="Choose boy or girl explorer"></div>
+            <input type="hidden" id="pAvatar" value="human_boy_v1">
+            <div class="preview-row"><a id="previewCharacterBtn" class="btn btn-ghost btn-sm" href="character-lab.html?character=human_boy_v1" target="_blank" rel="noopener">🎮 Preview explorer in 3D</a></div>
+            <div class="privacy-note">These are designed game characters, not uploaded photos of a real child. The 3D runner will use this choice when the RealWorld character pack is active.</div>
+          </div>
+          <div class="field">
+            <label data-i18n="profile_pin_label">Set a 4-digit PIN</label>
+            <input type="password" id="pPin" inputmode="numeric" maxlength="4" pattern="\d{4}" required>
+          </div>
+          <div id="formError" class="error-text hidden"></div>
+          <button type="submit" id="createProfileBtn" class="btn btn-primary btn-block" data-i18n="profile_save_button">Create Profile</button>
+        </form>
+      </div>
+
+      <div class="card success-box hidden" id="successCard">
+        <div style="font-size:2.6rem;" id="successAvatar">🎉</div>
+        <h2 data-i18n="profile_success">Profile created!</h2>
+        <div class="id-display">
+          <div id="successName"></div>
+          <div id="successId" style="font-size:0.9rem; opacity:0.85; margin-top:6px;"></div>
+        </div>
+        <a class="btn btn-secondary" href="parent-dashboard.html" data-i18n="parent_view_dashboard">View Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+<script src="js/i18n.js"></script>
+<script src="js/lq-platform.js"></script>
+<script src="js/api.js"></script>
+<script src="js/character-presets.js"></script>
+<script>
+  requireParentAuth();
+
+  const grid = document.getElementById("characterGrid");
+  const avatarInput = document.getElementById("pAvatar");
+  const previewCharacterBtn = document.getElementById("previewCharacterBtn");
+
+  function syncPreviewLink() {
+    previewCharacterBtn.href = `character-lab.html?character=${encodeURIComponent(avatarInput.value)}`;
+  }
+
+  function renderCharacters() {
+    grid.innerHTML = "";
+    const lang = typeof getLang === "function" ? getLang() : "en";
+    LQCharacters.presets.forEach((preset, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "character-option" + (avatarInput.value === preset.id || (!avatarInput.value && i === 0) ? " selected" : "");
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", button.classList.contains("selected") ? "true" : "false");
+      button.innerHTML = `
+        <span class="character-avatar">${preset.icon}</span>
+        <span class="character-title">${LQCharacters.label(preset.id, lang)}</span>
+        <span class="character-note">Realistic-cartoon 3D explorer</span>
+      `;
+      button.onclick = () => {
+        grid.querySelectorAll(".character-option").forEach((el) => {
+          el.classList.remove("selected");
+          el.setAttribute("aria-checked", "false");
+        });
+        button.classList.add("selected");
+        button.setAttribute("aria-checked", "true");
+        avatarInput.value = preset.id;
+        syncPreviewLink();
+      };
+      grid.appendChild(button);
+    });
+    syncPreviewLink();
+  }
+
+  renderCharacters();
+  document.addEventListener("lq:lang-changed", renderCharacters);
+
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("formError");
+    const submitBtn = document.getElementById("createProfileBtn");
+    errEl.classList.add("hidden");
+    submitBtn.disabled = true;
+    const oldLabel = submitBtn.textContent;
+    submitBtn.textContent = "Creating…";
+    try {
+      const payload = {
+        name: document.getElementById("pName").value,
+        age: Number(document.getElementById("pAge").value),
+        className: document.getElementById("pClass").value,
+        language: document.getElementById("pLanguage").value,
+        avatar: avatarInput.value,
+        pin: document.getElementById("pPin").value,
+      };
+      const data = await api.childCreate(payload);
+      const chosenIcon = LQCharacters.icon(avatarInput.value);
+      document.getElementById("formCard").classList.add("hidden");
+      document.getElementById("successCard").classList.remove("hidden");
+      document.getElementById("successAvatar").textContent = chosenIcon;
+      document.getElementById("successName").textContent = `${data.child.name} ${chosenIcon}`;
+      document.getElementById("successId").textContent = `Child ID: ${data.child.id}`;
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove("hidden");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = oldLabel;
+    }
+  });
+</script>
+</body>
+</html>

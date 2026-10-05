@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2fbf6a" />
+<meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="LearnQuest" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" /><link rel="icon" href="/assets/icons/favicon-32.png" type="image/png" /><title>LearnQuest 3D asset gallery</title>
+<link rel="stylesheet" href="/css/explorer.css" />
+<style>
+  body { overflow:hidden; } #app { display:grid; grid-template-columns:300px 1fr 280px; height:100vh; } aside { background:var(--card); overflow:auto; padding:10px; border-right:3px solid #3b2a12; } aside.info { border-right:none; border-left:3px solid #3b2a12; font-size:13px; }
+  #list button { display:block; width:100%; text-align:left; margin:3px 0; padding:4px 8px; font-size:13px; } #list h4 { margin:12px 0 2px; color:#2a6b3a; } #stage { position:relative; } #view { width:100%; height:100%; display:block; background:#6a7f8a; }
+  #prog { position:absolute; left:12px; top:12px; background:rgba(255,251,233,.92); border:2px solid #3b2a12; border-radius:10px; padding:4px 10px; font-size:13px; } #ctl { position:absolute; left:12px; bottom:12px; display:flex; gap:6px; flex-wrap:wrap; max-width:80%; } #ctl label { background:rgba(255,251,233,.92); border:2px solid #3b2a12; border-radius:10px; padding:2px 8px; font-size:13px; font-weight:700; }
+  table.kv td, table.kv th { font-size:12px; padding:3px 6px; }
+</style><script src="/js/lq-platform.js"></script>
+<script src="/js/pwa.js" defer></script>
+</head>
+<body>
+<div id="app">
+  <aside><a href="/explorer.html" class="btn">&larr; Hub</a><h3>3D models</h3><div id="list"></div></aside>
+  <div id="stage"><canvas id="view"></canvas><div id="prog">Pick a model on the left</div>
+    <div id="ctl"><label><input type="checkbox" id="oWire" /> wireframe</label><label><input type="checkbox" id="oBox" /> bounding box</label><label><input type="checkbox" id="oAxes" /> axes</label><label><input type="checkbox" id="oGrid" checked /> grid</label>
+      <label>Background <select id="oBg"><option value="#6a7f8a">grey</option><option value="#c4ead8">jungle haze</option><option value="#101c34">night</option><option value="#ffffff">white</option></select></label>
+      <label>Animation <select id="oAnim"><option value="">(none)</option></select></label><label>Speed <input type="range" id="oSpeed" min="0.1" max="2.5" step="0.1" value="1" /></label><label><input type="checkbox" id="oPause" /> pause</label></div></div>
+  <aside class="info" id="info">Select a model.</aside>
+</div>
+<script type="importmap">{ "imports": { "three": "/vendor/three/three.module.js" } }</script>
+<script type="module" src="/js/asset-gallery.js"></script>
+</body></html>

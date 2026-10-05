@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnQuest — Learn. Unlock. Adventure.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .hero {
+    position: relative;
+    padding: 40px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-emoji-row { font-size: 2.2rem; margin-bottom: 18px; letter-spacing: 8px; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); max-width: 720px; margin: 0 auto 0.4em; }
+  .hero p.sub { max-width: 520px; margin: 0 auto 28px; font-size: 1.05rem; }
+  .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .canopy-strip {
+    height: 90px;
+    background: linear-gradient(180deg, transparent, var(--canopy) 85%);
+    position: relative;
+    margin-top: -50px;
+  }
+  .features {
+    background: var(--canopy);
+    padding: 60px 24px 70px;
+  }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 22px; }
+  .feature-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-lg);
+    padding: 26px 22px;
+    color: var(--white);
+  }
+  .feature-card .emoji { font-size: 2rem; margin-bottom: 12px; }
+  .feature-card h3 { color: var(--white); }
+  .feature-card p { color: rgba(255,255,255,0.75); margin: 0; }
+  footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <header class="topbar">
+      <div class="brand"><span class="leaf-badge">🌿</span><span data-i18n="app_name">LearnQuest</span></div>
+      <div class="lang-switch">
+        <button data-lang="en">EN</button>
+        <button data-lang="hi">हि</button>
+        <button data-lang="mr">मर</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-emoji-row">🌳 🐒 🦜 🐯 🌴</div>
+      <h1 data-i18n="home_hero_title">Learn. Unlock. Adventure.</h1>
+      <p class="sub" data-i18n="home_hero_sub">Every lesson opens a new gate in the jungle.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="child-login.html" data-i18n="home_cta_child">I'm a Kid — Let's Play!</a>
+        <a class="btn btn-ghost" href="parent.html" data-i18n="home_cta_parent">I'm a Grown-up</a>
+      </div>
+    </section>
+    <div class="canopy-strip"></div>
+
+    <section class="features">
+      <div class="container feature-grid">
+        <div class="feature-card">
+          <div class="emoji">🎮</div>
+          <h3 data-i18n="home_feature_1_title">Real Games</h3>
+          <p data-i18n="home_feature_1_body">Not worksheets — a jungle world with coins, gates and boss battles.</p>
+        </div>
+        <div class="feature-card">
+          <div class="emoji">🔒</div>
+          <h3 data-i18n="home_feature_2_title">Learning Gates</h3>
+          <p data-i18n="home_feature_2_body">Answer questions correctly to unlock the path forward.</p>
+        </div>
+        <div class="feature-card">
+          <div class="emoji">📊</div>
+          <h3 data-i18n="home_feature_3_title">Parent Insights</h3>
+          <p data-i18n="home_feature_3_body">See progress, accuracy and weak topics at a glance.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>LearnQuest · Phase 1 prototype</footer>
+  </div>
+
+<script src="js/i18n.js"></script>
+</body>
+</html>

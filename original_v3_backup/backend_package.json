@@ -1,0 +1,33 @@
+{
+  "name": "learnquest-backend",
+  "version": "1.0.0",
+  "description": "LearnQuest gamified learning platform API and game server",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
+  "packageManager": "npm@11.17.0",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node db/seed.js",
+    "migrate": "node db/migrate.js",
+    "check": "node --check server.js && node --check db/index.js && node --check db/seed.js && node --check db/migrate.js && node --check learning/mission-catalog.js && node --check utils/logger.js && node --check utils/validate.js && node --check utils/rate-limit.js && node --check utils/features.js && node --check utils/run-integrity.js && node --check utils/think-time.js && node --check routes/auth.js && node --check routes/child.js && node --check routes/questions.js && node --check routes/game.js && node --check routes/missions.js && node --check routes/rewards.js && node --check routes/parent.js && node --check routes/tasks.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.4",
+    "nanoid": "^3.3.7",
+    "pino": "^9.4.0",
+    "three": "0.185.1"
+  }
+}

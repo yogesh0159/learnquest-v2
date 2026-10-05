@@ -1,0 +1,44 @@
+{
+  "name": "learnquest",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  },
+  "packageManager": "npm@11.17.0",
+  "scripts": {
+    "postinstall": "npm --prefix backend install --omit=dev",
+    "start": "npm --prefix backend start",
+    "seed": "npm --prefix backend run seed",
+    "migrate": "npm --prefix backend run migrate",
+    "test": "npm --prefix backend test",
+    "check": "npm --prefix backend run check && node scripts/validate-project.js",
+    "jungle:local": "node scripts/jungle-local-server.js",
+    "setup:backend": "npm --prefix backend install --omit=dev",
+    "setup:full": "npm install --no-audit --no-fund",
+    "jungle:test": "node scripts/test-jungle-run.mjs",
+    "explorer": "node --disable-warning=ExperimentalWarning scripts/start-explorer.js",
+    "native:test": "node scripts/test-native-core.mjs",
+    "native:build": "sh native/build.sh",
+    "native:all": "sh native/run_all_tests.sh",
+    "engine:test": "cd backend && node --disable-warning=ExperimentalWarning --test test/engine.test.js",
+    "pwa:build": "node scripts/build-pwa.mjs",
+    "pwa:check": "node scripts/build-pwa.mjs --check",
+    "platforms:test": "node scripts/test-platforms.mjs",
+    "desktop:install": "cd desktop && npm install",
+    "desktop:start": "cd desktop && npm start",
+    "desktop:dist:win": "cd desktop && npm run dist:win",
+    "desktop:dist:mac": "cd desktop && npm run dist:mac",
+    "desktop:dist:linux": "cd desktop && npm run dist:linux",
+    "mobile:install": "cd mobile && npm install",
+    "mobile:sync": "cd mobile && npm run sync",
+    "mobile:android": "cd mobile && npm run android",
+    "mobile:ios": "cd mobile && npm run ios",
+    "pages:build": "node scripts/build-pages.mjs --base / --out site",
+    "pages:serve": "node scripts/serve-pages.mjs site / 8080",
+    "pages:test": "node scripts/test-pages.mjs site /"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
+}

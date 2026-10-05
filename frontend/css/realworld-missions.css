@@ -1,0 +1,28 @@
+body { background: #102c28; color: #fff; overflow-x: hidden; }
+.mission-shell { min-height:100vh; background:radial-gradient(circle at 50% -10%,#337d68 0,transparent 48%),linear-gradient(#173f39,#0b2422); }
+.mission-topbar { display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px clamp(14px,4vw,40px);background:rgba(7,26,24,.72);backdrop-filter:blur(12px);position:relative;z-index:3; }
+.mission-topbar a { color:#fff;font-weight:800; }
+.mission-evidence { display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end; }
+.evidence-pill { padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.12);font-size:.82rem;font-weight:800; }
+.mission-main { max-width:1180px;margin:auto;padding:24px clamp(14px,3vw,30px) 50px; }
+.mission-intro { text-align:center;margin-bottom:18px; }
+.mission-intro h1 { color:#fff;font-size:clamp(2rem,5vw,3.4rem);margin-bottom:4px; }
+.mission-intro p { color:#d8f2e7;max-width:720px;margin:auto; }
+.mission-picker { display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0; }
+.mission-choice { min-height:142px;border:2px solid rgba(255,255,255,.18);border-radius:22px;padding:18px;background:rgba(255,255,255,.09);color:#fff;text-align:left;cursor:pointer;font:inherit;transition:.16s transform,.16s background; }
+.mission-choice:hover,.mission-choice:focus-visible,.mission-choice.active { transform:translateY(-3px);background:rgba(255,255,255,.17);border-color:#ffd05a; }
+.mission-choice .icon { display:block;font-size:2rem;margin-bottom:8px; }.mission-choice strong{display:block;font:800 1.14rem var(--font-display)}.mission-choice small{color:#cde7de}
+.play-area { display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);min-height:470px;border-radius:28px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.3); }
+.world-scene { position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;min-height:400px;background:linear-gradient(#75cdf1 0 56%,#83be62 56%); }
+.world-scene::before { content:"";position:absolute;inset:auto 0 0;height:44%;background:repeating-linear-gradient(90deg,transparent 0 58px,rgba(255,255,255,.08) 58px 60px); }
+.scene-art { position:relative;width:92%;height:82%;display:flex;align-items:flex-end;justify-content:center;font-size:clamp(3rem,8vw,6rem);transition:.35s transform; }
+.scene-art.bump { transform:translateY(-9px) rotate(-1deg); }.scene-art.shake{animation:mission-shake .35s}.scene-caption{position:absolute;left:18px;bottom:16px;background:rgba(5,28,25,.82);padding:9px 13px;border-radius:12px;font-weight:800}
+.scene-market .scene-art::before{content:"🥕  🍎  🥛\A ▰▰▰  MARKET  ▰▰▰";white-space:pre;text-align:center}.scene-bridge .scene-art::before{content:"🌲  🌉  🌲\A 〰️〰️〰️〰️";white-space:pre;text-align:center}.scene-road .scene-art::before{content:"🏫  🛣️  🛑  📚\A · · · ➜ LIBRARY";white-space:pre;text-align:center}
+.interaction-panel { color:var(--ink);padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;justify-content:center; }
+.objective-label { color:var(--leaf);font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase; }.interaction-panel h2{font-size:clamp(1.35rem,3vw,2rem);margin:8px 0 18px}
+.mission-progress { height:9px;border-radius:99px;background:#e6eee9;overflow:hidden;margin-bottom:22px; }.mission-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--sunbeam));transition:width .3s}
+.mission-options { display:grid;gap:10px; }.mission-option{width:100%;border:2px solid #dbe7e0;border-radius:15px;background:#f9fcfa;padding:13px 14px;text-align:left;font:700 1rem var(--font-body);cursor:pointer;color:var(--ink);}.mission-option:hover,.mission-option:focus-visible{border-color:var(--leaf);background:#effaf2}.mission-option:disabled{opacity:.6}
+.key-hint{float:right;color:#718078;font-size:.76rem}.feedback-card{margin-top:14px;padding:14px;border-radius:14px;background:#eaf8ff;border-left:5px solid var(--sky);color:#24434a}.feedback-card.wrong{background:#fff1ed;border-color:var(--coral);}.feedback-card strong{display:block;margin-bottom:3px}.feedback-card p{margin:0;color:inherit;line-height:1.35}.next-button{margin-top:12px}
+.completion { text-align:center;padding:24px }.completion .trophy{font-size:4rem}.completion h2{color:var(--canopy)}
+@keyframes mission-shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+@media(max-width:760px){.mission-picker{grid-template-columns:1fr}.mission-choice{min-height:unset}.play-area{grid-template-columns:1fr}.world-scene{min-height:245px}.interaction-panel{min-height:350px}.mission-evidence{display:none}}

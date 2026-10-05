@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maths Kingdom — LearnQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  body { background:#f4effd; }
+  .kingdom-bg { min-height:calc(100vh - 76px); background:radial-gradient(circle at 50% 0,#efe3ff 0,#f7f1ff 34%,#fff6df 100%); padding-bottom:60px; }
+  .hero { padding:28px 16px 14px; text-align:center; position:relative; overflow:hidden; }
+  .hero::before,.hero::after{content:"✦";position:absolute;color:#d6a347;opacity:.32;font-size:80px;top:0}.hero::before{left:8%}.hero::after{right:8%;transform:scale(.7)}
+  .hero h1 { margin:0; font-size:clamp(30px,5vw,48px); color:#3f2969; }
+  .hero p { margin:8px auto 0; max-width:720px; color:#655d72; }
+  .runner-badge { display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:#4d337d;color:#fff;font-weight:800;font-size:.82rem;margin-bottom:8px;box-shadow:0 7px 18px rgba(67,39,107,.18); }
+  .chapter-pill{display:inline-flex;margin-top:12px;padding:6px 12px;border-radius:999px;background:#fff7dc;color:#6f5324;font-weight:800;font-size:.78rem;border:1px solid #ead18d}
+  .map-shell { max-width:960px; margin:0 auto; padding:0 18px; }
+  .level-list { display:grid; gap:12px; position:relative; }
+  .level-list::before { content:""; position:absolute; left:34px; top:35px; bottom:35px; width:5px; border-radius:999px; background:linear-gradient(#8156bd,#d3a13d,#a94c45); opacity:.45; }
+  .level-card { position:relative; display:grid; grid-template-columns:70px 1fr auto; gap:14px; align-items:center; padding:14px 16px 14px 10px; border-radius:22px; background:rgba(255,255,255,.92); border:1px solid rgba(76,49,120,.13); box-shadow:0 9px 24px rgba(74,51,110,.09); }
+  .level-card.locked { filter:saturate(.45); opacity:.66; }
+  .level-card.boss { background:linear-gradient(135deg,#fff1e3,#f4e7ff); border-color:rgba(154,72,56,.24); }
+  .node { z-index:2; width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:#fff;border:3px solid #d3cadc;font-size:1.35rem;font-weight:900;box-shadow:0 6px 0 rgba(67,41,103,.12); }
+  .completed .node { border-color:#6baf75;background:#eaf7e9; }
+  .unlocked .node { border-color:#d6a33b;background:#fff7d8; }
+  .boss .node { border-color:#a94c45;background:#ffe9e5; }
+  .level-main { min-width:0; }
+  .level-title { font-size:1.1rem;font-weight:900;line-height:1.1;color:#44305f; }
+  .level-meta { display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;font-size:.78rem;color:#756d7d; }
+  .stars { letter-spacing:1px;color:#d29d23;font-weight:900; }
+  .play-btn { min-width:126px; min-height:44px; border:none;border-radius:15px;padding:0 14px;background:#50347f;color:#fff;font:800 .9rem "Baloo 2";cursor:pointer;box-shadow:0 5px 0 #342158; }
+  .play-btn:hover { transform:translateY(-1px); }
+  .play-btn:disabled { background:#aaa4b1;box-shadow:none;cursor:not-allowed; }
+  .legend { display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0 18px;font-size:.8rem;color:#5f5868; }
+  .legend span { display:inline-flex;align-items:center;gap:5px; }
+  .dot { width:11px;height:11px;border-radius:50%;display:inline-block; }
+  @media(max-width:650px){ .level-card{grid-template-columns:58px 1fr;}.node{width:48px;height:48px}.play-btn{grid-column:2;width:100%;}.level-list::before{left:31px}.hero{padding-top:18px}.hero::before,.hero::after{display:none} }
+</style>
+</head>
+<body>
+<div class="screen">
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="leaf-badge">🏰</span><span data-i18n="app_name">LearnQuest</span></a>
+    <div class="lang-switch"><button data-lang="en">EN</button><button data-lang="hi">हि</button><button data-lang="mr">मर</button></div>
+  </header>
+  <main class="kingdom-bg">
+    <section class="hero">
+      <div class="runner-badge">👑 WORLD 2 · 3D CASTLE RUNNER</div>
+      <h1>🏰 Maths Kingdom Adventure</h1>
+      <p>Race through castle gates, number markets, fraction bridges and royal halls. Solve maths gates while dodging barrels, shields, swinging maces and broken drawbridges.</p>
+      <div class="chapter-pill">🔓 Unlocked after Jungle Guardian · 10 new levels</div>
+    </section>
+    <div class="legend"><span><i class="dot" style="background:#6baf75"></i>Completed</span><span><i class="dot" style="background:#d6a33b"></i>Ready</span><span><i class="dot" style="background:#aaa"></i>Locked</span><span><i class="dot" style="background:#a94c45"></i>Boss</span></div>
+    <div class="map-shell"><div id="levelList" class="level-list"></div></div>
+  </main>
+</div>
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+requireChildAuth();
+let state=null;
+const missions={
+  1:"Castle gate tutorial · 2 seals · Maths gates",2:"Number market dash · 2 seals · Mental maths",3:"Fraction bridge · 2 seals · Fractions",4:"Shape courtyard · geometry traps · 3 seals",5:"Multiplication tower · 4 gates · 3 seals",6:"Division dungeon · moving hazards · 3 seals",7:"Clockwork hall · timed maths · 4 seals",8:"Geometry garden · 5 gates · 4 seals",9:"Royal equation hall · elite traps · 4 seals",10:"Number Dragon boss · 8 gates · 4 royal seals"
+};
+function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+function render(){
+  const levels=state.mathsKingdomLevels||state.levelsByWorld?.maths_kingdom||[];
+  const kingdom=state.worlds.find(w=>w.id==="maths_kingdom");
+  if(!kingdom||Number(kingdom.is_unlocked||0)!==1){location.href="dashboard.html";return;}
+  const list=document.getElementById("levelList");list.innerHTML="";
+  levels.forEach(level=>{
+    const locked=level.status==="locked",completed=level.status==="completed",boss=Number(level.is_boss||0)===1;
+    const stars=level.best_stars?"⭐".repeat(level.best_stars)+"☆".repeat(3-level.best_stars):"☆☆☆";
+    const card=document.createElement("article");card.className=`level-card ${locked?"locked":completed?"completed":"unlocked"} ${boss?"boss":""}`;
+    const name=level[`name_${getLang()}`]||level.name_en;
+    card.innerHTML=`
+      <div class="node">${locked?"🔒":boss?"🐉":level.level_number}</div>
+      <div class="level-main"><div class="level-title">${esc(name)}</div><div class="level-meta"><span>${esc(missions[level.level_number]||"Royal maths mission")}</span><span class="stars">${stars}</span>${level.best_score?`<span>🏆 ${level.best_score}</span>`:""}${level.best_accuracy?`<span>🧠 ${level.best_accuracy}%</span>`:""}</div></div>
+      <button class="play-btn" ${locked?"disabled":""}>${locked?"Locked":completed?"Play Again":"Start Quest"}</button>`;
+    const btn=card.querySelector("button");if(!locked)btn.onclick=()=>location.href=`maths-kingdom-game.html?level=${encodeURIComponent(level.id)}`;
+    list.appendChild(card);
+  });
+}
+async function load(){try{state=await api.childMe();render();}catch(e){document.getElementById("levelList").innerHTML=`<div class="card"><h3>Could not load Maths Kingdom</h3><p>${esc(e.message)}</p><a class="btn btn-primary" href="dashboard.html">Back</a></div>`;}}
+document.addEventListener("lq:i18n-ready",()=>state&&render());document.addEventListener("lq:lang-changed",async()=>{try{await api.childUpdate({language:getLang()});}catch(e){}load();});load();
+</script>
+</body>
+</html>
