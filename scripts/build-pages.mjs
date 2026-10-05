@@ -23,7 +23,7 @@ const rel = (p, r) => path.relative(r, p).split(path.sep).join("/");
 fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
 const copyDir = (from, to) => { for (const e of fs.readdirSync(from, { withFileTypes: true })) { const a = path.join(from, e.name), b = path.join(to, e.name), r = rel(a, fe);
   if (SKIP_DIRS.some((d) => r === d || r.startsWith(d + "/")) || SKIP_FILES.has(r)) continue;
-  if (e.isDirectory()) { fs.mkdirSync(b, { recursive: true }); copyDir(a, b); } else if (!r.includes("/") && !PAGES.includes(r) && !["manifest.webmanifest", "sw.js"].includes(r)) continue; else fs.copyFileSync(a, b); } };
+  if (e.isDirectory()) { fs.mkdirSync(b, { recursive: true }); copyDir(a, b); } else if (!r.includes("/") && !PAGES.includes(r) && !["manifest.webmanifest", "sw.js", "index.html"].includes(r)) continue; else fs.copyFileSync(a, b); } };
 copyDir(fe, out);
 // three.js: exactly the files the game imports (listed by the app's own offline manifest)
 const pm = JSON.parse(fs.readFileSync(path.join(fe, "precache-manifest.json"), "utf8")); const three = path.join(root, "node_modules", "three");
@@ -48,8 +48,31 @@ if (base !== "/") for (const f of walk(out)) if (TEXT.test(f)) { const s = fs.re
 if (base !== "/") { const mm = JSON.parse(fs.readFileSync(mf, "utf8")); for (const k of ["id", "start_url", "scope"]) if (mm[k] && mm[k].startsWith("/") && !mm[k].startsWith(base)) mm[k] = base + mm[k].slice(1); fs.writeFileSync(mf, JSON.stringify(mm, null, 2)); }
 else { const mm = JSON.parse(fs.readFileSync(mf, "utf8")); fs.writeFileSync(mf, JSON.stringify(mm, null, 2)); }
 
-// entry page, no Jekyll
-fs.writeFileSync(path.join(out, "index.html"), `<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta http-equiv="refresh" content="0; url=${base}jungle-local-preview.html" /><title>LearnQuest Jungle Run</title></head><body style="font-family:system-ui;background:#cfeedd;text-align:center;padding:40px"><p>Opening the game... <a href="${base}jungle-local-preview.html">Play Jungle Run</a></p></body></html>\n`);
+// texts that exist only on the free web page (the Play / device-speed buttons and the note) are added to the site's own copy of the translations
+const PAGES_TEXTS = {
+  en: { home_cta_play: "\u25B6 Play Jungle Run", home_cta_speed: "Check my device speed", home_link_lab: "3D lab", home_pages_note: "Playing on the free web page: your progress is saved on this device. Kid and parent accounts need the LearnQuest server." },
+  hi: { home_cta_play: "\u25B6 \u091C\u0902\u0917\u0932 \u0930\u0928 \u0916\u0947\u0932\u094B", home_cta_speed: "\u092E\u0947\u0930\u0947 \u0921\u093F\u0935\u093E\u0907\u0938 \u0915\u0940 \u0938\u094D\u092A\u0940\u0921 \u091C\u093E\u0901\u091A\u094B", home_link_lab: "3D \u0932\u0948\u092C", home_pages_note: "\u092E\u0941\u092B\u093C\u094D\u0924 \u0935\u0947\u092C \u092A\u0947\u091C \u092A\u0930 \u0916\u0947\u0932 \u0930\u0939\u0947 \u0939\u0948\u0902: \u0906\u092A\u0915\u0940 \u092A\u094D\u0930\u0917\u0924\u093F \u0907\u0938\u0940 \u0921\u093F\u0935\u093E\u0907\u0938 \u092A\u0930 \u0938\u0947\u0935 \u0939\u094B\u0924\u0940 \u0939\u0948\u0964 \u092C\u091A\u094D\u091A\u094B\u0902 \u0914\u0930 \u092E\u093E\u0924\u093E-\u092A\u093F\u0924\u093E \u0915\u0947 \u0905\u0915\u093E\u0909\u0902\u091F \u0915\u0947 \u0932\u093F\u090F LearnQuest \u0938\u0930\u094D\u0935\u0930 \u091A\u093E\u0939\u093F\u090F\u0964" },
+  mr: { home_cta_play: "\u25B6 \u091C\u0902\u0917\u0932 \u0930\u0928 \u0916\u0947\u0933\u093E", home_cta_speed: "\u092E\u093E\u091D\u094D\u092F\u093E \u0921\u093F\u0935\u094D\u0939\u093E\u0907\u0938\u091A\u0940 \u0917\u0924\u0940 \u0924\u092A\u093E\u0938\u093E", home_link_lab: "3D \u0932\u0945\u092C", home_pages_note: "\u092E\u094B\u092B\u0924 \u0935\u0947\u092C \u092A\u0947\u091C\u0935\u0930 \u0916\u0947\u0933\u0924 \u0906\u0939\u093E\u0924: \u0924\u0941\u092E\u091A\u0940 \u092A\u094D\u0930\u0917\u0924\u0940 \u092F\u093E\u091A \u0921\u093F\u0935\u094D\u0939\u093E\u0907\u0938\u0935\u0930 \u0938\u0947\u0935\u094D\u0939 \u0939\u094B\u0924\u0947. \u092E\u0941\u0932\u093E\u0902\u091A\u094D\u092F\u093E \u0906\u0923\u093F \u092A\u093E\u0932\u0915\u093E\u0902\u091A\u094D\u092F\u093E \u0916\u093E\u0924\u094D\u092F\u093E\u0902\u0938\u093E\u0920\u0940 LearnQuest \u0938\u0930\u094D\u0935\u094D\u0939\u0930 \u0932\u093E\u0917\u0924\u094B." },
+};
+for (const [lang, texts] of Object.entries(PAGES_TEXTS)) { const f = path.join(out, "locales", lang + ".json"); fs.writeFileSync(f, JSON.stringify({ ...JSON.parse(fs.readFileSync(f, "utf8")), ...texts }, null, 2) + "\n"); }
+
+// home page: the project's own home page (hero, features, 3 languages). Its two login buttons point at pages that need the backend, so here they become
+// "Play Jungle Run" and "Check my device speed"; the game menu gets a Home link back.
+{ const f = path.join(out, "index.html"); let s = fs.readFileSync(f, "utf8");
+  const cta = /<div class="hero-ctas">[\s\S]*?<\/div>/;
+  if (!cta.test(s)) throw new Error("home page: hero buttons block not found");
+  s = s.replace(cta, `<div class="hero-ctas">
+        <a class="btn btn-primary" href="jungle-local-preview.html" data-i18n="home_cta_play">\u25B6 Play Jungle Run</a>
+        <a class="btn btn-ghost" href="selftest.html" data-i18n="home_cta_speed">Check my device speed</a>
+      </div>
+      <p class="sub" style="margin:22px auto 0;font-size:.9rem"><a href="character-lab.html" data-i18n="home_link_lab">3D lab</a></p>
+      <p class="sub" style="margin:10px auto 0;font-size:.85rem;opacity:.8" data-i18n="home_pages_note">Playing on the free web page: your progress is saved on this device. Kid and parent accounts need the LearnQuest server.</p>`);
+  fs.writeFileSync(f, s);
+  const g = path.join(out, "jungle-local-preview.html"); let h = fs.readFileSync(g, "utf8"); const lab = 'data-i18n="menu.lab">Lab view</a>';
+  if (!h.includes(lab)) throw new Error("game menu: Lab view link not found");
+  fs.writeFileSync(g, h.replace(lab, lab + ' &middot; <a href="index.html" aria-label="Home" title="Home">\u{1F3E0}</a>')); }
+
+// no Jekyll
 fs.writeFileSync(path.join(out, ".nojekyll"), "");
 
 // offline file list for this site (small files = shell, 3D models = offline pack), URLs include the base
