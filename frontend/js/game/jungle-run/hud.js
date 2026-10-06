@@ -38,7 +38,7 @@ export class Hud {
   show(name, on = true) { const e = this.el[name]; if (e) e.hidden = !on; }
   coach(text, step = "") { if (!this.el.coach) return; this.el.coach.hidden = !text; this.el.coachText.textContent = text || ""; if (this.el.coachStep) this.el.coachStep.textContent = step; }
   device(text) { if (this.el.loadDevice) this.el.loadDevice.textContent = text; }
-  banner(text) { if (!this.el.banner) return; this.el.banner.hidden = !text; this._set("banner", this.el.bannerText, text || ""); }
+  banner(text) { if (!this.el.banner) return; this.el.banner.hidden = !text; document.body.classList.toggle("has-question", !!text); this._set("banner", this.el.bannerText, text || ""); }
   toast(text, kind = "good", ms = 1700) {
     const t = this.el.toast; if (!t) return;
     t.textContent = text; t.className = `toast ${kind}`; t.hidden = false;

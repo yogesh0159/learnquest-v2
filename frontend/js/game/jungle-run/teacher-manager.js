@@ -9,7 +9,7 @@ import { t, i18n } from "./i18n.js";
 const SHAPES = ["\u25CF", "\u25B2", "\u25A0"];                      // circle / triangle / square: the same shapes and colours as the lanes on the question board
 
 /**
- * The friendly teacher who runs behind the child, and asks the "rescue question" when she catches up.
+ * The friendly teacher who runs behind the child (Temple Run / Subway Surfers style): a stumble brings her right behind him; a second stumble or a wrong answer and she grabs him.
  * She re-uses the already loaded Boy model (no extra download) dressed as a teacher: graduation cap, round glasses, a book in her hand.
  * Weak devices: on the "minimal" level there is no extra character; everything else (speech bubbles, rescue questions) still works.
  */
@@ -17,7 +17,7 @@ export class TeacherManager {
   constructor({ game }) {
     this.game = game; const p = game.profile.settings;
     this.brain = new TeacherBrain({ enabled: p.teacherChase !== false, gentle: p.grade === 1 ? 0.8 : 1, rng: () => Math.random() });
-    this.group = null; this.anim = null; this.x = 0; this.off = 0; this.sign = -1; this.zNow = this.brain.k.safeZ; this.alias = ""; this.loading = null;
+    this.group = null; this.anim = null; this.x = 0; this.off = 0; this.sign = -1; this.zNow = this.brain.k.farZ; this.alias = ""; this.loading = null;
     this.q = null; this.answered = false; this.serial = 0; this.lastSubject = ""; this.bubbleTimer = 0; this.rescueResult = null;
     this._buildDom();
     window.addEventListener("keydown", (e) => this._key(e));
@@ -78,24 +78,36 @@ export class TeacherManager {
   }
 
   /* ------------------------------------------------------------------ state */
-  reset() { this.brain.reset(); this.brain.gentle = this.game.profile.settings.grade === 1 ? 0.8 : 1; this.x = this.game.player?.x || 0; this.zNow = this.brain.z + 0.8; this.alias = ""; this.q = null; this.serial = 0; this.hideRescue(); this.hideBubble(); this.setVisible(false); }
+  reset() { this.brain.reset(); this.brain.gentle = this.game.profile.settings.grade === 1 ? 0.8 : 1; this.x = this.game.player?.x || 0; this.zNow = this.brain.k.farZ + 0.8; this.off = 0; this.alias = ""; this.q = null; this.serial = 0; this.hideRescue(); this.hideBubble(); this.setVisible(false); }
   onRunStart() { this._syncVisible(); const l = this.brain.startLine(); if (l && this.enabled) this.say(l); }
   _syncVisible() { this.setVisible(this.enabled && ["playing", "rescue", "gameover"].includes(this.game.state)); }
   setVisible(v) { if (this.group) this.group.visible = v && this.game.quality.teacherModel; if (this.blob) this.blob.visible = v && this.game.quality.blob && this.game.quality.teacherModel; if (!v) this.hideBubble(); }
-  canRescue() { const g = this.game; return this.enabled && g.state === "playing" && g.player.alive && !g.tutorial.active && g.director.enabled; }
+  canCatch() { const g = this.game; return this.enabled && g.state === "playing" && g.player.alive && g.stats.lives > 0 && !g.tutorial.active && g.director.enabled; }
 
-  /** Gameplay events from GameManager: "hit", "correct", "enigma", "coins5". */
-  event(name, detail) { if (!this.enabled) return; const line = this.brain.event(name, detail); if (line) this.say(line); }
+  /** The runner stumbled over an obstacle.  First time: she runs right up behind him.  Again while she is close: she grabs him. */
+  onHit(reason) {
+    if (!this.enabled) return; const r = this.brain.event("hit", { reason });
+    if (r.line && !r.caught) this.say(r.line);
+    if (r.caught) { if (this.canCatch()) this.startCatch("hit"); else this.brain.state = "close"; }
+  }
+  /** A wrong answer at a question board: she grabs him at once and shows the right answer. */
+  onWrong(result) {
+    if (!this.enabled) return; const r = this.brain.event("wrong");
+    if (r.caught) { if (this.canCatch()) this.startCatch("wrong", result); else this.brain.state = "close"; }
+  }
+  /** "correct", "enigma" ... : she drops back. */
+  event(name, detail) { if (!this.enabled) return; const r = this.brain.event(name, detail); if (r.line) this.say(r.line); }
 
   update(dt, ctx = {}) {
     const g = this.game; if (!this.enabled) return;
-    const res = this.brain.update(dt, ctx); if (res.line && res.line.kind !== "caught") this.say(res.line);
+    this.brain.update(dt, ctx);
     if (this.group) {
-      this.x += (g.player.x - this.x) * (1 - Math.exp(-3.4 * dt));
-      this.zNow += (this.brain.z - this.zNow) * (1 - Math.exp(-3.5 * dt));
-      // She runs a little to the side (towards the lane with more room) so the child stays fully visible; directly behind only when she is about to catch up.
+      const st = this.brain.state, caught = st === "caught";
+      this.x += (g.player.x - this.x) * (1 - Math.exp(-(caught ? 8 : 3.4) * dt));
+      this.zNow += (this.brain.z - this.zNow) * (1 - Math.exp(-(caught ? 7 : st === "close" ? 5 : 2.2) * dt));
+      // she runs a little to the side (towards the lane with more room) so the child stays visible; right behind him when she is close
       const px = g.player.x; if (px < -1) this.sign = 1; else if (px > 1) this.sign = -1;
-      const sideWant = this.sign * 1.15 * Math.pow(1 - Math.min(1, this.brain.closeness), 0.7); this.off += (sideWant - this.off) * (1 - Math.exp(-4 * dt));
+      this.off += (this.sign * this.brain.side - this.off) * (1 - Math.exp(-4 * dt));
       const gx = Math.max(-2.9, Math.min(2.9, this.x + this.off));
       this.group.position.set(gx, 0, this.zNow); if (this.blob) this.blob.position.set(gx, 0.03, this.zNow);
       const talking = g.state === "rescue" || g.state === "gameover"; const want = talking ? "TALK" : "RUN";
@@ -103,72 +115,78 @@ export class TeacherManager {
       if (want === "RUN") this.anim.play("RUN", { fade: 0.2, timeScale: Math.max(0.8, (g.speed / 9) * 1.25 * this.brain.speedFactor) });
       this.anim.update(dt);
     }
-    this._placeBubble(dt);
-    return res;
+    this._tickBubble(dt);
   }
 
-  /* ------------------------------------------------------------------- speech bubble */
+  /* ------------------------------------------------------------------- speech bubble (a corner of the screen, never on the road) */
   say(line) {
     const key = `teacher.l.${line.kind}${line.variant || 1}`; const text = t(key); if (!text || text === key) return;
-    this.bubble.textContent = text; this.bubble.hidden = false; this.bubbleTimer = line.kind === "caught" ? 6 : 2.6;
+    this.bubble.textContent = `\u{1F9D1}\u200D\u{1F3EB} ${text}`; this.bubble.hidden = false; this.bubbleTimer = 2.8;
     if (this.game.profile.settings.tts && line.kind !== "caught") this.game.speaker.speak(text);
   }
   hideBubble() { this.bubble.hidden = true; this.bubbleTimer = 0; }
-  _placeBubble(dt) {
-    if (this.bubble.hidden) return; this.bubbleTimer -= dt; if (this.bubbleTimer <= 0 || this.game.state === "menu") return this.hideBubble();
-    const g = this.game; const w = innerWidth, h = innerHeight;
-    let tx, ty;
-    if (this.group && this.group.visible) { const v = new THREE.Vector3(this.group.position.x, 1.7, this.zNow).project(g.camera); tx = (v.x * 0.5 + 0.5) * w; ty = (-v.y * 0.5 + 0.5) * h; if (v.z > 1) { tx = w * 0.25; ty = h * 0.7; } }
-    else { tx = w * 0.3; ty = h * 0.72; }                                                                           // no model on weak devices: the bubble sits at the lower left
-    const bw = this.bubble.offsetWidth || 200, bh = this.bubble.offsetHeight || 40; const dir = this.sign || 1;      // the bubble goes on the outer side, so it never covers the child
-    let x = tx + dir * (bw / 2 + Math.min(90, w * 0.1)); x = Math.min(w - bw / 2 - 8, Math.max(bw / 2 + 8, x)); const y = Math.min(h - 120, Math.max(90 + bh / 2, ty - 20));
-    this.bubble.className = dir > 0 ? "r" : "l"; this.bubble.style.left = `${x}px`; this.bubble.style.top = `${y}px`;
-  }
+  _tickBubble(dt) { if (this.bubble.hidden) return; this.bubbleTimer -= dt; if (this.bubbleTimer <= 0 || this.game.state === "menu") this.hideBubble(); }
 
-  /* ------------------------------------------------------------------ rescue question */
-  startRescue() {
+  /* ------------------------------------------------------------------ the catch scene */
+  startCatch(kind, info) {
     const g = this.game; if (g.state !== "playing") return;
-    g.state = "rescue"; this.serial++; this.answered = false;
-    const rng = seededFor(g.runSeed, 7000 + this.serial); const s = g.profile.settings;
-    const subject = pickSubject(rng, s.subjects, this.lastSubject); this.lastSubject = subject;
-    const q = generateQuestion({ subject, level: levelForProgress(g.stats.correct, s.grade), rng }); this.q = q; const loc = localizeQuestion(q, t, i18n.lang); this.loc = loc;
-    this.p.title.textContent = t("teacher.caught"); this.p.say.textContent = t("teacher.l.caught1"); this.p.q.textContent = loc.text; this.p.fb.textContent = ""; this.p.fb.className = "fb"; this.p.hint.textContent = t("teacher.keys");
-    this.p.opts.innerHTML = ""; q.options.forEach((o, i) => { const b = document.createElement("button"); b.className = `opt o${i}`; b.dataset.i = String(i); b.innerHTML = `<i>${SHAPES[i]}</i><b></b><kbd>${i + 1}</kbd>`; b.querySelector("b").textContent = o.label; b.addEventListener("click", () => this.answer(i)); this.p.opts.appendChild(b); });
-    this.p.root.hidden = false; g.hud.show("hud", true);
-    g.audio.play("question"); g.audio.setMood("quiz"); g.vibrate(40); g.speaker.speak(`${t("teacher.l.caught1")} ${loc.spoken}`);
-    g.player.state = "idle"; g.player.anim?.play("IDLE", { fade: 0.2 }); this.hideBubble();                // the panel already carries her line
-    g.events.dispatchEvent(new CustomEvent("teacher-caught", { detail: { serial: this.serial, subject } }));
+    g.state = "rescue"; this.serial++; this.answered = false; this.kind = kind; this.hideBubble();
+    this.p.root.classList.toggle("explain", kind === "wrong");
+    if (kind === "wrong") {
+      const q = info.question; const loc = localizeQuestion(q, t, i18n.lang); this.q = q; this.loc = loc;
+      this.p.title.textContent = t("teacher.catch.title"); this.p.say.textContent = t("teacher.catch.wrong"); this.p.q.textContent = loc.text;
+      this.p.answer.textContent = info.correctLabel; this.p.fb.className = "fb"; this.p.fb.textContent = loc.explanation; this.p.tip.textContent = ""; this.p.opts.innerHTML = "";
+      this.p.go.hidden = false; this.p.go.textContent = t("teacher.go"); this.p.root.hidden = false;
+      g.audio.play("wrong"); g.vibrate(60); g.speaker.speak(`${t("teacher.catch.wrong")} ${info.correctLabel}. ${loc.explanation}`);
+      this.holdTimer = setTimeout(() => this.finishCatch(false), 9000);
+    } else {
+      const rng = seededFor(g.runSeed, 7000 + this.serial); const s = g.profile.settings;
+      const subject = pickSubject(rng, s.subjects, this.lastSubject); this.lastSubject = subject;
+      const q = generateQuestion({ subject, level: levelForProgress(g.stats.correct, s.grade), rng }); this.q = q; const loc = localizeQuestion(q, t, i18n.lang); this.loc = loc;
+      this.p.title.textContent = t("teacher.catch.title"); this.p.say.textContent = t("teacher.catch.hit"); this.p.q.textContent = loc.text; this.p.answer.textContent = ""; this.p.fb.textContent = ""; this.p.fb.className = "fb"; this.p.tip.textContent = t("teacher.keys");
+      this.p.go.hidden = true; this.p.opts.innerHTML = ""; q.options.forEach((o, i) => { const b = document.createElement("button"); b.className = `opt o${i}`; b.dataset.i = String(i); b.innerHTML = `<i>${SHAPES[i]}</i><b></b><kbd>${i + 1}</kbd>`; b.querySelector("b").textContent = o.label; b.addEventListener("click", () => this.answer(i)); this.p.opts.appendChild(b); });
+      this.p.root.hidden = false; g.audio.play("question"); g.audio.setMood("quiz"); g.vibrate(40); g.speaker.speak(`${t("teacher.catch.hit")} ${loc.spoken}`);
+    }
+    g.player.state = "idle"; g.player.anim?.play("IDLE", { fade: 0.2 });
+    g.events.dispatchEvent(new CustomEvent("teacher-caught", { detail: { serial: this.serial, kind } }));
   }
   _key(e) {
-    if (this.game.state !== "rescue" || this.answered || e.repeat) return;
+    const g = this.game; if (g.state !== "rescue" || e.repeat) return;
+    if (this.kind === "wrong") { if (["Enter", " ", "ArrowUp", "ArrowDown", "1", "2", "3"].includes(e.key)) { e.preventDefault(); this.finishCatch(false); } return; }
+    if (this.answered) return;
     const map = { 1: 0, 2: 1, 3: 2, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 1, ArrowRight: 2, a: 0, A: 0, s: 1, S: 1, d: 2, D: 2 }; const k = e.key in map ? map[e.key] : undefined;
     if (k !== undefined && k < (this.q?.options.length || 0)) { e.preventDefault(); this.answer(k); }
   }
+  /** the escape question after a second stumble: a right answer wins the lost heart back */
   answer(i) {
-    const g = this.game; if (g.state !== "rescue" || this.answered || !this.q) return; this.answered = true;
+    const g = this.game; if (g.state !== "rescue" || this.kind !== "hit" || this.answered || !this.q) return; this.answered = true;
     const q = this.q, ok = i === q.correctIndex;
     this.p.opts.querySelectorAll("button").forEach((b, k) => { b.disabled = true; b.classList.toggle("right", k === q.correctIndex); b.classList.toggle("wrong", k === i && !ok); });
     this.p.fb.className = `fb ${ok ? "ok" : "bad"}`; this.p.fb.textContent = `${ok ? t("board.correct") : t("board.oops")}  ${this.loc.explanation}`;
     this.p.say.textContent = t(ok ? "teacher.l.rescued1" : "teacher.l.oops1");
-    g._onAnswer({ question: q, subject: q.subject, chosenLabel: q.options[i].label, correctLabel: q.options[q.correctIndex].label, correct: ok, source: "teacher" });   // same scoring, streak, review and report as a board question
-    this.rescueResult = ok; setTimeout(() => this.finishRescue(), 1700);
+    g._onAnswer({ question: q, subject: q.subject, chosenLabel: q.options[i].label, correctLabel: q.options[q.correctIndex].label, correct: ok, source: "teacher" }, { noPenalty: true });   // same scoring, streak, review and report as a board question
+    if (ok && g.stats.lives < g.stats.maxLives) { g.stats.lives++; g.hud.toast(t("teacher.heartBack"), "gold", 2200); setTimeout(() => g.audio.play("lifeUp"), 300); }
+    this.rescueResult = ok; this.holdTimer = setTimeout(() => this.finishCatch(ok), 1800);
   }
-  finishRescue() {
-    const g = this.game; if (g.state !== "rescue") return; this.hideRescue();
-    const line = this.brain.rescueDone(!!this.rescueResult); g.state = "playing"; g.lastTs = performance.now();
-    if (g.player.alive) { g.player.startRun(); g.player.invulnerable = Math.max(g.player.invulnerable, 1.4); }
-    g.audio.setMood("run"); this.q = null; this.alias = ""; this.say(line);
+  finishCatch(ok) {
+    const g = this.game; if (g.state !== "rescue") return; clearTimeout(this.holdTimer); this.hideRescue();
+    const line = this.brain.release(this.kind === "hit" ? !!ok : null); g.state = "playing"; g.lastTs = performance.now();
+    if (g.player.alive) { g.player.startRun(); g.player.invulnerable = Math.max(g.player.invulnerable, 1.6); }
+    g.audio.setMood("run"); this.q = null; this.alias = ""; if (line) this.say(line);
+    g.hud.banner("");
   }
-  hideRescue() { this.p.root.hidden = true; }
+  hideRescue() { clearTimeout(this.holdTimer); this.p.root.hidden = true; }
 
-  onGameOver() { this.hideRescue(); this.brain.state = "chase"; }
+  onGameOver() { this.hideRescue(); this.brain.state = "far"; }
 
   /* ------------------------------------------------------------------------ DOM */
   _buildDom() {
-    const bubble = document.createElement("div"); bubble.id = "teacherBubble"; bubble.hidden = true; bubble.setAttribute("role", "status"); document.body.appendChild(bubble); this.bubble = bubble;
+    const bubble = document.createElement("div"); bubble.id = "teacherBubble"; bubble.hidden = true; bubble.setAttribute("role", "status");
+    (document.getElementById("msgLane") || document.body).appendChild(bubble); this.bubble = bubble;
     const root = document.createElement("div"); root.id = "rescue"; root.hidden = true; root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
-    root.innerHTML = '<div class="card"><div class="who"><span class="face">\u{1F9D1}\u200D\u{1F3EB}</span><b class="title"></b></div><p class="say"></p><h2 class="q"></h2><div class="opts"></div><p class="fb"></p><small class="tip"></small></div>';
+    root.innerHTML = '<div class="card"><div class="who"><span class="face">\u{1F9D1}\u200D\u{1F3EB}</span><b class="title"></b></div><p class="say"></p><h2 class="q"></h2><div class="ans"></div><div class="opts"></div><p class="fb"></p><button class="go primary" hidden></button><small class="tip"></small></div>';
     document.body.appendChild(root);
-    this.p = { root, title: root.querySelector(".title"), say: root.querySelector(".say"), q: root.querySelector(".q"), opts: root.querySelector(".opts"), fb: root.querySelector(".fb"), hint: root.querySelector(".tip") };
+    this.p = { root, title: root.querySelector(".title"), say: root.querySelector(".say"), q: root.querySelector(".q"), answer: root.querySelector(".ans"), opts: root.querySelector(".opts"), fb: root.querySelector(".fb"), go: root.querySelector(".go"), tip: root.querySelector(".tip") };
+    this.p.go.addEventListener("click", () => this.finishCatch(false));
   }
 }

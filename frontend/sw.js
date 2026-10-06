@@ -2,8 +2,8 @@
  *  - shell (pages, scripts, styles, three.js, wasm, icons) is cached when the app is first opened   -> cache  lq-shell-<version>
  *  - 3D models are cached the first time they are used (or all at once from Settings)             -> cache  lq-assets-<assetsVersion>
  *  - /api/* is NEVER cached (accounts, progress and answers always come from the server)
- *  - pages: network first (so a new version arrives), saved copy when offline, offline.html as the last resort
- * A new version waits until the player taps "Reload" (message SKIP_WAITING) so a game is never reloaded in the middle of a run. */
+ *  - scripts, styles, translations: network first (revalidated, so a new deploy is never mixed with old files), the saved copy offline;  pages: network first, saved copy offline, offline.html as the last resort
+ * A new version takes over immediately; the page shows "A new version is ready - Reload now" (a running game is never reloaded by itself). */
 const MANIFEST_URL = "/precache-manifest.json";
 const META = "lq-meta";                                   // keeps the manifest of the active version (the service worker can be stopped and restarted at any time, also while offline)
 let current;
@@ -18,7 +18,7 @@ self.addEventListener("install", (event) => {
     const c = await caches.open(names(m).shell);
     const urls = m.shell.map((e) => e.url).concat(["/offline.html"]);
     await Promise.all(urls.map(async (u) => { const res = await fetch(new Request(u, { cache: "reload" })); if (res.ok) await c.put(u, res); }));
-    if (!(await self.clients.matchAll()).length) self.skipWaiting();                    // first install: no game is open, activate straight away
+    self.skipWaiting();                                                                // take over at once: files are fetched fresh anyway, so a running page is never left on mixed versions
   })());
 });
 
@@ -52,7 +52,11 @@ self.addEventListener("fetch", (event) => {
       try { const r = await Promise.race([fetch(req), new Promise((_, rej) => setTimeout(() => rej(new Error("slow")), 4000))]); return r; }
       catch { const hit = await caches.match(req, { ignoreSearch: true }); return hit || (await caches.match("/offline.html")) || Response.error(); }
     }
-    const shellHit = await (await caches.open(n.shell)).match(req, { ignoreSearch: true }); if (shellHit) return shellHit;
+    const shellCache = await caches.open(n.shell); const shellHit = await shellCache.match(req, { ignoreSearch: true });
+    if (shellHit) {                                                                       // pages, scripts, styles, translations: ALWAYS the latest when online (one revalidation, usually a 304), the saved copy offline
+      try { const r = await Promise.race([fetch(new Request(req, { cache: "no-cache" })), new Promise((_, rej) => setTimeout(() => rej(new Error("slow")), 3500))]); if (r.ok && r.type === "basic") shellCache.put(req, r.clone()); return r; }
+      catch { return shellHit; }
+    }
     if (isModel(url)) {                                                                   // models & images: cache first, fill on first use
       const c = await caches.open(n.assets); const hit = await c.match(req); if (hit) return hit;
       const r = await fetch(req); if (r.ok && r.type === "basic") c.put(req, r.clone()); return r;

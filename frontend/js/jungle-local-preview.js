@@ -1,3 +1,4 @@
+import { FreePlays, FREE_PLAYS, backendReachable, accountUrl } from "./game/jungle-run/free-plays.js";
 import { GameManager } from "./game/jungle-run/game-manager.js";
 import { QUALITY } from "./game/jungle-run/config.js";
 import { SUBJECTS, TRAILS } from "./game/jungle-run/profile.js";
@@ -28,9 +29,25 @@ async function main() {
       document.querySelectorAll("[data-character]").forEach((b) => b.classList.toggle("active", b === btn));
     });
   });
-  $("playBtn").addEventListener("click", () => game.start());
+  // ---- three free runs without an account, then a parent account (and a child profile) -------------------------------
+  const fp = new FreePlays();
+  const paintFree = () => { const el = $("freeLeft"); if (!el) return; el.hidden = !fp.limited; if (fp.limited) el.textContent = t(fp.left > 0 ? "free.left" : "free.none", { n: fp.left, max: FREE_PLAYS }); };
+  const showGate = () => new Promise(async (resolve) => {
+    const apiBase = (window.LQ_CONFIG && window.LQ_CONFIG.apiBase) || ""; const server = await backendReachable(apiBase);
+    const box = document.createElement("div"); box.id = "freeGate"; box.className = "screen"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
+    const url = accountUrl(apiBase); const childUrl = `${apiBase}${apiBase ? "/" : ""}child-login.html`;
+    box.innerHTML = `<div class="card"><h1>${t("free.title")}</h1><p>${t(server ? "free.body" : "free.noserver", { max: FREE_PLAYS })}</p>${server
+      ? `<a class="primary btn" href="${url}">${t("free.parent")}</a><p class="small"><a href="${childUrl}">${t("free.child")}</a></p><p class="small" id="freeCount"></p>`
+      : `<button class="primary" id="freeGuest">${t("free.guest")}</button><p class="small"><a href="index.html">${t("menu.home")}</a></p>`}</div>`;
+    document.body.appendChild(box); game.audio?.play?.("question");
+    if (server) { let s = 4; const c = box.querySelector("#freeCount"); const tick = () => { c.textContent = t("free.redirect", { s }); if (s-- <= 0) location.href = url; else box._t = setTimeout(tick, 1000); }; tick(); box.querySelector("a.primary").addEventListener("click", () => clearTimeout(box._t)); resolve(false); }
+    else box.querySelector("#freeGuest").addEventListener("click", () => { box.remove(); resolve(true); });
+  });
+  game.playGate = async () => { if (fp.canPlay()) { fp.record(); paintFree(); return true; } return showGate(); };
+  paintFree();
+  $("playBtn").addEventListener("click", () => game.requestStart());
   $("coachSkip").addEventListener("click", () => game.skipTutorial());
-  $("againBtn").addEventListener("click", () => game.start());
+  $("againBtn").addEventListener("click", () => game.requestStart());
   $("resumeBtn").addEventListener("click", () => game.resume());
   $("pauseBtn")?.addEventListener("click", () => game.togglePause());
   $("labBtn")?.addEventListener("click", () => game.toggleLab());
@@ -40,9 +57,9 @@ async function main() {
   const deviceHtml = () => {
     const d = game.deviceInfo(); const c = d.calibration;
     const row = (k, v) => `<tr><th>${t(k)}</th><td>${v}</td></tr>`;
-    return `<h4>${t("dev.title")}</h4><table class="devtable">${row("dev.gpu", `${d.gpu.replace(/^ANGLE \((.*)\)$/, "$1").slice(0, 60)}`)}${row("dev.screen", `${d.native.w}x${d.native.h}`)}${row("dev.refresh", `${d.refreshHz} Hz`)}${row("dev.ram", d.ram ? `${d.ram} GB` : "?")}${row("dev.cores", d.cores || "?")}${row("dev.engine", t(d.engine === "native" ? "dev.engine.native" : "dev.engine.js"))}${row("dev.limit", t(`gfx.${d.cap}`))}${row("dev.draws", `${d.renderW}x${d.renderH} (${t(`gfx.${d.tier}`)})`)}</table>
+    return `<details class="adv"><summary>${t("dev.title")}</summary><table class="devtable">${row("dev.gpu", `${d.gpu.replace(/^ANGLE \((.*)\)$/, "$1").slice(0, 60)}`)}${row("dev.screen", `${d.native.w}x${d.native.h}`)}${row("dev.refresh", `${d.refreshHz} Hz`)}${row("dev.ram", d.ram ? `${d.ram} GB` : "?")}${row("dev.cores", d.cores || "?")}${row("dev.limit", t(`gfx.${d.cap}`))}${row("dev.draws", `${d.renderW}x${d.renderH} (${t(`gfx.${d.tier}`)})`)}</table>
       <small>${c && c.date ? t("dev.measured", { date: new Date(c.date).toLocaleDateString() }) + ": " + (c.probes || []).map((p) => `${t(`gfx.${p.tier}`).split(" (")[0]} ${p.avgFps} fps`).join(" \u00b7 ") : t("dev.notyet")}</small>
-      <div class="row"><button data-act="retest">${t("dev.retest")}</button></div>`;
+      <div class="row"><button data-act="retest">${t("dev.retest")}</button></div></details>`;
   };
   /* ---- app: install / offline pack / update (js/pwa.js) ---- */
   let offline = null; let dl = null;
@@ -85,7 +102,6 @@ async function main() {
       <label><input type="checkbox" data-opt="reducedMotion" ${game.reducedMotion ? "checked" : ""} /> ${t("set.motion")}</label>
       <label><input type="checkbox" data-opt="bigText" ${st.bigText ? "checked" : ""} /> ${t("set.bigtext")}</label>
       <label><input type="checkbox" data-opt="teacherChase" ${st.teacherChase !== false ? "checked" : ""} /> ${t("teacher.setting")}</label>
-      <label><input type="checkbox" data-opt="nativeCore" ${st.nativeCore !== false ? "checked" : ""} /> ${t("set.native")} <small>${t("set.native.note")}</small></label>
       <h4>${t("set.graphics")} <small>${t("gfx.now", { tier: t(`gfx.${game.qualityId}`) })}</small></h4>
       <div class="row">${["auto", "ultra", "high", "balanced", "low", "minimal"].map((v) => `<button data-gfx="${v}" class="${(st.graphics || "auto") === v ? "on" : ""}">${t(`gfx.${v}`)}</button>`).join("")}</div>
       ${deviceHtml()}${appHtml()}

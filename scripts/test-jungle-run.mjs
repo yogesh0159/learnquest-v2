@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { resolveAliases } from "../frontend/js/game/jungle-run/animation-aliases.js";
 import { generateQuestion, levelForProgress, listQuestionSubjects, registerQuestionGenerator } from "../frontend/js/game/jungle-run/question-generator.js";
 import { neutralizeRootMotion, measureRootMotion } from "../frontend/js/game/jungle-run/root-motion.js";
-import { mulberry32 } from "../frontend/js/game/jungle-run/rng.js";
+import { mulberry32, seededFor as sf } from "../frontend/js/game/jungle-run/rng.js";
 import { pickSubject } from "../frontend/js/game/jungle-run/question-generator.js";
 import { Profile, TRAILS, SUBJECTS } from "../frontend/js/game/jungle-run/profile.js";
 import { ACHIEVEMENTS, evaluateAchievements } from "../frontend/js/game/jungle-run/achievements.js";
@@ -298,39 +298,96 @@ test("the device result is cached per device: same device -> reused, different s
   assert.equal(readDeviceCache(st, deviceSignature(f1, "2")), null); mem.set("learnquest.device.v1", "{broken"); assert.equal(readDeviceCache(st, sig), null); writeDeviceCache(st, { signature: sig, tier: "ultra!" }); assert.equal(readDeviceCache(st, sig), null);
 });
 
-console.log("teacher (friendly chaser)");
+console.log("teacher (Subway-style chaser)");
 import { TeacherBrain, TEACHER_LINES, TEACHER_TUNING } from "../frontend/js/game/jungle-run/teacher-brain.js";
-test("closeness is driven by learning: mistakes bring her closer, right answers / Enigma / coins push her back", () => {
-  const b = new TeacherBrain({ rng: () => 0 }); const c0 = b.closeness;
-  b.event("hit", { reason: "rock" }); assert.ok(Math.abs(b.closeness - (c0 + 0.35)) < 1e-9);
-  b.event("hit", { reason: "wrong-answer" }); assert.ok(b.closeness > c0 + 0.7);
-  const hi = b.closeness; b.event("correct"); assert.ok(b.closeness < hi - 0.39); const m = b.closeness; b.event("enigma"); assert.ok(b.closeness < m - 0.29); const q = b.closeness; b.event("coins5"); assert.ok(b.closeness < q);
-  for (let i = 0; i < 20; i++) b.event("correct"); assert.equal(b.closeness, 0);
+const mkBrain = (o = {}) => { const b = new TeacherBrain({ rng: () => 0, ...o }); b.grace = 0; return b; };
+test("she starts a few steps behind (far); a first stumble brings her right behind him (close); a second stumble while she is close grabs him", () => {
+  const b = mkBrain(); assert.equal(b.state, "far"); assert.equal(b.z, TEACHER_TUNING.farZ);
+  let r = b.event("hit"); assert.equal(b.state, "close"); assert.equal(r.caught, null); assert.equal(b.z, TEACHER_TUNING.closeZ);
+  r = b.event("hit"); assert.equal(r.caught, "hit"); assert.equal(b.state, "caught"); assert.equal(b.z, TEACHER_TUNING.caughtZ); assert.equal(b.catches, 1);
 });
-test("she gains ground very slowly when nothing happens, never catches during the start grace period, and holds back near a question board", () => {
-  const b = new TeacherBrain({ rng: () => 0 }); b.closeness = 0.99;
-  for (let i = 0; i < 60; i++) { const r = b.update(0.1, {}); assert.equal(r.caught, false); }                 // 6 s < 7 s grace
-  const hold = new TeacherBrain({ rng: () => 0 }); hold.grace = 0; hold.closeness = 1; for (let i = 0; i < 50; i++) assert.equal(hold.update(0.1, { hold: true }).caught, false); assert.ok(hold.closeness <= 0.97);
-  const slow = new TeacherBrain({ rng: () => 0 }); slow.grace = 0; const c0 = slow.closeness; slow.update(10, {}); assert.ok(slow.closeness - c0 < 0.2 && slow.closeness > c0);
+test("a wrong answer grabs him at once, even when she is far", () => {
+  const b = mkBrain(); const r = b.event("wrong"); assert.equal(r.caught, "wrong"); assert.equal(b.state, "caught"); assert.equal(b.event("wrong").caught, null);   // no second grab while she holds him
 });
-test("she catches the runner when closeness reaches 1 (after the grace time) and then waits for the rescue answer", () => {
-  const b = new TeacherBrain({ rng: () => 0 }); b.grace = 0; b.closeness = 0.98; let caught = false; for (let i = 0; i < 40 && !caught; i++) caught = b.update(0.1, {}).caught;
-  assert.ok(caught && b.state === "caught"); assert.equal(b.update(1, {}).caught, false);                          // no second catch while the question is open
+test("she stays close only for a while, then drops back; a right answer takes time off and an Enigma sends her back at once", () => {
+  const b = mkBrain(); b.event("hit"); assert.equal(b.state, "close");
+  for (let i = 0; i < 160; i++) b.update(0.1, {}); assert.equal(b.state, "far");                      // 14 s later
+  b.event("hit"); b.event("correct"); b.event("correct"); assert.equal(b.state, "close"); assert.ok(b.closeLeft > 0 && b.closeLeft <= 2.01); b.event("correct"); assert.equal(b.state, "far");     // each right answer takes 6 s off the 14 s: three send her back
+  const c = mkBrain(); c.event("hit"); c.event("enigma"); assert.equal(c.state, "far");
+  const d = mkBrain(); d.event("hit"); d.event("correct"); assert.equal(d.state, "close");             // one right answer is not enough
 });
-test("rescue: a right answer frees the child with a long grace period, a wrong one still frees but keeps her close; both resume the chase", () => {
-  for (const [ok, closeness] of [[true, 0.28], [false, 0.55]]) { const b = new TeacherBrain({ rng: () => 0 }); b.state = "caught"; const line = b.rescueDone(ok); assert.equal(b.closeness, closeness); assert.equal(b.state, "chase"); assert.equal(b.grace, TEACHER_TUNING.graceAfterRescue); assert.equal(line.kind, ok ? "rescued" : "oops"); }
+test("after she lets go she stays right behind him for 8 seconds (so a third stumble is dangerous), and a rescue answer is remembered", () => {
+  const b = mkBrain(); b.event("wrong"); const line = b.release(null); assert.equal(line, null); assert.equal(b.state, "close"); assert.equal(b.closeLeft, TEACHER_TUNING.afterCatchClose);
+  const c = mkBrain(); c.event("hit"); c.event("hit"); assert.equal(c.release(true).kind, "rescued"); assert.equal(c.catchesRight, 1); const d = mkBrain(); d.event("hit"); d.event("hit"); assert.equal(d.release(false).kind, "oops");
+  assert.equal(c.event("hit").caught, "hit");                                                          // close again: the next stumble grabs him
 });
-test("she adapts: a struggling child gets a patient teacher, a strong one a quicker teacher, Grade 1 is gentler", () => {
-  const weak = new TeacherBrain(); [0, 0, 1, 0].forEach((x) => weak.recent.push(x)); const strong = new TeacherBrain(); [1, 1, 1, 1, 1].forEach((x) => strong.recent.push(x)); const mid = new TeacherBrain();
-  assert.ok(weak.pace < 0.7 && strong.pace > 1.1 && mid.pace === 1); assert.ok(new TeacherBrain({ gentle: 0.8 }).pace === 0.8);
-  const a = new TeacherBrain({ rng: () => 0 }), c = new TeacherBrain({ rng: () => 0 }); c.recent = [0, 0, 0, 0]; a.event("hit", { reason: "rock" }); c.event("hit", { reason: "rock" }); assert.ok(c.closeness < a.closeness);
+test("no grab in the first seconds of a run, and a disabled teacher does nothing", () => {
+  const b = new TeacherBrain({ rng: () => 0 }); b.event("hit"); assert.equal(b.event("hit").caught, null); assert.equal(b.state, "close");     // grace period: only runs up close
+  const off = new TeacherBrain({ enabled: false }); assert.deepEqual(off.event("wrong"), { caught: null, line: null }); assert.equal(off.state, "far"); assert.deepEqual(off.update(100, {}), { line: null });
 });
-test("her distance maps smoothly from 3.7 m (far) to 1.6 m (about to catch); lines are spaced out and every variant exists in all languages", () => {
-  const b = new TeacherBrain(); b.closeness = 0; assert.ok(Math.abs(b.z - 3.7) < 1e-9); b.closeness = 1; assert.ok(Math.abs(b.z - 1.6) < 1e-9); b.closeness = 0.5; assert.ok(b.z < 3.7 && b.z > 1.6);
-  const s = new TeacherBrain({ rng: () => 0.99 }); s.t = 100; const l1 = s.event("correct"); const l2 = s.event("correct"); assert.ok(l1 && !l2);                       // second line within 5.5 s is suppressed
-  for (const lang of ["en", "hi", "mr"]) for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`);
+test("she adapts: a struggling child gets a patient teacher (shorter time close), a strong one a quicker teacher; Grade 1 is gentler", () => {
+  const weak = mkBrain(); [0, 0, 1, 0].forEach((x) => weak.recent.push(x)); const strong = mkBrain(); [1, 1, 1, 1, 1].forEach((x) => strong.recent.push(x)); const mid = mkBrain();
+  assert.ok(weak.pace < 0.7 && strong.pace > 1.1 && mid.pace === 1); assert.equal(mkBrain({ gentle: 0.8 }).pace, 0.8);
+  weak.event("hit"); strong.event("hit"); mid.event("hit"); assert.ok(weak.closeLeft < mid.closeLeft && mid.closeLeft < strong.closeLeft);
 });
-test("a disabled teacher does nothing at all", () => { const b = new TeacherBrain({ enabled: false }); b.event("hit"); assert.equal(b.closeness, TEACHER_TUNING.startCloseness); assert.deepEqual(b.update(100, {}), { caught: false, line: null }); });
+test("she keeps to the side while far (so the child stays visible) and runs right behind him when close; lines are spaced out and exist in all languages", () => {
+  const b = mkBrain(); assert.ok(b.side > 1); b.event("hit"); assert.ok(b.side < 0.6 && b.z < 2);
+  const s = mkBrain({ rng: () => 0.99 }); s.t = 100; const l1 = s.event("correct").line; const l2 = s.event("correct").line; assert.ok(l1 && !l2);
+  for (const lang of ["en", "hi", "mr"]) { for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`); for (const k of ["teacher.catch.title", "teacher.catch.wrong", "teacher.catch.hit", "teacher.go", "teacher.heartBack"]) assert.ok(STRINGS[lang][k], `${lang} ${k}`); }
+});
+
+console.log("exciting questions");
+test("every question is a jungle gate with a story in English, Hindi and Marathi: it carries the numbers, has an emoji, no leftover {placeholders}; the board keeps the short sum", () => {
+  const tt = (lang) => (k, v) => { let s = STRINGS[lang][k] ?? STRINGS.en[k] ?? k; for (const [a, b] of Object.entries(v || {})) s = s.replaceAll(`{${a}}`, b); return s; };
+  const seen = { en: new Set(), hi: new Set(), mr: new Set() };
+  for (const subject of listQuestionSubjects()) for (let level = 1; level <= 4; level++) for (let i = 0; i < 30; i++) {
+    const q = generateQuestion({ subject, level, rng: sf(500 + level, i) });
+    for (const lang of ["en", "hi", "mr"]) { const loc = localizeQuestion(q, tt(lang), lang); assert.ok(loc.story && loc.story.length > 12, `${subject} ${lang}`); assert.ok(!/[{}]/.test(loc.story), "placeholder left: " + loc.story); assert.ok(/\p{Extended_Pictographic}/u.test(loc.story), "no emoji: " + loc.story);
+      if (["add", "sub", "mul"].includes(q.meta?.kind)) { assert.ok(loc.story.includes(String(q.meta.a)) && loc.story.includes(String(q.meta.b)), loc.story); assert.ok(/[?\u0964]/.test(loc.story)); } if (lang !== "en" && subject !== "science" && subject !== "spelling") assert.ok(/[\u0900-\u097F]/.test(loc.story), "not localised: " + loc.story); seen[lang].add(loc.story.split(":")[0]); assert.equal(loc.text.includes("{"), false); assert.ok(loc.spokenStory && !/^\p{Extended_Pictographic}/u.test(loc.spokenStory)); }
+  }
+  for (const lang of ["en", "hi", "mr"]) assert.ok(seen[lang].size >= 10, `${lang}: only ${seen[lang].size} different gate names`);       // variety: Monkey Maths, Treasure Gate, Banana Bridge, Parrot Post, Tiger Gate, Mystery Path, ...
+});
+test("the story of a question never changes for the same question (no randomness), and different numbers give different stories", () => {
+  const q = generateQuestion({ subject: "math", level: 2, rng: sf(9, 3) }); const tt = (k) => STRINGS.en[k] ?? k;
+  assert.equal(localizeQuestion(q, tt, "en").story, localizeQuestion(q, tt, "en").story); const set = new Set(); for (let i = 0; i < 40; i++) set.add(localizeQuestion(generateQuestion({ subject: "math", level: 2, rng: sf(9, i) }), tt, "en").story.split(":")[0]); assert.ok(set.size >= 3, [...set].join());
+});
+
+console.log("free runs");
+import { FreePlays, backendReachable, accountUrl, FREE_PLAYS } from "../frontend/js/game/jungle-run/free-plays.js";
+const fpStore = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
+test("three free runs without an account: the 4th is refused; the counter is remembered between visits", () => {
+  const s = fpStore(); let fp = new FreePlays({ storage: s, search: "" }); assert.equal(FREE_PLAYS, 3);
+  for (let i = 0; i < 3; i++) { assert.ok(fp.canPlay(), "run " + (i + 1)); fp.record(); }
+  assert.equal(fp.left, 0); assert.equal(fp.canPlay(), false); fp = new FreePlays({ storage: s, search: "" }); assert.equal(fp.used, 3); assert.equal(fp.canPlay(), false);
+});
+test("a signed-in parent or child plays without a limit; ?freeplays=off and ?freeplays=reset work; a broken storage never locks anybody out or throws", () => {
+  for (const role of ["parent", "child"]) { const fp = new FreePlays({ storage: fpStore({ lq_token: "abc", lq_role: role, lq_free_plays: "9" }), search: "" }); assert.ok(fp.loggedIn && fp.canPlay() && fp.left === Infinity); fp.record(); assert.equal(fp.used, 9); }
+  assert.ok(!new FreePlays({ storage: fpStore({ lq_token: "abc" }), search: "" }).loggedIn);                          // a token without a role is not a login
+  assert.ok(new FreePlays({ storage: fpStore({ lq_free_plays: "7" }), search: "?freeplays=off" }).canPlay());
+  const r = fpStore({ lq_free_plays: "7" }); assert.ok(new FreePlays({ storage: r, search: "?freeplays=reset" }).canPlay());
+  const broken = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } }; const fp = new FreePlays({ storage: broken, search: "" }); assert.equal(fp.used, 0); assert.doesNotThrow(() => fp.record()); assert.ok(fp.canPlay());
+});
+test("a server is 'reachable' only when /api/health answers ok; timeouts and errors count as unreachable; the account address opens the Sign Up tab", async () => {
+  assert.equal(await backendReachable("", 500, async () => ({ ok: true, json: async () => ({ ok: true }) })), true);
+  assert.equal(await backendReachable("", 500, async () => ({ ok: false })), false); assert.equal(await backendReachable("", 500, async () => { throw new Error("down"); }), false);
+  assert.equal(await backendReachable("", 500, async () => ({ ok: true, json: async () => ({ nope: 1 }) })), false);
+  assert.equal(accountUrl(""), "parent.html?signup=1&from=game"); assert.equal(accountUrl("https://api.example.com"), "https://api.example.com/parent.html?signup=1&from=game");
+});
+
+console.log("home page");
+import fs from "node:fs";
+test("home page texts: every data-h key in index.html exists in English, Hindi and Marathi (home-3d.js), with the same keys in all three", () => {
+  const src = fs.readFileSync(new URL("../frontend/js/home-3d.js", import.meta.url), "utf8"); const body = src.slice(src.indexOf("const H = {") + 10, src.indexOf("\n};", src.indexOf("const H = {")) + 2);
+  const H = new Function("return (" + body + ")")(); const html = fs.readFileSync(new URL("../frontend/index.html", import.meta.url), "utf8");
+  const keys = [...html.matchAll(/data-h="([^"]+)"/g)].map((m) => m[1]); assert.ok(keys.length >= 25);
+  for (const lang of ["en", "hi", "mr"]) for (const k of keys) assert.ok(H[lang][k], `${lang}: ${k}`);
+  assert.deepEqual(Object.keys(H.hi).sort(), Object.keys(H.en).sort()); assert.deepEqual(Object.keys(H.mr).sort(), Object.keys(H.en).sort());
+  assert.ok(/[\u0900-\u097F]/.test(H.hi.how_title) && /[\u0900-\u097F]/.test(H.mr.how_title));
+});
+test("home page keeps the two hero buttons the Pages build swaps (one .hero-ctas block, no nested div) and has the 3D canvas, illustration and loader", () => {
+  const html = fs.readFileSync(new URL("../frontend/index.html", import.meta.url), "utf8"); const m = html.match(/<div class="hero-ctas">[\s\S]*?<\/div>/); assert.ok(m && !m[0].slice(5).includes("<div"));
+  for (const k of ['id="heroCanvas"', 'class="hero-art"', 'id="heroLoad"', 'id="modeChip"', 'type="importmap"', 'js/home-3d.js']) assert.ok(html.includes(k), k);
+});
 
 await Promise.all(pending);
 console.log(`\n${passed} tests passed`);

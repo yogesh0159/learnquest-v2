@@ -1,24 +1,22 @@
 {
   "app_name": "LearnQuest",
   "nav_home": "Home",
-  "home_hero_title": "Learn. Unlock. Adventure.",
-  "home_hero_sub": "Every lesson opens a new gate in the jungle. Play, learn Maths, English & GK, and become a Jungle Legend.",
+  "home_hero_title": "Run the jungle. Learn as you play.",
+  "home_hero_sub": "A 3D running game where every right answer opens the path. Maths, spelling, science and more, in English, Hindi and Marathi.",
   "home_cta_child": "I'm a Kid — Let's Play!",
-  "home_cta_parent": "I'm a Grown-up",
+  "home_cta_parent": "Parents: log in or sign up",
   "home_feature_1_title": "Real Games",
   "home_feature_1_body": "Not worksheets — a jungle world with coins, gates and boss battles.",
   "home_feature_2_title": "Learning Gates",
   "home_feature_2_body": "Answer questions correctly to unlock the path forward.",
   "home_feature_3_title": "Parent Insights",
   "home_feature_3_body": "See progress, accuracy and weak topics at a glance.",
-
   "child_login_title": "Enter the Jungle",
   "child_login_id_label": "Your Child ID",
   "child_login_pin_label": "4-digit PIN",
   "child_login_button": "Let's Go!",
   "child_login_no_id": "Don't have an ID? Ask your grown-up to create your profile.",
   "child_login_error": "Hmm, that ID or PIN doesn't match. Try again!",
-
   "parent_auth_title": "Parent Access",
   "parent_tab_login": "Log In",
   "parent_tab_signup": "Sign Up",
@@ -28,7 +26,6 @@
   "parent_login_button": "Log In",
   "parent_signup_button": "Create Account",
   "parent_auth_error": "Something went wrong. Please check your details.",
-
   "profile_setup_title": "Create a Child Profile",
   "profile_name_label": "Child's Name",
   "profile_age_label": "Age",
@@ -38,7 +35,6 @@
   "profile_class_label": "Class (optional)",
   "profile_save_button": "Create Profile",
   "profile_success": "Profile created! Share the Child ID & PIN so they can log in.",
-
   "dashboard_greeting": "Hi, {name}!",
   "dashboard_xp": "XP",
   "dashboard_coins": "Coins",
@@ -50,14 +46,12 @@
   "dashboard_rewards_link": "Reward Shop",
   "dashboard_tasks_link": "My Tasks",
   "dashboard_logout": "Log Out",
-
   "jungle_title": "Jungle World",
   "jungle_subtitle": "Walk the path. Pass the gates. Reach the Guardian.",
   "jungle_locked": "Locked",
   "jungle_completed": "Completed",
   "jungle_play": "Play",
   "jungle_boss": "Boss Battle",
-
   "gate_title": "Knowledge Gate",
   "gate_instruction": "Answer correctly to unlock the path!",
   "gate_submit": "Submit Answer",
@@ -73,18 +67,15 @@
   "boss_title": "Boss Battle: Jungle Guardian",
   "boss_hp_label": "Guardian HP",
   "boss_defeated": "Boss Defeated! 🎉",
-
   "rewards_title": "Reward Shop",
   "rewards_subtitle": "Spend your coins on jungle gear!",
   "rewards_owned": "Owned",
   "rewards_unlock": "Unlock",
   "rewards_not_enough": "Not enough coins",
-
   "tasks_title": "My Tasks",
   "tasks_empty": "No tasks yet — check back soon!",
   "tasks_complete": "Mark Done",
   "tasks_completed": "Completed",
-
   "parent_dashboard_title": "Parent Dashboard",
   "parent_add_child": "+ Add Child",
   "parent_no_children": "No child profiles yet. Add one to get started.",
@@ -101,7 +92,6 @@
   "parent_task_reward_value": "Reward Value",
   "parent_task_assign": "Assign Task",
   "parent_view_dashboard": "View Dashboard",
-
   "common_back": "Back",
   "common_loading": "Loading...",
   "common_save": "Save",

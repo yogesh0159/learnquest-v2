@@ -46,7 +46,7 @@ export class GameManager {
     const mem = new Map(); const store = this.sandbox ? { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, String(v)), removeItem: (k) => mem.delete(k) } : globalThis.localStorage;
     this.store = store; this.profile = new Profile(store); if (this.sandbox && params.get("tutorial") !== "1") this.profile.data.tutorialDone = true;
     this.characterKey = ["boy", "girl"].includes(params.get("character")) ? params.get("character") : this.profile.settings.character;
-    i18n.set(detectLanguage(this.profile.settings.language, location.search, navigator.language));
+    i18n.set(detectLanguage(this.profile.settings.language || (() => { try { return localStorage.getItem("lq_lang") || ""; } catch { return ""; } })(), location.search, navigator.language));   // the language chosen on the home page carries over until the player picks one in the game
     this.speaker = new Speaker(); this.speaker.enabled = !!this.profile.settings.tts; this.speaker.lang = LANGS[i18n.lang].speech;
     // Test/explorer URL options (never saved to the profile): ?subjects=science,spelling &grade=3 &biomeStart=1200 &lives=5 &god=1 &tools=1
     const subj = (params.get("subjects") || "").split(",").filter(Boolean);
@@ -180,7 +180,7 @@ export class GameManager {
     gr.addColorStop(0, "rgba(0,0,0,.55)"); gr.addColorStop(0.6, "rgba(0,0,0,.28)"); gr.addColorStop(1, "rgba(0,0,0,0)"); bg.fillStyle = gr; bg.fillRect(0, 0, 64, 64);
     this.blob = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(bc), transparent: true, depthWrite: false, fog: false }));
     this.blob.rotation.x = -Math.PI / 2; this.blob.position.y = 0.03; this.blob.renderOrder = 2; this.blob.name = "BlobShadow"; this.scene.add(this.blob);
-    this.questions.on("question", (q) => { const loc = localizeQuestion(q, t, i18n.lang); this.hud.banner(`${t("teacher.asks")} ${loc.text}`); this.audio.play("question"); this.speaker.speak(loc.spoken); });
+    this.questions.on("question", (q) => { const loc = localizeQuestion(q, t, i18n.lang); this.hud.banner(loc.story || loc.text); this.audio.play("question"); this.speaker.speak(loc.spokenStory || loc.spoken); });
     this.questions.on("answer", (r) => this._onAnswer(r));
     this.questions.on("zone-end", () => this.hud.banner(""));
     this.ambient = new AmbientFx({ scene: this.scene, native: this.native });
@@ -202,7 +202,7 @@ export class GameManager {
         slide: () => this.state === "playing" && this.player.slide(),
         togglePause: () => this.togglePause(),
         pauseWhenHidden: () => { if (this.state === "playing") this.pause(); },
-        ready: () => { if (this.state === "menu" || this.state === "gameover") { this.start(); return true; } return false; },
+        ready: () => { if (this.state === "menu" || this.state === "gameover") { this.requestStart(); return true; } return false; },
       },
     });
     this.input.bind();
@@ -221,6 +221,12 @@ export class GameManager {
     await this._loadCharacter(key);
     this.profile.set("character", key);
     this.player.reset();
+  }
+
+  /** The Play buttons and the Enter key come through here, so the "3 free runs" gate (set by the page) can stop a run. */
+  async requestStart() {
+    if (this._gating) return false; this._gating = true;
+    try { if (this.playGate && !(await this.playGate())) return false; this.start(); return true; } finally { this._gating = false; }
   }
 
   start() {
@@ -314,12 +320,12 @@ export class GameManager {
     this.fx.burst(this.player.x, 0.8, 0, 16, { color: 0xff8a5a, speed: 3, up: 1.5, life: 0.5 });
     this.audio.play("hit"); this.vibrate(70);
     if (this.stats.lives <= 0) { this.player.die(); this.dying = 1.7; }
-    this.teacher?.event("hit", { reason });
+    if (reason !== "wrong-answer") this.teacher?.onHit(reason);            // a stumble: she runs up behind him; a second stumble while she is close: she grabs him
     this.events.dispatchEvent(new CustomEvent("hit", { detail: { reason } }));
     return true;
   }
 
-  _onAnswer(r) {
+  _onAnswer(r, opts = {}) {
     const s = this.stats;
     const loc = localizeQuestion(r.question, t, i18n.lang);
     this.review.push({ text: loc.text, subject: r.subject, chosen: r.chosenLabel, correct: r.correctLabel, ok: r.correct, explanation: loc.explanation });
@@ -334,8 +340,9 @@ export class GameManager {
       for (let lane = 0; lane < 3; lane++) for (let i = 0; i < 5; i++) this.collectibles.spawn("coin", LANES[lane], 1.05, -9 - i * 1.8);
       if (s.streak % 3 === 0 && s.lives < s.maxLives) { s.lives++; this.hud.toast(t("t.streak"), "gold", 2200); setTimeout(() => this.audio.play("lifeUp"), 450); }
     } else {
-      s.wrong++; this.hud.toast(t("t.wrong", { x: localizeQuestion(r.question, t, i18n.lang).explanation }), "bad", 2400); this.audio.play("wrong");
-      this._loseLife("wrong-answer");
+      s.wrong++; this.audio.play("wrong");
+      if (!opts.noPenalty) { const lost = this._loseLife("wrong-answer"); if (lost && this.player.alive && this.stats.lives > 0) this.teacher?.onWrong(r); }       // she grabs him only when a heart really went (a shield or protection saves him from her too)       // a wrong answer: she grabs him and shows the right answer
+      if (!this.teacher?.enabled) this.hud.toast(t("t.wrong", { x: localizeQuestion(r.question, t, i18n.lang).explanation }), "bad", 2400);
     }
     setTimeout(() => this.hud.banner(""), 2200);
     this.events.dispatchEvent(new CustomEvent("answer", { detail: r }));
@@ -362,7 +369,7 @@ export class GameManager {
       if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.stats.combo = 0; }
       if (this.power.has("magnet")) this.collectibles.attract(p.x, p.y, dt);
       p.update(dt, this.speed);
-      if (this.teacher) { const hold = this.tutorial.active || !this.director.enabled || (this.questions.active && -this.questions.padZ < 70); const tr = this.teacher.update(dt, { hold }); if (tr?.caught && this.teacher.canRescue()) this.teacher.startRescue(); }
+      if (this.teacher) { const hold = this.tutorial.active || !this.director.enabled; this.teacher.update(dt, { hold }); }
       this.audio.setSpeed(this.speed); this.audio.setMood(this.questions.active && -this.questions.padZ < 90 ? "quiz" : "run");
       this.track.update(dz); this.collectibles.update(dt, dz); this.obstacles.update(dz); this.questions.update(dt, p);
       this.fx.update(dt, dz); this.env.update(dt, p.x);
@@ -624,10 +631,10 @@ export class GameManager {
   }
   /** Switch the whole game to English / Hindi / Marathi, live. */
   setLanguage(lang) {
-    this.profile.set("language", lang); i18n.set(detectLanguage(lang, "", ""));
+    this.profile.set("language", lang); i18n.set(detectLanguage(lang, "", "")); try { localStorage.setItem("lq_lang", lang); } catch { /* storage blocked */ }   // ... and back: the home page and the other pages follow
     this.speaker.lang = LANGS[i18n.lang].speech; i18n.apply(document); this.hud.last = {};
     this.refreshMenuStats(); this.questions?.draw?.(this.questions.feedback);
-    if (this.questions?.question) this.hud.banner(`${t("teacher.asks")} ${localizeQuestion(this.questions.question, t, i18n.lang).text}`);
+    if (this.questions?.question) { const l2 = localizeQuestion(this.questions.question, t, i18n.lang); this.hud.banner(l2.story || l2.text); }
     this.events.dispatchEvent(new CustomEvent("language-changed", { detail: { lang: i18n.lang } }));
   }
   setSetting(key, value) { this.profile.set(key, value); if (key === "teacherChase") this.teacher?.setEnabled(!!value); this.applyAccessibility(); if (key === "tts" && value) this.speaker.speak(t("sp.on")); }
@@ -652,7 +659,7 @@ export class GameManager {
     const p = this.player;
     return {
       biome: this.biome?.name, power: this.power.list().map((p) => p.id), state: this.state, character: this.characterKey, lane: p.laneIndex, x: +p.x.toFixed(3), y: +p.y.toFixed(3), playerState: p.state, anim: p.anim?.currentAlias,
-      speed: +this.speed.toFixed(2), ...this.stats, fps: this.fps, quality: this.qualityId, renderScale: this.renderScale, gpu: this.gpu, gpuClass: this.gpuClass, device: { cap: this.device?.cap, start: this.device?.start, tier: this.deviceTier }, renderPx: this.renderSizePx, teacher: this.teacher ? { closeness: +this.teacher.brain.closeness.toFixed(2), state: this.teacher.brain.state, rescues: this.teacher.brain.rescues, model: !!this.teacher.group } : null, native: !!this.native, frameProfile: this.frameProfile(),
+      speed: +this.speed.toFixed(2), ...this.stats, fps: this.fps, quality: this.qualityId, renderScale: this.renderScale, gpu: this.gpu, gpuClass: this.gpuClass, device: { cap: this.device?.cap, start: this.device?.start, tier: this.deviceTier }, renderPx: this.renderSizePx, teacher: this.teacher ? { closeness: +this.teacher.brain.closeness.toFixed(2), state: this.teacher.brain.state, rescues: this.teacher.brain.catches, model: !!this.teacher.group } : null, native: !!this.native, frameProfile: this.frameProfile(),
       track: this.track.continuity(), segmentsRecycled: this.track.recycledTotal,
       activeCoins: this.collectibles.active.filter((c) => c.kind === "coin").length, activeEnigma: this.collectibles.active.filter((c) => c.kind === "enigma").length,
       activeObstacles: this.obstacles.active.length, zone: this.questions.hasZone ? { state: this.questions.state, text: this.questions.question?.text, boardZ: +this.questions.boardZ.toFixed(1) } : null,

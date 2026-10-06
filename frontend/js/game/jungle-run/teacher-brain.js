@@ -1,20 +1,21 @@
 /**
- * The teacher's behaviour (pure logic, no graphics): how close she is, when she "catches" the runner, and what she says.
+ * The teacher's behaviour (pure logic, no graphics) - the Temple Run / Subway Surfers chase, made friendly and educational.
  *
- * Design: she is a friendly teacher running behind the child ("the bell is ringing, run to class!"), not a monster.
- *   closeness 0 = far behind, 1 = caught.  It is driven by LEARNING, not only by stumbling:
- *     mistakes bring her closer   (obstacle +0.35, wrong answer +0.45)
- *     good play pushes her back   (right answer -0.40, Golden Enigma -0.30, every 5 coins -0.04)
- *   When she catches up she does not end the run: she asks a RESCUE QUESTION (right = free again, wrong = one heart).
- *   It adapts: a child who answers well gets a quicker teacher, one who struggles gets a patient one.
+ *   far     she runs a few steps behind the child
+ *   close   after a mistake she is right behind him for a while
+ *   caught  she has grabbed the runner (the game stops for a moment)
+ *
+ *   hit an obstacle .......... far -> close (for `closeSeconds`);  already close -> CAUGHT  (escape question: right = heart back)
+ *   wrong answer ............. CAUGHT at once (she shows the right answer and explains it)
+ *   right answer / Enigma .... she drops back (a right answer also shortens the time she stays close)
+ *   it adapts: a child who answers well gets a quicker teacher, one who struggles a patient one.
  */
 export const TEACHER_TUNING = Object.freeze({
-  safeZ: 3.7, catchZ: 1.6,                      // metres behind the runner when far / when she is about to catch
-  startCloseness: 0.18, creepPerSec: 0.012,     // she very slowly gains ground when nothing happens
-  gain: { hit: 0.35, wrong: 0.45 }, relief: { correct: 0.40, enigma: 0.30, coins5: 0.04 },
-  graceAtStart: 7, graceAfterRescue: 14,        // seconds in which she cannot catch
-  afterRescue: { right: 0.28, wrong: 0.55 },
-  lineGap: 5.5,                                 // seconds between spoken lines
+  farZ: 3.2, closeZ: 1.75, caughtZ: 0.85,       // metres behind the runner
+  farSide: 1.15, closeSide: 0.45, caughtSide: 0.9, // how far to the side she runs (so the child stays visible)
+  closeSeconds: 14, afterCatchClose: 8,         // how long she stays right behind after a stumble / after letting go
+  correctShortens: 6, graceAtStart: 5,          // a right answer takes 6 s off; no catch in the first 5 s
+  lineGap: 4.5,                                 // seconds between spoken lines
 });
 
 /** how many text variants exist for each line (keys teacher.l.<kind><n> in i18n.js) */
@@ -24,62 +25,58 @@ export class TeacherBrain {
   constructor({ enabled = true, gentle = 1, tuning = TEACHER_TUNING, rng = Math.random } = {}) {
     this.enabled = enabled; this.gentle = gentle; this.k = tuning; this.rng = rng; this.reset();
   }
-  reset() {
-    this.closeness = this.k.startCloseness; this.grace = this.k.graceAtStart; this.state = "chase"; this.t = 0; this.lastLineAt = -99;
-    this.recent = []; this.rescues = 0; this.rescuesRight = 0; this.flags = { near: false, close: false };
-  }
+  reset() { this.state = "far"; this.closeLeft = 0; this.grace = this.k.graceAtStart; this.t = 0; this.lastLineAt = -99; this.recent = []; this.catches = 0; this.catchesRight = 0; }
   setEnabled(v) { this.enabled = !!v; }
 
-  /** 0.6 patient ... 1.25 quick, from the last answers. */
+  /** 0.6 patient ... 1.25 quick, from the last answers (Grade 1 starts gentler). */
   get pace() {
     const n = this.recent.length; if (n < 3) return this.gentle;
     const acc = this.recent.reduce((a, b) => a + b, 0) / n;
-    const f = acc <= 0.4 ? 0.6 : acc <= 0.7 ? 0.85 : acc >= 0.9 && n >= 4 ? 1.2 : 1;
-    return f * this.gentle;
+    return (acc <= 0.4 ? 0.6 : acc <= 0.7 ? 0.85 : acc >= 0.9 && n >= 4 ? 1.2 : 1) * this.gentle;
   }
-  /** distance behind the runner, metres */
-  get z() { const c = Math.pow(Math.min(1, Math.max(0, this.closeness)), 1.25); return this.k.safeZ + (this.k.catchZ - this.k.safeZ) * c; }
-  get mood() { return this.closeness >= 0.8 ? "close" : this.closeness >= 0.55 ? "near" : "calm"; }
-  get speedFactor() { return 1 + 0.3 * this.closeness; }
+  get z() { return this.state === "caught" ? this.k.caughtZ : this.state === "close" ? this.k.closeZ : this.k.farZ; }
+  get side() { return this.state === "caught" ? this.k.caughtSide : this.state === "close" ? this.k.closeSide : this.k.farSide; }
+  get closeness() { return this.state === "caught" ? 1 : this.state === "close" ? 0.7 : 0.15; }     // for animation speed and the debug view
+  get mood() { return this.state === "far" ? "calm" : this.state === "close" ? "near" : "close"; }
+  get speedFactor() { return this.state === "far" ? 1 : 1.25; }
 
-  /** @returns {{kind:string}|null} a line she wants to say */
+  /** @returns {{caught:string|null, line:object|null}} caught = "hit" | "wrong" when she grabs the runner now */
   event(name, detail = {}) {
-    if (!this.enabled) return null;
-    const add = (v) => { this.closeness = Math.min(1, this.closeness + v * this.pace); };
-    const sub = (v) => { this.closeness = Math.max(0, this.closeness - v); };
+    const out = { caught: null, line: null };
+    if (!this.enabled) return out;
     switch (name) {
-      case "hit": add(detail.reason === "wrong-answer" ? this.k.gain.wrong : this.k.gain.hit); if (detail.reason === "wrong-answer") this.recent.push(0); break;
-      case "correct": sub(this.k.relief.correct); this.recent.push(1); return this._say("praise");
-      case "enigma": sub(this.k.relief.enigma); break;
-      case "coins5": sub(this.k.relief.coins5); break;
+      case "hit":                                                         // stumbled over an obstacle
+        if (this.state === "close" && this.grace <= 0) { this.state = "caught"; this.catches++; out.caught = "hit"; out.line = { kind: "caught", variant: 1 }; }
+        else { this.state = "close"; this.closeLeft = this.k.closeSeconds * (this.pace < 1 ? 0.75 : this.pace > 1 ? 1.2 : 1); out.line = this._say("close"); }
+        break;
+      case "wrong":                                                       // wrong answer at a question board: caught at once
+        this.recent.push(0); this.recent = this.recent.slice(-6);
+        if (this.state !== "caught") { this.state = "caught"; this.catches++; out.caught = "wrong"; out.line = { kind: "caught", variant: 1 }; }
+        break;
+      case "correct":
+        this.recent.push(1); this.recent = this.recent.slice(-6);
+        if (this.state === "close") { this.closeLeft -= this.k.correctShortens; if (this.closeLeft <= 0) this.state = "far"; }
+        out.line = this._say("praise");
+        break;
+      case "enigma": if (this.state === "close") this.state = "far"; break;
       default: break;
     }
-    this.recent = this.recent.slice(-6);
-    return null;
-  }
-
-  /** @param {{hold?:boolean}} ctx hold = a question board is near or the tutorial runs: she keeps her distance */
-  update(dt, ctx = {}) {
-    const out = { caught: false, line: null };
-    if (!this.enabled || this.state !== "chase") return out;
-    this.t += dt; this.grace = Math.max(0, this.grace - dt);
-    if (!ctx.hold) this.closeness = Math.min(1, this.closeness + this.k.creepPerSec * this.pace * dt);
-    if (this.closeness < 0.4) { this.flags.near = false; this.flags.close = false; }
-    if (this.closeness >= 1) {
-      if (ctx.hold || this.grace > 0) this.closeness = 0.97;
-      else { this.state = "caught"; out.caught = true; out.line = { kind: "caught", variant: 1 }; return out; }
-    }
-    if (this.closeness >= 0.8 && !this.flags.close) { this.flags.close = true; out.line = this._say("close"); }
-    else if (this.closeness >= 0.55 && !this.flags.near) { this.flags.near = true; out.line = this._say("near"); }
     return out;
   }
 
-  /** the child answered the rescue question */
-  rescueDone(correct) {
-    this.rescues++; if (correct) this.rescuesRight++;
-    this.closeness = correct ? this.k.afterRescue.right : this.k.afterRescue.wrong; this.grace = this.k.graceAfterRescue; this.state = "chase";
-    this.flags.near = this.flags.close = false; this.recent.push(correct ? 1 : 0); this.recent = this.recent.slice(-6);
-    this.lastLineAt = this.t; return { kind: correct ? "rescued" : "oops", variant: 1 };
+  /** @param {{hold?:boolean}} ctx hold = the tutorial runs: she only jogs behind and never grabs */
+  update(dt, ctx = {}) {
+    if (!this.enabled) return { line: null };
+    this.t += dt; this.grace = Math.max(0, this.grace - dt);
+    if (this.state === "close") { this.closeLeft -= dt; if (this.closeLeft <= 0) { this.state = "far"; } }
+    return { line: null };
+  }
+
+  /** the scene is over: the runner is free again, she stays right behind for a moment */
+  release(correct) {
+    if (correct != null) { this.catchesRight += correct ? 1 : 0; this.recent.push(correct ? 1 : 0); this.recent = this.recent.slice(-6); }
+    this.state = "close"; this.closeLeft = this.k.afterCatchClose; this.lastLineAt = this.t;
+    return correct == null ? null : { kind: correct ? "rescued" : "oops", variant: 1 };
   }
   startLine() { return this._say("start", true); }
 

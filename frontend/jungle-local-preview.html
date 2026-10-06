@@ -31,10 +31,10 @@
     </div>
     <button id="pauseBtn" class="round" aria-label="Pause">II</button>
     <div id="hudPower" hidden></div>
-    <div id="coach" hidden><span id="coachStep"></span><b id="coachText"></b><button id="coachSkip" data-i18n="coach.skip">Skip</button></div>
     <div id="touchPad" aria-label="Touch controls"><button id="tLeft" aria-label="Left">&#9664;</button><button id="tRight" aria-label="Right">&#9654;</button><button id="tJump" aria-label="Jump">&#11014;</button><button id="tSlide" aria-label="Slide">&#11015;</button></div>
+    <div id="msgLane" aria-live="polite"><div id="coach" hidden><span id="coachStep"></span><b id="coachText"></b><button id="coachSkip" data-i18n="coach.skip">Skip</button></div>
+      <div id="toast" class="toast" hidden></div></div>
     <div id="questionBanner" hidden><span class="qlbl" data-i18n="q.label">Question</span><span id="questionText"></span><span class="qhint" data-i18n="q.hint">Run through the lane with the answer!</span></div>
-    <div id="toast" class="toast" hidden></div>
     <div class="hint" data-i18n="hint.keys">&larr; &rarr; / A D: lanes &nbsp; &uarr; / W / Space: jump &nbsp; &darr; / S: slide &nbsp; P: pause &nbsp; M: sound &nbsp; F2: lab</div>
   </div>
 
@@ -44,18 +44,20 @@
 
   <section id="menuScreen" class="screen" hidden>
     <div class="card">
+      <nav class="menu-nav" aria-label="LearnQuest"><a href="index.html" data-i18n="menu.home">Home</a><a href="parent.html" data-family data-i18n="menu.parents">Parents</a><a href="child-login.html" data-family data-i18n="menu.kids">Kids</a></nav>
       <h1 data-i18n="menu.title">Jungle Run</h1><p data-i18n="menu.sub">Collect coins, answer the questions by running through the right lane!</p>
       <div class="picker langrow" id="langRow" aria-label="Language"><button class="choice" data-lang="en">English</button><button class="choice" data-lang="hi">हिन्दी</button><button class="choice" data-lang="mr">मराठी</button></div>
+      <p id="freeLeft" class="stat free" hidden></p>
       <p id="menuStats" class="stat"></p>
       <p id="qualityBadge" class="stat"></p>
       <div class="picker"><button class="choice" data-character="boy" data-i18n="menu.boy">Boy explorer</button><button class="choice" data-character="girl" data-i18n="menu.girl">Girl explorer</button></div>
       <button id="playBtn" class="primary" data-i18n="menu.play">Play</button>
       <details id="settingsBox"><summary data-i18n="menu.settings">Settings &amp; rewards</summary><div id="settingsBody"></div></details>
-      <p class="small"><span data-i18n="menu.enter">Press Enter to start</span> &middot; <a href="#" id="labBtn" data-i18n="menu.lab">Lab view</a></p>
+      <p class="small"><span data-i18n="menu.enter">Press Enter to start</span></p>
     </div>
   </section>
 
-  <section id="pauseScreen" class="screen" hidden><div class="card"><h1 data-i18n="pause.title">Paused</h1><button id="resumeBtn" class="primary" data-i18n="pause.resume">Resume</button></div></section>
+  <section id="pauseScreen" class="screen" hidden><div class="card"><h1 data-i18n="pause.title">Paused</h1><button id="resumeBtn" class="primary" data-i18n="pause.resume">Resume</button><p class="small"><a href="index.html" data-i18n="menu.home">Home</a></p></div></section>
 
   <section id="gameOverScreen" class="screen" hidden>
     <div class="card"><h1 data-i18n="over.title">Great run!</h1><div id="overStats" class="stats"></div><div id="overAch"></div><div id="overReview"></div><button id="againBtn" class="primary" data-i18n="over.again">Play again</button><p class="small" data-i18n="over.enter">Press Enter to restart</p></div>

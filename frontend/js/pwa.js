@@ -21,7 +21,13 @@
       if (r.waiting && navigator.serviceWorker.controller) { S.updateReady = true; emit(); }
       r.addEventListener("updatefound", function () { if (r.installing) watch(r.installing); });
     }).catch(function () { /* registration blocked: the site still works online */ });
-    navigator.serviceWorker.addEventListener("controllerchange", function () { S.controlled = true; emit(); if (S.reloading) location.reload(); });
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      S.controlled = true;
+      if (S.reloading) return location.reload();
+      if (hadController) { S.updateReady = true; emit(); if (document.body && document.body.classList.contains("home")) location.reload(); }   // a new version took over: the home page refreshes by itself, a running game only offers "Reload now"
+      else emit();
+    });
   }
   S.applyUpdate = function () { if (reg && reg.waiting) { S.reloading = true; reg.waiting.postMessage({ type: "SKIP_WAITING" }); } else location.reload(); };
 

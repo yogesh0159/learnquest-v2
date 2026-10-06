@@ -59,7 +59,7 @@ async def part_c(p):
     d=dict(p.devices['iPhone 13']); d.pop('default_browser_type',None); b=await p.chromium.launch(args=ARGS); c=await b.new_context(**d, service_workers="block"); pg=await c.new_page()
     await pg.add_init_script("window.__played=0; HTMLMediaElement.prototype.play=function(){window.__played++; return Promise.resolve()};")
     await pg.goto(URL,wait_until="commit"); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await pg.evaluate("LQ_JUNGLE.stopLoop()")
-    await pg.touchscreen.tap(100,100); await pg.wait_for_timeout(300); ok("iPhone: the first touch starts the silent audio loop that stops the silent switch from muting the game",await pg.evaluate("window.__played")>=1)
+    box=await pg.evaluate("(()=>{const r=document.querySelector('#menuScreen h1').getBoundingClientRect(); return [r.left+r.width/2,r.top+r.height/2]})()"); await pg.touchscreen.tap(*box); await pg.wait_for_timeout(300); ok("iPhone: the first touch starts the silent audio loop that stops the silent switch from muting the game",await pg.evaluate("window.__played")>=1)
     await pg.evaluate("document.getElementById('settingsBox').open=true"); await b.close()
     # desktop browser: fullscreen button visible
     b,pg,logs=await launch(p,900,500); await boot(pg,URL); ok("desktop browser: the Fullscreen button is available",not await pg.evaluate("document.getElementById('fsBtn').hidden")); await b.close()

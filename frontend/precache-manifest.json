@@ -1,7 +1,7 @@
 {
- "version": "a0b5d3c16dbf",
+ "version": "6e39636fa871",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3278714,
+ "shellBytes": 3308924,
  "packBytes": 54912780,
  "shell": [
   {
@@ -41,13 +41,13 @@
   },
   {
    "url": "/character-lab.html",
-   "hash": "cbff266200b5",
-   "bytes": 4163
+   "hash": "8c59e46b3682",
+   "bytes": 4208
   },
   {
    "url": "/child-login.html",
-   "hash": "12699ab656f1",
-   "bytes": 3388
+   "hash": "96912607b172",
+   "bytes": 3433
   },
   {
    "url": "/css/character-lab.css",
@@ -71,8 +71,8 @@
   },
   {
    "url": "/css/jungle-local-preview.css",
-   "hash": "493f3544f93d",
-   "bytes": 15837
+   "hash": "a5182c7f428e",
+   "bytes": 19648
   },
   {
    "url": "/css/jungle-runner.css",
@@ -96,8 +96,8 @@
   },
   {
    "url": "/dashboard.html",
-   "hash": "b30ef0d573a8",
-   "bytes": 6287
+   "hash": "84d36ee514cf",
+   "bytes": 6332
   },
   {
    "url": "/explorer.html",
@@ -106,8 +106,8 @@
   },
   {
    "url": "/index.html",
-   "hash": "1d4d9fdcf041",
-   "bytes": 10451
+   "hash": "ff441c5ea0b7",
+   "bytes": 10687
   },
   {
    "url": "/js/api.js",
@@ -181,7 +181,7 @@
   },
   {
    "url": "/js/game/jungle-run/achievements.js",
-   "hash": "f0c449ab37ce",
+   "hash": "7436e8393ec6",
    "bytes": 2270
   },
   {
@@ -246,8 +246,8 @@
   },
   {
    "url": "/js/game/jungle-run/debug-panel.js",
-   "hash": "7b3d98c4071c",
-   "bytes": 4071
+   "hash": "d3d69af52261",
+   "bytes": 4142
   },
   {
    "url": "/js/game/jungle-run/device-profile.js",
@@ -260,24 +260,29 @@
    "bytes": 8709
   },
   {
+   "url": "/js/game/jungle-run/free-plays.js",
+   "hash": "7291dd24c6b9",
+   "bytes": 2378
+  },
+  {
    "url": "/js/game/jungle-run/fx-manager.js",
    "hash": "a69f339bbf9e",
    "bytes": 2274
   },
   {
    "url": "/js/game/jungle-run/game-manager.js",
-   "hash": "edfec3f338c0",
-   "bytes": 49470
+   "hash": "ffc9ef2c6856",
+   "bytes": 50469
   },
   {
    "url": "/js/game/jungle-run/hud.js",
-   "hash": "6560a0f06703",
-   "bytes": 3620
+   "hash": "1f0010a0da6f",
+   "bytes": 3676
   },
   {
    "url": "/js/game/jungle-run/i18n.js",
-   "hash": "5b00b01aa531",
-   "bytes": 42714
+   "hash": "5464387a40dd",
+   "bytes": 46828
   },
   {
    "url": "/js/game/jungle-run/native-core.js",
@@ -326,8 +331,8 @@
   },
   {
    "url": "/js/game/jungle-run/question-i18n.js",
-   "hash": "43af63c5f08f",
-   "bytes": 1726
+   "hash": "fefe5b3a986c",
+   "bytes": 10295
   },
   {
    "url": "/js/game/jungle-run/question-manager.js",
@@ -371,13 +376,13 @@
   },
   {
    "url": "/js/game/jungle-run/teacher-brain.js",
-   "hash": "7ca4dbaa3698",
-   "bytes": 5204
+   "hash": "006b31e0202d",
+   "bytes": 5362
   },
   {
    "url": "/js/game/jungle-run/teacher-manager.js",
-   "hash": "227c1f5c8be7",
-   "bytes": 14669
+   "hash": "b772cd5cf705",
+   "bytes": 16143
   },
   {
    "url": "/js/game/jungle-run/textures.js",
@@ -436,8 +441,8 @@
   },
   {
    "url": "/js/home-3d.js",
-   "hash": "c014b42a7fcb",
-   "bytes": 25989
+   "hash": "70b99b7e7138",
+   "bytes": 27045
   },
   {
    "url": "/js/i18n.js",
@@ -446,8 +451,8 @@
   },
   {
    "url": "/js/jungle-local-preview.js",
-   "hash": "0823f07496e6",
-   "bytes": 16198
+   "hash": "7c87cd6920d7",
+   "bytes": 18019
   },
   {
    "url": "/js/jungle-runner.js",
@@ -471,8 +476,8 @@
   },
   {
    "url": "/js/pwa.js",
-   "hash": "a102e2d1741a",
-   "bytes": 4661
+   "hash": "b8cbfe8c6743",
+   "bytes": 5003
   },
   {
    "url": "/js/realworld-missions.js",
@@ -490,29 +495,34 @@
    "bytes": 20159
   },
   {
+   "url": "/js/site-nav.js",
+   "hash": "40f3effd46ff",
+   "bytes": 2359
+  },
+  {
    "url": "/jungle-game.html",
    "hash": "786dc7d95c8f",
    "bytes": 6427
   },
   {
    "url": "/jungle-local-preview.html",
-   "hash": "9c47a7b639c1",
-   "bytes": 6937
+   "hash": "0b70c8df7c26",
+   "bytes": 7289
   },
   {
    "url": "/locales/en.json",
-   "hash": "bb724bfd88ae",
-   "bytes": 4334
+   "hash": "05f20825eea9",
+   "bytes": 4364
   },
   {
    "url": "/locales/hi.json",
-   "hash": "097b11137fc2",
-   "bytes": 7159
+   "hash": "e332280c3093",
+   "bytes": 7236
   },
   {
    "url": "/locales/mr.json",
-   "hash": "543c1ef686cc",
-   "bytes": 7052
+   "hash": "05d3441fa580",
+   "bytes": 7161
   },
   {
    "url": "/manifest.webmanifest",
@@ -531,23 +541,23 @@
   },
   {
    "url": "/parent-dashboard.html",
-   "hash": "df6af2b48bac",
-   "bytes": 17519
+   "hash": "bb6b1477c69d",
+   "bytes": 17564
   },
   {
    "url": "/parent.html",
-   "hash": "ef63bb2ef8d1",
-   "bytes": 5186
+   "hash": "206b0ce5a25f",
+   "bytes": 6698
   },
   {
    "url": "/profile-setup.html",
-   "hash": "2c44c902b4b6",
-   "bytes": 9140
+   "hash": "765ba8137272",
+   "bytes": 9185
   },
   {
    "url": "/realworld-missions.html",
-   "hash": "80130acf3a71",
-   "bytes": 2338
+   "hash": "c7473f5d6b39",
+   "bytes": 2383
   },
   {
    "url": "/reference-studio.html",
@@ -556,8 +566,8 @@
   },
   {
    "url": "/rewards.html",
-   "hash": "ca46de3a2752",
-   "bytes": 4783
+   "hash": "49da669501b1",
+   "bytes": 4828
   },
   {
    "url": "/selftest.html",
@@ -566,8 +576,8 @@
   },
   {
    "url": "/tasks.html",
-   "hash": "730ea2c8b64a",
-   "bytes": 4400
+   "hash": "2e7513ba14d3",
+   "bytes": 4445
   },
   {
    "url": "/wasm/lq_core.wasm",
@@ -576,13 +586,13 @@
   },
   {
    "url": "/world-jungle.html",
-   "hash": "582742fac854",
-   "bytes": 7247
+   "hash": "f059e2636717",
+   "bytes": 7292
   },
   {
    "url": "/world-maths_kingdom.html",
-   "hash": "c1ec8a8850d4",
-   "bytes": 8237
+   "hash": "f679fcd718af",
+   "bytes": 8282
   },
   {
    "url": "/vendor/three-addons/environments/RoomEnvironment.js",
@@ -621,8 +631,8 @@
   },
   {
    "url": "/",
-   "hash": "1d4d9fdcf041",
-   "bytes": 10451
+   "hash": "ff441c5ea0b7",
+   "bytes": 10687
   }
  ],
  "offlinePack": [

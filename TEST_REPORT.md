@@ -249,3 +249,20 @@ New backend tests: JavaScript engine = 960 golden questions + verification; Pyth
 **Found by the tests and fixed:** `npm ci` in the workflow would have run the root `postinstall` (backend install) - now `--ignore-scripts`; dead links in the self-check page (Hub) and the 3D lab (profile, reference studio) - now pointed at the game; two false alarms in my own checker (extension matching, root-path matching); and, from the earlier teacher preview: the speech bubble covered the child, the teacher stood exactly in the child's lane, the rescue hint escaped the card (CSS class clash with the game's `.hint`) and the "Got you!" bubble ghosted behind the panel - all fixed.
 **Also found by the new phone checks and fixed:** on a narrow phone the Fullscreen button and the third score chip sat under the pause / sound buttons - the Fullscreen button is now hidden on phones and the chips keep clear of the buttons (checked on iPhone portrait + landscape and Pixel: 11 / 11 each).
 **Not verified:** the real GitHub Actions run, the live `github.io` address, GitHub's own response headers, and the repository push (needs the user's account).
+
+## Update 19 - results on the final code
+| Suite | Result |
+|---|---|
+| Unit tests (teacher x7, free runs x3, story questions x2) / validator / platform config / backend | **68 / 68**, **637 checks**, **14 / 14**, **70 / 70** |
+| Python / Java / C++ parity (questions untouched) | **3,784**, **1,864**, **10 / 10** |
+| Teacher (`t_b9`): far / close / caught, escape question, wrong-answer scene, tutorial, setting, Hindi, iPhone, weak-device mode, cost | **15 + 7 + 4** |
+| Free runs (`t_free`): counting, gate without a server, signed-in bypass, Hindi, Enter key; with the backend: redirect to parent sign-up, Sign Up tab, navigation bar | **13 + 4** |
+| Home page (`t_home`): illustration mode, scroll, languages, reduced motion, lite / full 3D, context loss, iPhone | **15 + 7 + 9 + 6** |
+| GitHub Pages layout (`t_pages`: home page, real offline, no self-check) / root layout | **17**, **3** |
+| Installable app: files / offline / update + stale-file regression | **10**, **13**, **12** |
+| Gameplay / audio / biomes / languages / tutorial+touch / Lab / settings | **27**, **36**, **12**, **19**, **31**, **21**, **22** |
+| Performance B / device analysis (A + B) / native core | **4**, **6 + 18**, **9** |
+| Phones and app shell (iPhone portrait + landscape, Pixel, lifecycle) | **11 + 11 + 11**, **15** |
+| Hub / original pages with the new navigation bar / Jungle Runner (Boy, Girl) / Maths Kingdom / gallery / CSP sweep | **35**, **15**, **7 + 7**, **14**, **11**, clean |
+**Found by the tests and fixed:** the service worker mixed new pages with old translation files; the question banner was huge and the coach text almost invisible; on phones the banner was squeezed to half the width; the emoji in the teacher's speech bubble printed as code; a wrong answer grabbed him even when a shield had saved him (and froze the long-run test); the language chosen on the home page did not reach the game; tests that tapped (100,100) now hit the menu navigation; the device panel is folded so its text is only visible after opening "Advanced".
+**Not verified:** real GPUs and phones, the native feel of the grab scene (the teacher uses her talking pose, there is no dedicated grab animation), Hindi / Marathi wording by a native speaker, and the real GitHub run.

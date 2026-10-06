@@ -1,24 +1,22 @@
 {
   "app_name": "LearnQuest",
   "nav_home": "मुख्यपृष्ठ",
-  "home_hero_title": "शिका. उघडा. साहस करा.",
-  "home_hero_sub": "प्रत्येक धडा जंगलातील नवीन दार उघडतो. खेळा, गणित, इंग्रजी आणि सामान्य ज्ञान शिका आणि जंगलाचे वीर व्हा.",
+  "home_hero_title": "जंगलात धावा, खेळता खेळता शिका",
+  "home_hero_sub": "एक 3D धावण्याचा गेम, ज्यात प्रत्येक बरोबर उत्तर रस्ता उघडते. गणित, स्पेलिंग, विज्ञान आणि बरेच काही, इंग्रजी, हिंदी आणि मराठीत.",
   "home_cta_child": "मी मूल आहे — चला खेळूया!",
-  "home_cta_parent": "मी पालक आहे",
+  "home_cta_parent": "पालक: लॉग इन किंवा साइन अप",
   "home_feature_1_title": "खरे खेळ",
   "home_feature_1_body": "वर्कशीट नाही — नाणी, दारे आणि बॉस लढाई असलेले जंगल जग.",
   "home_feature_2_title": "लर्निंग गेट्स",
   "home_feature_2_body": "पुढचा रस्ता उघडण्यासाठी बरोबर उत्तर द्या.",
   "home_feature_3_title": "पालक माहिती",
   "home_feature_3_body": "प्रगती, अचूकता आणि कमकुवत विषय एका दृष्टीक्षेपात पहा.",
-
   "child_login_title": "जंगलात प्रवेश करा",
   "child_login_id_label": "तुमची चाइल्ड ID",
   "child_login_pin_label": "4 अंकी पिन",
   "child_login_button": "चला जाऊया!",
   "child_login_no_id": "ID नाही? तुमच्या पालकांना प्रोफाइल बनवायला सांगा.",
   "child_login_error": "ही ID किंवा पिन जुळत नाही. पुन्हा प्रयत्न करा!",
-
   "parent_auth_title": "पालक प्रवेश",
   "parent_tab_login": "लॉग इन",
   "parent_tab_signup": "साइन अप",
@@ -28,7 +26,6 @@
   "parent_login_button": "लॉग इन करा",
   "parent_signup_button": "खाते तयार करा",
   "parent_auth_error": "काहीतरी चूक झाली. कृपया तुमची माहिती तपासा.",
-
   "profile_setup_title": "चाइल्ड प्रोफाइल तयार करा",
   "profile_name_label": "मुलाचे नाव",
   "profile_age_label": "वय",
@@ -38,7 +35,6 @@
   "profile_class_label": "इयत्ता (ऐच्छिक)",
   "profile_save_button": "प्रोफाइल तयार करा",
   "profile_success": "प्रोफाइल तयार झाले! चाइल्ड ID आणि पिन शेअर करा जेणेकरून ते लॉग इन करू शकतील.",
-
   "dashboard_greeting": "नमस्कार, {name}!",
   "dashboard_xp": "XP",
   "dashboard_coins": "नाणी",
@@ -50,14 +46,12 @@
   "dashboard_rewards_link": "रिवॉर्ड शॉप",
   "dashboard_tasks_link": "माझी कामे",
   "dashboard_logout": "लॉग आउट",
-
   "jungle_title": "जंगल जग",
   "jungle_subtitle": "वाटेने चाला. दारे पार करा. संरक्षकापर्यंत पोहोचा.",
   "jungle_locked": "बंद",
   "jungle_completed": "पूर्ण झाले",
   "jungle_play": "खेळा",
   "jungle_boss": "बॉस लढाई",
-
   "gate_title": "नॉलेज गेट",
   "gate_instruction": "रस्ता उघडण्यासाठी बरोबर उत्तर द्या!",
   "gate_submit": "उत्तर सबमिट करा",
@@ -73,18 +67,15 @@
   "boss_title": "बॉस लढाई: जंगल संरक्षक",
   "boss_hp_label": "संरक्षक HP",
   "boss_defeated": "बॉस पराभूत! 🎉",
-
   "rewards_title": "रिवॉर्ड शॉप",
   "rewards_subtitle": "तुमच्या नाण्यांनी जंगल गियर घ्या!",
   "rewards_owned": "तुमच्याकडे आहे",
   "rewards_unlock": "अनलॉक करा",
   "rewards_not_enough": "पुरेशी नाणी नाहीत",
-
   "tasks_title": "माझी कामे",
   "tasks_empty": "अजून कामे नाहीत — लवकरच पहा!",
   "tasks_complete": "पूर्ण म्हणून चिन्हांकित करा",
   "tasks_completed": "पूर्ण झाले",
-
   "parent_dashboard_title": "पालक डॅशबोर्ड",
   "parent_add_child": "+ मूल जोडा",
   "parent_no_children": "अजून चाइल्ड प्रोफाइल नाही. सुरू करण्यासाठी एक जोडा.",
@@ -101,7 +92,6 @@
   "parent_task_reward_value": "बक्षीस मूल्य",
   "parent_task_assign": "काम नेमून द्या",
   "parent_view_dashboard": "डॅशबोर्ड पहा",
-
   "common_back": "मागे",
   "common_loading": "लोड होत आहे...",
   "common_save": "जतन करा",

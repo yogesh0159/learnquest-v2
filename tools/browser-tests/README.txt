@@ -44,3 +44,7 @@ Update 17 (teacher): t_b9.py a|b|c  the friendly teacher who runs behind the chi
 
 Update 18 (GitHub Pages): t_pages.py a|b  the built site served like GitHub Pages under /LearnQuest/ (a: game, no 404, service worker scope, real offline) and at the root (b).
      scripts/test-pages.mjs checks a built site; scripts/serve-pages.mjs serves it like Pages.
+
+Update 19 (premium experience): t_free.py a|b  three free runs and the account gate (a: no server = guest, b: full backend -> parent sign-up)
+     t_b9.py a|b|c  the Subway-style teacher (first stumble = close, second = grabbed + escape question, wrong answer = grabbed + shows the answer)
+     t_home.py a|b|c|d  home page (static / lite 3D / full 3D / iPhone);  t_pages.py (GitHub Pages layout, now without self-check and account pages)

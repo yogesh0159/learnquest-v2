@@ -19,12 +19,12 @@ async def part_a(p):
         pg.on("requestfailed",lambda r: bad.append(("failed",r.failure,r.url.replace(f"http://127.0.0.1:{port}",""))) if r.url.startswith(f"http://127.0.0.1:{port}") and "ERR_ABORTED" not in str(r.failure) else None)     # a request cancelled because the visitor already moved to another page is not a missing file     # only this site; Google Fonts is external
         await pg.goto(B,wait_until="load"); await pg.wait_for_selector(".hero-copy h1",timeout=30000); await pg.wait_for_function("document.querySelector('.hero-copy h1').innerText.length>5",timeout=20000)
         ok("opening the project address (…/LearnQuest/) shows the HOME PAGE and stays there (no redirect into the game)",pg.url==B or pg.url==B+"index.html",pg.url)
-        h1=await E("document.querySelector('.hero-copy h1').innerText"); ok("home page: hero title, Play button, device-speed button and 3D lab link",h1.startswith("Learn")  and await E("!!document.querySelector('a[href=\"jungle-local-preview.html\"]') && !!document.querySelector('a[href=\"selftest.html\"]') && !!document.querySelector('a[href=\"character-lab.html\"]')"),h1)
-        await pg.click('[data-lang="hi"]'); await pg.wait_for_function("document.querySelector('[data-i18n=home_cta_play]').innerText.includes('जंगल')",timeout=10000); ok("home page switches to Hindi (title, Play button)",'जंगल' in await E("document.querySelector('[data-i18n=home_cta_play]').innerText"))
+        h1=await E("document.querySelector('.hero-copy h1').innerText"); ok("home page: hero title, Play button and 'See how it works'; no self-check, 3D lab or account links",h1.startswith("Run the jungle") and await E("!!document.querySelector('.hero-ctas a[href=\"jungle-local-preview.html\"]') && !!document.querySelector('.hero-ctas a[href=\"#how\"]') && !document.querySelector('a[href*=\"selftest\"], a[href*=\"character-lab\"], [data-family]')"),h1)
+        await pg.click('[data-lang="hi"]'); await pg.wait_for_function("document.querySelector('[data-h=cta_play]').innerText.includes('जंगल')",timeout=10000); ok("home page switches to Hindi (title, Play button)",'जंगल' in await E("document.querySelector('[data-h=cta_play]').innerText"))
         await pg.click('[data-lang="en"]')
-        await pg.click('a[href="jungle-local-preview.html"]'); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await E("LQ_JUNGLE.stopLoop()")
+        await pg.click('.hero-ctas a[href="jungle-local-preview.html"]'); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await E("LQ_JUNGLE.stopLoop()")
         ok("the Play button opens the game",pg.url.startswith(B+"jungle-local-preview.html"),pg.url)
-        await pg.click('a[href="index.html"][aria-label="Home"]'); await pg.wait_for_selector(".hero-copy h1",timeout=30000); ok("the Home link in the game menu leads back to the home page",pg.url.endswith("index.html") or pg.url==B,pg.url)
+        await pg.click('.menu-nav a[href="index.html"]'); await pg.wait_for_selector(".hero-copy h1",timeout=30000); ok("the Home link in the game menu leads back to the home page",pg.url.endswith("index.html") or pg.url==B,pg.url)
         await pg.goto(B+"jungle-local-preview.html?seed=4242&quality=low&calibrate=0&notutorial=1&drs=0",wait_until="commit"); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await E("LQ_JUNGLE.stopLoop()")
         diag=await E("LQ_JUNGLE.assets.diagnostics()"); ok("all 3D models loaded from the sub-folder, no placeholders",not diag['failures'] and len(diag['assets'])>=9,f"{len(diag['assets'])} models")
         ok("not a single file is missing (no 404 / failed request) while the game starts",not bad,str(bad[:4]))
@@ -53,9 +53,9 @@ async def part_b(p):
         b,pg,logs=await launch(p,960,540); E=pg.evaluate; bad=[]
         pg.on("response",lambda r: bad.append((r.status,r.url)) if r.status>=400 and 'favicon' not in r.url else None)
         await pg.goto(B,wait_until="load"); await pg.wait_for_selector(".hero-copy h1",timeout=30000); ok("user-site layout (https://NAME.github.io/): the home page opens at the site root",pg.url in (B,B+"index.html"),pg.url)
-        await pg.click('a[href="jungle-local-preview.html"]'); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await E("LQ_JUNGLE.stopLoop()")
+        await pg.click('.hero-ctas a[href="jungle-local-preview.html"]'); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=150000); await E("LQ_JUNGLE.stopLoop()")
         diag=await E("LQ_JUNGLE.assets.diagnostics()"); ok("all models loaded and no missing file",not diag['failures'] and not bad,str(bad[:3]))
-        await pg.goto(B+"selftest.html",wait_until="commit"); await pg.wait_for_selector("#start, button",timeout=30000); ok("the self-check page is part of the site (device report for any visitor)",'Self-check' in await E("document.body.innerText") or 'self' in (await E("document.title")).lower(),await E("document.title"))
+        ok("the self-check page is NOT part of the public site",(await pg.goto(B+"selftest.html")).status==404)
         await b.close()
     finally: pr.terminate()
 async def main():

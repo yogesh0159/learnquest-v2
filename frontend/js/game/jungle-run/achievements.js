@@ -8,7 +8,7 @@ export const ACHIEVEMENTS = Object.freeze([
   { id: "dist_1500",   icon: "\u{1F680}", title: "Jungle Marathon",   desc: "Run 1500 m in one run",              test: (r) => r.distance >= 1500 },
   { id: "right_5",     icon: "\u{1F4A1}", title: "Bright Mind",       desc: "Answer 5 questions right in a run",  test: (r) => r.correct >= 5 },
   { id: "streak_5",    icon: "\u{1F525}", title: "On Fire",           desc: "5 right answers in a row",           test: (r) => r.bestStreak >= 5 },
-  { id: "enigma_3",    icon: "\u{1F52E}", title: "Enigma Master",     desc: "Collect 3 Golden Enigmas in a run",  test: (r) => r.tokens >= 3 },
+  { id: "enigma_3",    icon: "\u{1F52E}", title: "Mystery Master",     desc: "Collect 3 mystery coins in a run",  test: (r) => r.tokens >= 3 },
   { id: "clean_300",   icon: "\u{1F6E1}\uFE0F", title: "Untouchable", desc: "Run 300 m without getting hit",      test: (r) => r.noHitDistance >= 300 },
   { id: "combo_20",    icon: "\u26A1",    title: "Combo King",        desc: "Collect 20 coins in a row",          test: (r) => r.bestCombo >= 20 },
   { id: "all_rounder", icon: "\u{1F308}", title: "All-Rounder",       desc: "Answer right in 3 different subjects", test: (r) => (r.subjectsRight || 0) >= 3 },

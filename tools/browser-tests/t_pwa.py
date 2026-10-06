@@ -77,13 +77,16 @@ async def part_c(p):
         await pg.goto(U,wait_until="commit"); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=120000); await E("LQ_JUNGLE.stopLoop()"); await pg.wait_for_function("LQ_PWA.registered",timeout=20000)
         await pg.reload(); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=120000); await E("LQ_JUNGLE.stopLoop()")
         v1=(await E("caches.keys()")); ok("version 1 installed",any(k.startswith('lq-shell-') for k in v1),str(v1))
+        # ---- the bug a visitor met: a translation file changes on the server while the service worker is already installed -> the page must get the NEW file, not a saved old one
+        loc=json.load(open(tmp+"/frontend/locales/en.json")); loc["zz_fresh_marker"]="v2"; json.dump(loc,open(tmp+"/frontend/locales/en.json","w"))
+        got=await E("fetch('locales/en.json').then(r=>r.text())"); ok("changed files are never served stale by the installed service worker (translations, scripts, styles come fresh when online)",'zz_fresh_marker' in got)
         # ---- publish version 2: the service worker file changes and the precache manifest gets a new version
         m=json.load(open(tmp+"/frontend/precache-manifest.json")); m['version']='newversion0001'; json.dump(m,open(tmp+"/frontend/precache-manifest.json","w"))
         open(tmp+"/frontend/sw.js","a").write("\n// version 2\n")
         await E("navigator.serviceWorker.getRegistration().then(r=>r.update())"); await pg.wait_for_function("LQ_PWA.updateReady",timeout=40000)
-        ok("a new version is detected and waits (the running game is NOT reloaded)",await E("LQ_PWA.updateReady") and await E("LQ_JUNGLE.ready"))
+        ok("a new version takes over and is announced (the running game is NOT reloaded by itself)",await E("LQ_PWA.updateReady") and await E("LQ_JUNGLE.ready"))
         await pg.click("#settingsBox summary"); txt=await E("document.getElementById('settingsBody').innerText"); ok("Settings shows 'A new version is ready' with a Reload button",'A new version is ready' in txt and await E("!!document.querySelector('[data-act=update]')"))
-        names=await E("caches.keys()"); ok("version 2 is downloaded in the background while version 1 keeps working",'lq-shell-newversion0001' in names and any(k.startswith('lq-shell-') and k!='lq-shell-newversion0001' for k in names),str(names))
+        names=await E("caches.keys()"); ok("version 2 is downloaded and active",'lq-shell-newversion0001' in names,str(names))
         await pg.click("[data-act=update]"); await pg.wait_for_function("document.readyState==='complete' && LQ_PWA.controlled",timeout=60000); await pg.wait_for_function("window.LQ_JUNGLE&&window.LQ_JUNGLE.ready",timeout=120000)
         names=await E("caches.keys()"); ok("after 'Reload now' the new version is active and the old one is deleted",'lq-shell-newversion0001' in names and not any(k.startswith('lq-shell-') and k!='lq-shell-newversion0001' for k in names),str(names)); await E("LQ_JUNGLE.stopLoop()")
         await b.close()
