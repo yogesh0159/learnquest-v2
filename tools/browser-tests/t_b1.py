@@ -7,7 +7,7 @@ async def shot(pg,name):
 async def main():
     async with async_playwright() as p:
         b,pg,logs=await launch(p,960,540)
-        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=balanced&seed=21"); E=pg.evaluate
+        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=balanced&seed=21"); E=pg.evaluate; await E("LQ_JUNGLE.setSetting('readTime', 'off')")        # this suite is about power-ups: the question pause has its own tests
         await E("LQ_JUNGLE.stopLoop()")
         # ---- LAB
         await pg.keyboard.press("F2"); await pg.wait_for_timeout(700); await E("LQ_JUNGLE.advance(0.3)")

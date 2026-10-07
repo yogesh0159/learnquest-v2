@@ -25,6 +25,7 @@ import { Profile, TRAILS } from "./profile.js";
 import { evaluateAchievements, achievementById } from "./achievements.js";
 import { Speaker } from "./speech.js";
 import { i18n, t, detectLanguage, LANGS, STRINGS } from "./i18n.js";
+import { readSeconds } from "./question-reading.js";
 import { localizeQuestion } from "./question-i18n.js";
 import { Tutorial } from "./tutorial.js";
 import { BiomeManager, AmbientFx } from "./biome-manager.js";
@@ -62,7 +63,7 @@ export class GameManager {
     this.prof = { n: 0, logic: 0, misc: 0, render: 0, frame: 0 };
     this.renderScale = 1; this.drsEnabled = params.get("drs") !== "0"; this.drs = new AdaptiveResolution({ min: 0.5, max: 1 });
     this.speedMultiplier = 1; this.lab = params.get("lab") === "1";
-    this.stats = this._freshStats(); this.speed = 0; this.runSeed = (Math.random() * 1e9) | 0;
+    this.stats = this._freshStats(); this.speed = 0; this.reading = null; this.hud?.reading?.(false); this.runSeed = (Math.random() * 1e9) | 0;
     this.frameMs = 16; this.lastTs = 0; this.fps = 0; this.fpsAcc = 0; this.fpsN = 0;
     this.audio = new AudioManager({ logger, storage: store }); this.audio.wantMusic = true; if (this.sandbox) this.audio.settings.muted = true;   // music starts on the first click / key press
     this.specialHandlers = []; this.events = new EventTarget(); this.fixedStep = false; this.ready = false;
@@ -87,6 +88,7 @@ export class GameManager {
     this._buildWorld();
     this._bindInput();
     this.lifecycle = new AppLifecycle({ game: this });
+    addEventListener("keydown", (e) => { if (this.reading && !e.repeat && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopImmediatePropagation(); this.skipReading(); } }, true);
     this.teacher = new TeacherManager({ game: this }); await this.teacher.load();                  // the friendly teacher who runs behind the child                  // pause when the app is left, keep the screen awake, back button, iOS audio, GPU context loss
     this._applyQuality(this.quality);
     await this.calibrate();
@@ -180,7 +182,7 @@ export class GameManager {
     gr.addColorStop(0, "rgba(0,0,0,.55)"); gr.addColorStop(0.6, "rgba(0,0,0,.28)"); gr.addColorStop(1, "rgba(0,0,0,0)"); bg.fillStyle = gr; bg.fillRect(0, 0, 64, 64);
     this.blob = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(bc), transparent: true, depthWrite: false, fog: false }));
     this.blob.rotation.x = -Math.PI / 2; this.blob.position.y = 0.03; this.blob.renderOrder = 2; this.blob.name = "BlobShadow"; this.scene.add(this.blob);
-    this.questions.on("question", (q) => { const loc = localizeQuestion(q, t, i18n.lang); this.hud.banner(loc.story || loc.text); this.audio.play("question"); this.speaker.speak(loc.spokenStory || loc.spoken); });
+    this.questions.on("question", (q) => { const loc = localizeQuestion(q, t, i18n.lang); this.hud.banner(loc.story || loc.text); this.audio.play("question"); this.speaker.speak(loc.spokenStory || loc.spoken); this._beginReading(loc); });
     this.questions.on("answer", (r) => this._onAnswer(r));
     this.questions.on("zone-end", () => this.hud.banner(""));
     this.ambient = new AmbientFx({ scene: this.scene, native: this.native });
@@ -354,9 +356,37 @@ export class GameManager {
   }
 
   /** One simulation step (also driven by tests via advance()). */
+  /* ---------------------------------------------------------------- reading time: the runner waits while the question is read */
+  _beginReading(loc) {
+    if (this.state !== "playing" || this.tutorial.active || !this.player.alive) return;
+    const secs = readSeconds((loc.spokenStory || loc.text || "").length, this.profile.settings.grade, this.profile.settings.readTime); if (secs <= 0) return;
+    this.reading = { left: secs, total: secs }; this.player.state = "idle"; this.player.anim?.play("IDLE", { fade: 0.25 }); this.teacher?.hideBubble(); this.hud.teacherChip("");
+    this.hud.reading(true, 0, t("q.reading", { s: Math.ceil(secs) })); this.audio.setMood("quiz"); this.events.dispatchEvent(new CustomEvent("reading", { detail: { seconds: secs } }));
+  }
+  /** "Ready!" (button, Enter or Space): start before the time is over */
+  skipReading() { if (this.reading) this._endReading(); }
+  _endReading() {
+    if (!this.reading) return; this.reading = null; this.hud.reading(false);
+    if (this.player.alive) { this.player.startRun(); this.player.invulnerable = Math.max(this.player.invulnerable, 1.0); this.speed = Math.max(this.speed, GAME.baseSpeed * 0.5); }
+    this.audio.setMood("run"); this.lastTs = performance.now();
+  }
+  _stepReading(dt) {
+    const r = this.reading, p = this.player; r.left -= dt; this.speed *= Math.exp(-7 * dt);
+    p.update(dt, 0); this.env.update(dt); this.fx.update(dt, 0); this.ambient.update(dt, 0, this.biome.state.fireflies, this.reducedMotion); this.teacher?.update(dt, { hold: true });
+    this.hud.reading(true, 1 - Math.max(0, r.left) / r.total, t("q.reading", { s: Math.max(1, Math.ceil(r.left)) }));
+    if (r.left <= 0) this._endReading();
+  }
+  /** back to the start screen (from "Great run!" or the pause screen) */
+  toMenu() {
+    if (this.state !== "gameover" && this.state !== "paused") return; this.reading = null; this.hud.reading(false);
+    for (const s of ["over", "gameOver", "pause", "hud"]) this.hud.show(s, false); this.hud.banner(""); this.hud.teacherChip(""); this._resetRun();
+    this.state = "menu"; this.audio.setMood("quiz"); this.hud.show("menu", true); this.events.dispatchEvent(new CustomEvent("menu"));
+  }
+
   step(dt) {
     const p = this.player;
-    if (this.state === "playing") {
+    if (this.state === "playing" && this.reading) { this._stepReading(dt); }
+    else if (this.state === "playing") {
       const target = this._targetSpeed();
       this.speed += (target - this.speed) * (1 - Math.exp(-3 * dt));
       const dz = this.speed * dt;
@@ -637,7 +667,7 @@ export class GameManager {
     if (this.questions?.question) { const l2 = localizeQuestion(this.questions.question, t, i18n.lang); this.hud.banner(l2.story || l2.text); }
     this.events.dispatchEvent(new CustomEvent("language-changed", { detail: { lang: i18n.lang } }));
   }
-  setSetting(key, value) { this.profile.set(key, value); if (key === "teacherChase") this.teacher?.setEnabled(!!value); this.applyAccessibility(); if (key === "tts" && value) this.speaker.speak(t("sp.on")); }
+  setSetting(key, value) { this.profile.set(key, value); if (key === "readTime" && this.reading && value === "off") this.skipReading(); if (key === "teacherChase") this.teacher?.setEnabled(!!value); this.applyAccessibility(); if (key === "tts" && value) this.speaker.speak(t("sp.on")); }
 
   /* ---------------------------------------------------------- Lab: characters */
   labCharacters() { return ["boy", "girl"].map((k) => ({ key: k, label: ASSET_REGISTRY[k].label, active: k === this.characterKey })); }

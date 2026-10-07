@@ -6,7 +6,7 @@
   var lang = "en"; try { lang = localStorage.getItem("lq_lang") || "en"; } catch (e) { /* storage blocked */ }
   var d = T[lang] || T.en, here = location.pathname.split("/").pop() || "index.html";
   var items = [["index.html", "\u{1F3E0} " + d.home], ["jungle-local-preview.html", "\u25B6 " + d.play]];
-  if (FAMILY) items.push(["parent.html", "\u{1F469}\u200D\u{1F467} " + d.parents], ["child-login.html", "\u{1F9D2} " + d.kids]);
+  if (FAMILY) items.push(["parent.html", "\u{1F46A} " + d.parents], ["child-login.html", "\u{1F9D2} " + d.kids]);
   var css = document.createElement("style");
   css.textContent = ".sitenav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;padding:6px 10px;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(16,58,38,.14);font-family:'Baloo 2','Segoe UI',system-ui,sans-serif}" +
     ".sitenav a{padding:5px 14px;border-radius:999px;color:#103a26;text-decoration:none;font-weight:700;font-size:14px;border:2px solid transparent}.sitenav a:hover{background:rgba(47,191,106,.16)}.sitenav a.on{background:#2fbf6a;color:#fff}body.has-sitenav{padding-top:46px}";

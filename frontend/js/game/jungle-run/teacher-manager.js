@@ -78,10 +78,11 @@ export class TeacherManager {
   }
 
   /* ------------------------------------------------------------------ state */
-  reset() { this.brain.reset(); this.brain.gentle = this.game.profile.settings.grade === 1 ? 0.8 : 1; this.x = this.game.player?.x || 0; this.zNow = this.brain.k.farZ + 0.8; this.off = 0; this.alias = ""; this.q = null; this.serial = 0; this.hideRescue(); this.hideBubble(); this.setVisible(false); }
+  reset() { this.brain.reset(); this.brain.gentle = this.game.profile.settings.grade === 1 ? 0.8 : 1; this.x = this.game.player?.x || 0; this.zNow = this.brain.k.farZ + 0.8; this.off = 0; this.beat = 0; this.pending = null; this.panelShown = false; this.prevState = "far"; this.vis = false; this.alias = ""; this.q = null; this.serial = 0; this.hideRescue(); this.hideBubble(); this.setVisible(false); }
   onRunStart() { this._syncVisible(); const l = this.brain.startLine(); if (l && this.enabled) this.say(l); }
   _syncVisible() { this.setVisible(this.enabled && ["playing", "rescue", "gameover"].includes(this.game.state)); }
-  setVisible(v) { if (this.group) this.group.visible = v && this.game.quality.teacherModel; if (this.blob) this.blob.visible = v && this.game.quality.blob && this.game.quality.teacherModel; if (!v) this.hideBubble(); }
+  setVisible(v) { this.vis = !!v; this._applyVis(); if (!v) { this.hideBubble(); this.game.hud?.teacherChip(""); } }
+  _applyVis() { const on = this.vis && this.zNow < 8.6; if (this.group) this.group.visible = on && this.game.quality.teacherModel; if (this.blob) this.blob.visible = on && this.game.quality.blob && this.game.quality.teacherModel; }   // out of sight behind the camera while she is far
   canCatch() { const g = this.game; return this.enabled && g.state === "playing" && g.player.alive && g.stats.lives > 0 && !g.tutorial.active && g.director.enabled; }
 
   /** The runner stumbled over an obstacle.  First time: she runs right up behind him.  Again while she is close: she grabs him. */
@@ -109,19 +110,30 @@ export class TeacherManager {
       const px = g.player.x; if (px < -1) this.sign = 1; else if (px > 1) this.sign = -1;
       this.off += (this.sign * this.brain.side - this.off) * (1 - Math.exp(-4 * dt));
       const gx = Math.max(-2.9, Math.min(2.9, this.x + this.off));
-      this.group.position.set(gx, 0, this.zNow); if (this.blob) this.blob.position.set(gx, 0.03, this.zNow);
+      this.group.position.set(gx, 0, this.zNow); if (this.blob) this.blob.position.set(gx, 0.03, this.zNow); this._applyVis();
       const talking = g.state === "rescue" || g.state === "gameover"; const want = talking ? "TALK" : "RUN";
       if (want !== this.alias) { this.alias = want; if (!this.anim.play(want, { fade: 0.2, timeScale: want === "RUN" ? 1.3 : 1 })) this.anim.play(talking ? "IDLE" : "RUN", { fade: 0.2 }); }
       if (want === "RUN") this.anim.play("RUN", { fade: 0.2, timeScale: Math.max(0.8, (g.speed / 9) * 1.25 * this.brain.speedFactor) });
       this.anim.update(dt);
     }
-    this._tickBubble(dt);
+    this._tickBubble(dt); this._tickState();
+    if (this.beat > 0) { this.beat -= dt; if (this.beat <= 0) this._showPanel(); }       // the grab is seen for a moment first, then she explains
+  }
+  /** a small hint in the top bar while she is close, and a message when she runs into view or falls back */
+  _tickState() {
+    const g = this.game, b = this.brain, st = b.state;
+    g.hud.teacherChip(this.enabled && st === "close" && g.state === "playing" ? t("hud.teacher.close", { s: Math.max(1, Math.ceil(b.closeLeft)) }) : "");
+    if (st !== this.prevState) {
+      if (this.prevState === "far" && st === "close") g.hud.toast(t("t.teacherNear"), "bad", 2600);
+      if (this.prevState === "close" && st === "far" && g.state === "playing") g.hud.toast(t("t.teacherAway"), "good", 2200);
+      this.prevState = st;
+    }
   }
 
   /* ------------------------------------------------------------------- speech bubble (a corner of the screen, never on the road) */
   say(line) {
     const key = `teacher.l.${line.kind}${line.variant || 1}`; const text = t(key); if (!text || text === key) return;
-    this.bubble.textContent = `\u{1F9D1}\u200D\u{1F3EB} ${text}`; this.bubble.hidden = false; this.bubbleTimer = 2.8;
+    this.bubble.textContent = `\u{1F393} ${text}`; this.bubble.hidden = false; this.bubbleTimer = 2.8;
     if (this.game.profile.settings.tts && line.kind !== "caught") this.game.speaker.speak(text);
   }
   hideBubble() { this.bubble.hidden = true; this.bubbleTimer = 0; }
@@ -130,28 +142,31 @@ export class TeacherManager {
   /* ------------------------------------------------------------------ the catch scene */
   startCatch(kind, info) {
     const g = this.game; if (g.state !== "playing") return;
-    g.state = "rescue"; this.serial++; this.answered = false; this.kind = kind; this.hideBubble();
-    this.p.root.classList.toggle("explain", kind === "wrong");
+    g.state = "rescue"; this.serial++; this.answered = false; this.kind = kind; this.hideBubble(); g.hud.teacherChip(""); this.panelShown = false;
+    this.pending = { kind, info }; this.beat = 1.15;                                                // she runs up and grabs him; the panel comes after the beat
+    g.player.state = "idle"; g.player.anim?.play("IDLE", { fade: 0.2 }); g.audio.play(kind === "wrong" ? "wrong" : "hit"); g.vibrate(60);
+    g.hud.toast(t(kind === "wrong" ? "t.caughtWrong" : "t.caughtHit"), "bad", 3200); this.say({ kind: "caught", variant: 1 });
+    g.events.dispatchEvent(new CustomEvent("teacher-caught", { detail: { serial: this.serial, kind } }));
+  }
+  _showPanel() {
+    const g = this.game; if (g.state !== "rescue" || !this.pending) return; const { kind, info } = this.pending; this.pending = null; this.panelShown = true;
+    this.p.root.classList.toggle("explain", kind === "wrong"); this.p.title.textContent = t("teacher.catch.title"); this.p.why.textContent = t(`teacher.why.${kind}`); this.p.say.textContent = t(`teacher.ask.${kind}`);
     if (kind === "wrong") {
-      const q = info.question; const loc = localizeQuestion(q, t, i18n.lang); this.q = q; this.loc = loc;
-      this.p.title.textContent = t("teacher.catch.title"); this.p.say.textContent = t("teacher.catch.wrong"); this.p.q.textContent = loc.text;
+      const q = info.question; const loc = localizeQuestion(q, t, i18n.lang); this.q = q; this.loc = loc; this.p.q.textContent = loc.text;
       this.p.answer.textContent = info.correctLabel; this.p.fb.className = "fb"; this.p.fb.textContent = loc.explanation; this.p.tip.textContent = ""; this.p.opts.innerHTML = "";
-      this.p.go.hidden = false; this.p.go.textContent = t("teacher.go"); this.p.root.hidden = false;
-      g.audio.play("wrong"); g.vibrate(60); g.speaker.speak(`${t("teacher.catch.wrong")} ${info.correctLabel}. ${loc.explanation}`);
-      this.holdTimer = setTimeout(() => this.finishCatch(false), 9000);
+      this.p.go.hidden = false; this.p.go.textContent = t("teacher.go"); this.p.root.hidden = false; g.speaker.speak(`${t("teacher.ask.wrong")} ${info.correctLabel}. ${loc.explanation}`);
+      this.holdTimer = setTimeout(() => this.finishCatch(false), 12000);
     } else {
       const rng = seededFor(g.runSeed, 7000 + this.serial); const s = g.profile.settings;
       const subject = pickSubject(rng, s.subjects, this.lastSubject); this.lastSubject = subject;
       const q = generateQuestion({ subject, level: levelForProgress(g.stats.correct, s.grade), rng }); this.q = q; const loc = localizeQuestion(q, t, i18n.lang); this.loc = loc;
-      this.p.title.textContent = t("teacher.catch.title"); this.p.say.textContent = t("teacher.catch.hit"); this.p.q.textContent = loc.text; this.p.answer.textContent = ""; this.p.fb.textContent = ""; this.p.fb.className = "fb"; this.p.tip.textContent = t("teacher.keys");
+      this.p.q.textContent = loc.text; this.p.answer.textContent = ""; this.p.fb.textContent = ""; this.p.fb.className = "fb"; this.p.tip.textContent = t("teacher.keys");
       this.p.go.hidden = true; this.p.opts.innerHTML = ""; q.options.forEach((o, i) => { const b = document.createElement("button"); b.className = `opt o${i}`; b.dataset.i = String(i); b.innerHTML = `<i>${SHAPES[i]}</i><b></b><kbd>${i + 1}</kbd>`; b.querySelector("b").textContent = o.label; b.addEventListener("click", () => this.answer(i)); this.p.opts.appendChild(b); });
-      this.p.root.hidden = false; g.audio.play("question"); g.audio.setMood("quiz"); g.vibrate(40); g.speaker.speak(`${t("teacher.catch.hit")} ${loc.spoken}`);
+      this.p.root.hidden = false; g.audio.play("question"); g.audio.setMood("quiz"); g.speaker.speak(`${t("teacher.ask.hit")} ${loc.spoken}`);
     }
-    g.player.state = "idle"; g.player.anim?.play("IDLE", { fade: 0.2 });
-    g.events.dispatchEvent(new CustomEvent("teacher-caught", { detail: { serial: this.serial, kind } }));
   }
   _key(e) {
-    const g = this.game; if (g.state !== "rescue" || e.repeat) return;
+    const g = this.game; if (g.state !== "rescue" || e.repeat || !this.panelShown) return;
     if (this.kind === "wrong") { if (["Enter", " ", "ArrowUp", "ArrowDown", "1", "2", "3"].includes(e.key)) { e.preventDefault(); this.finishCatch(false); } return; }
     if (this.answered) return;
     const map = { 1: 0, 2: 1, 3: 2, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 1, ArrowRight: 2, a: 0, A: 0, s: 1, S: 1, d: 2, D: 2 }; const k = e.key in map ? map[e.key] : undefined;
@@ -159,7 +174,7 @@ export class TeacherManager {
   }
   /** the escape question after a second stumble: a right answer wins the lost heart back */
   answer(i) {
-    const g = this.game; if (g.state !== "rescue" || this.kind !== "hit" || this.answered || !this.q) return; this.answered = true;
+    const g = this.game; if (g.state !== "rescue" || this.kind !== "hit" || this.answered || !this.q || !this.panelShown) return; this.answered = true;
     const q = this.q, ok = i === q.correctIndex;
     this.p.opts.querySelectorAll("button").forEach((b, k) => { b.disabled = true; b.classList.toggle("right", k === q.correctIndex); b.classList.toggle("wrong", k === i && !ok); });
     this.p.fb.className = `fb ${ok ? "ok" : "bad"}`; this.p.fb.textContent = `${ok ? t("board.correct") : t("board.oops")}  ${this.loc.explanation}`;
@@ -169,13 +184,13 @@ export class TeacherManager {
     this.rescueResult = ok; this.holdTimer = setTimeout(() => this.finishCatch(ok), 1800);
   }
   finishCatch(ok) {
-    const g = this.game; if (g.state !== "rescue") return; clearTimeout(this.holdTimer); this.hideRescue();
+    const g = this.game; if (g.state !== "rescue") return; clearTimeout(this.holdTimer); this.beat = 0; this.pending = null; this.hideRescue();
     const line = this.brain.release(this.kind === "hit" ? !!ok : null); g.state = "playing"; g.lastTs = performance.now();
     if (g.player.alive) { g.player.startRun(); g.player.invulnerable = Math.max(g.player.invulnerable, 1.6); }
     g.audio.setMood("run"); this.q = null; this.alias = ""; if (line) this.say(line);
     g.hud.banner("");
   }
-  hideRescue() { clearTimeout(this.holdTimer); this.p.root.hidden = true; }
+  hideRescue() { clearTimeout(this.holdTimer); this.p.root.hidden = true; this.panelShown = false; }
 
   onGameOver() { this.hideRescue(); this.brain.state = "far"; }
 
@@ -184,9 +199,9 @@ export class TeacherManager {
     const bubble = document.createElement("div"); bubble.id = "teacherBubble"; bubble.hidden = true; bubble.setAttribute("role", "status");
     (document.getElementById("msgLane") || document.body).appendChild(bubble); this.bubble = bubble;
     const root = document.createElement("div"); root.id = "rescue"; root.hidden = true; root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
-    root.innerHTML = '<div class="card"><div class="who"><span class="face">\u{1F9D1}\u200D\u{1F3EB}</span><b class="title"></b></div><p class="say"></p><h2 class="q"></h2><div class="ans"></div><div class="opts"></div><p class="fb"></p><button class="go primary" hidden></button><small class="tip"></small></div>';
+    root.innerHTML = '<div class="card"><div class="who"><span class="face">\u{1F393}</span><b class="title"></b></div><p class="why"></p><p class="say"></p><h2 class="q"></h2><div class="ans"></div><div class="opts"></div><p class="fb"></p><button class="go primary" hidden></button><small class="tip"></small></div>';
     document.body.appendChild(root);
-    this.p = { root, title: root.querySelector(".title"), say: root.querySelector(".say"), q: root.querySelector(".q"), answer: root.querySelector(".ans"), opts: root.querySelector(".opts"), fb: root.querySelector(".fb"), go: root.querySelector(".go"), tip: root.querySelector(".tip") };
+    this.p = { root, title: root.querySelector(".title"), why: root.querySelector(".why"), say: root.querySelector(".say"), q: root.querySelector(".q"), answer: root.querySelector(".ans"), opts: root.querySelector(".opts"), fb: root.querySelector(".fb"), go: root.querySelector(".go"), tip: root.querySelector(".tip") };
     this.p.go.addEventListener("click", () => this.finishCatch(false));
   }
 }

@@ -1,7 +1,7 @@
 {
- "version": "6e39636fa871",
+ "version": "ec756ece3566",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3308924,
+ "shellBytes": 3322224,
  "packBytes": 54912780,
  "shell": [
   {
@@ -66,13 +66,13 @@
   },
   {
    "url": "/css/home.css",
-   "hash": "c80d76268e70",
-   "bytes": 12502
+   "hash": "a67b43c6cfef",
+   "bytes": 12648
   },
   {
    "url": "/css/jungle-local-preview.css",
-   "hash": "a5182c7f428e",
-   "bytes": 19648
+   "hash": "0548eaeec06a",
+   "bytes": 21549
   },
   {
    "url": "/css/jungle-runner.css",
@@ -106,8 +106,8 @@
   },
   {
    "url": "/index.html",
-   "hash": "ff441c5ea0b7",
-   "bytes": 10687
+   "hash": "e77db0ba5e44",
+   "bytes": 10634
   },
   {
    "url": "/js/api.js",
@@ -271,18 +271,18 @@
   },
   {
    "url": "/js/game/jungle-run/game-manager.js",
-   "hash": "ffc9ef2c6856",
-   "bytes": 50469
+   "hash": "143797c68986",
+   "bytes": 53144
   },
   {
    "url": "/js/game/jungle-run/hud.js",
-   "hash": "1f0010a0da6f",
-   "bytes": 3676
+   "hash": "0609ba486ca2",
+   "bytes": 4551
   },
   {
    "url": "/js/game/jungle-run/i18n.js",
-   "hash": "5464387a40dd",
-   "bytes": 46828
+   "hash": "2f06cc4e751e",
+   "bytes": 50484
   },
   {
    "url": "/js/game/jungle-run/native-core.js",
@@ -316,8 +316,8 @@
   },
   {
    "url": "/js/game/jungle-run/profile.js",
-   "hash": "d498bc3f755b",
-   "bytes": 4650
+   "hash": "30e2a4c131a3",
+   "bytes": 4755
   },
   {
    "url": "/js/game/jungle-run/question-banks.js",
@@ -338,6 +338,11 @@
    "url": "/js/game/jungle-run/question-manager.js",
    "hash": "a44b4bab8090",
    "bytes": 12924
+  },
+  {
+   "url": "/js/game/jungle-run/question-reading.js",
+   "hash": "569526b98d03",
+   "bytes": 966
   },
   {
    "url": "/js/game/jungle-run/question-service.js",
@@ -376,13 +381,13 @@
   },
   {
    "url": "/js/game/jungle-run/teacher-brain.js",
-   "hash": "006b31e0202d",
-   "bytes": 5362
+   "hash": "4fac494c3f72",
+   "bytes": 5558
   },
   {
    "url": "/js/game/jungle-run/teacher-manager.js",
-   "hash": "b772cd5cf705",
-   "bytes": 16143
+   "hash": "50486e414586",
+   "bytes": 17828
   },
   {
    "url": "/js/game/jungle-run/textures.js",
@@ -441,8 +446,8 @@
   },
   {
    "url": "/js/home-3d.js",
-   "hash": "70b99b7e7138",
-   "bytes": 27045
+   "hash": "eda23b717645",
+   "bytes": 26945
   },
   {
    "url": "/js/i18n.js",
@@ -451,8 +456,8 @@
   },
   {
    "url": "/js/jungle-local-preview.js",
-   "hash": "7c87cd6920d7",
-   "bytes": 18019
+   "hash": "4b6fda860b09",
+   "bytes": 18613
   },
   {
    "url": "/js/jungle-runner.js",
@@ -496,8 +501,8 @@
   },
   {
    "url": "/js/site-nav.js",
-   "hash": "40f3effd46ff",
-   "bytes": 2359
+   "hash": "1e3d7b426ef8",
+   "bytes": 2344
   },
   {
    "url": "/jungle-game.html",
@@ -506,8 +511,8 @@
   },
   {
    "url": "/jungle-local-preview.html",
-   "hash": "0b70c8df7c26",
-   "bytes": 7289
+   "hash": "84420dee4bde",
+   "bytes": 8011
   },
   {
    "url": "/locales/en.json",
@@ -631,8 +636,8 @@
   },
   {
    "url": "/",
-   "hash": "ff441c5ea0b7",
-   "bytes": 10687
+   "hash": "e77db0ba5e44",
+   "bytes": 10634
   }
  ],
  "offlinePack": [

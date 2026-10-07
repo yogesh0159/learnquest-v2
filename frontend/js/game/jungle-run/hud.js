@@ -6,7 +6,7 @@ export class Hud {
     const $ = (id) => doc.getElementById(id);
     this.el = {
       score: $("hudScore"), coins: $("hudCoins"), tokens: $("hudTokens"), distance: $("hudDistance"), hearts: $("hudHearts"),
-      multi: $("hudMulti"), combo: $("hudCombo"), streak: $("hudStreak"), power: $("hudPower"), banner: $("questionBanner"), bannerText: $("questionText"), toast: $("toast"),
+      multi: $("hudMulti"), combo: $("hudCombo"), streak: $("hudStreak"), power: $("hudPower"), banner: $("questionBanner"), teacher: $("hudTeacher"), readBar: $("readBar"), readyBtn: $("readyBtn"), readHint: $("readHint"), bannerText: $("questionText"), toast: $("toast"),
       loading: $("loadingScreen"), loadBar: $("loadBar"), loadText: $("loadText"), menu: $("menuScreen"), pause: $("pauseScreen"),
       over: $("gameOverScreen"), overStats: $("overStats"), error: $("errorBox"), errorText: $("errorText"), hud: $("hud"), best: $("bestScore"), loadDevice: $("loadDevice"), coach: $("coach"), coachText: $("coachText"), coachStep: $("coachStep"), overReview: $("overReview"), overAch: $("overAch"), menuStats: $("menuStats"),
     };
@@ -39,6 +39,14 @@ export class Hud {
   coach(text, step = "") { if (!this.el.coach) return; this.el.coach.hidden = !text; this.el.coachText.textContent = text || ""; if (this.el.coachStep) this.el.coachStep.textContent = step; }
   device(text) { if (this.el.loadDevice) this.el.loadDevice.textContent = text; }
   banner(text) { if (!this.el.banner) return; this.el.banner.hidden = !text; document.body.classList.toggle("has-question", !!text); this._set("banner", this.el.bannerText, text || ""); }
+  /** "teacher is close" hint in the top bar */
+  teacherChip(text) { const el = this.el.teacher; if (!el || this._tc === text) return; this._tc = text; el.hidden = !text; el.textContent = text || ""; }
+  /** reading time: the banner grows to the middle of the screen with a countdown bar and a "Ready!" button */
+  reading(on, frac = 0, hint = "") {
+    const b = this.el.banner; if (!b) return; b.classList.toggle("reading", !!on);
+    if (this.el.readBar) { this.el.readBar.hidden = !on; this.el.readBar.firstElementChild.style.width = `${Math.round(frac * 100)}%`; }
+    if (this.el.readyBtn) this.el.readyBtn.hidden = !on; if (this.el.readHint) { this.el.readHint.hidden = !on; if (on && this._rh !== hint) { this._rh = hint; this.el.readHint.textContent = hint; } }
+  }
   toast(text, kind = "good", ms = 1700) {
     const t = this.el.toast; if (!t) return;
     t.textContent = text; t.className = `toast ${kind}`; t.hidden = false;

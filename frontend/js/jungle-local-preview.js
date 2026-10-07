@@ -44,10 +44,11 @@ async function main() {
     else box.querySelector("#freeGuest").addEventListener("click", () => { box.remove(); resolve(true); });
   });
   game.playGate = async () => { if (fp.canPlay()) { fp.record(); paintFree(); return true; } return showGate(); };
-  paintFree();
+  paintFree(); game.events.addEventListener("menu", () => { paintFree(); document.body.classList.remove("has-question"); });
   $("playBtn").addEventListener("click", () => game.requestStart());
   $("coachSkip").addEventListener("click", () => game.skipTutorial());
   $("againBtn").addEventListener("click", () => game.requestStart());
+  $("menuBtn")?.addEventListener("click", () => game.toMenu()); $("menuBtn2")?.addEventListener("click", () => game.toMenu()); $("readyBtn")?.addEventListener("click", () => game.skipReading());
   $("resumeBtn").addEventListener("click", () => game.resume());
   $("pauseBtn")?.addEventListener("click", () => game.togglePause());
   $("labBtn")?.addEventListener("click", () => game.toggleLab());
@@ -101,6 +102,7 @@ async function main() {
       <label><input type="checkbox" data-opt="tts" ${st.tts ? "checked" : ""} ${game.speaker.supported ? "" : "disabled"} /> ${t("set.tts")} ${game.speaker.supported ? "" : t("set.tts.no")}</label>
       <label><input type="checkbox" data-opt="reducedMotion" ${game.reducedMotion ? "checked" : ""} /> ${t("set.motion")}</label>
       <label><input type="checkbox" data-opt="bigText" ${st.bigText ? "checked" : ""} /> ${t("set.bigtext")}</label>
+      <label>${t("set.readtime")} <select data-opt="readTime">${["off", "short", "normal", "long"].map((v) => `<option value="${v}" ${(st.readTime || "normal") === v ? "selected" : ""}>${t("read." + v)}</option>`).join("")}</select></label>
       <label><input type="checkbox" data-opt="teacherChase" ${st.teacherChase !== false ? "checked" : ""} /> ${t("teacher.setting")}</label>
       <h4>${t("set.graphics")} <small>${t("gfx.now", { tier: t(`gfx.${game.qualityId}`) })}</small></h4>
       <div class="row">${["auto", "ultra", "high", "balanced", "low", "minimal"].map((v) => `<button data-gfx="${v}" class="${(st.graphics || "auto") === v ? "on" : ""}">${t(`gfx.${v}`)}</button>`).join("")}</div>
@@ -127,7 +129,7 @@ async function main() {
     else if (b.dataset.gfx) game.setGraphics(b.dataset.gfx);
     renderSettings();
   });
-  settingsBody.addEventListener("change", (e) => { const o = e.target.dataset.opt; if (o) { game.setSetting(o, e.target.checked); renderSettings(); } });
+  settingsBody.addEventListener("change", (e) => { const o = e.target.dataset.opt; if (o) { game.setSetting(o, e.target.type === "checkbox" ? e.target.checked : e.target.value); renderSettings(); } });
   game.events.addEventListener("profile-changed", renderSettings);
 
   // ---- Language (English / Hindi / Marathi) --------------------------------------------------------------------------

@@ -11,7 +11,7 @@ async def main():
     async with async_playwright() as p:
         b,pg,logs=await launch(p,960,540)
         await pg.add_init_script(STUB)
-        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=77"); E=pg.evaluate
+        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=77"); E=pg.evaluate; await E("LQ_JUNGLE.setSetting('teacherChase', false); LQ_JUNGLE.setSetting('readTime', 'off')")        # these checks are about settings, review and achievements; the teacher and the reading pause have their own suites
         await E("LQ_JUNGLE.stopLoop(); localStorage.removeItem('learnquest.jungle.profile.v1')")
         await pg.reload(); await pg.wait_for_function("window.LQ_JUNGLE && window.LQ_JUNGLE.ready===true",timeout=120000); await E("LQ_JUNGLE.stopLoop()")
         # settings UI
@@ -51,6 +51,7 @@ async def main():
         await E("(()=>{const g=LQ_JUNGLE; for(let i=0;i<55;i++) g.collectibles.spawn('coin',g.player.x,1.0,-1.0-i*1.2); g.advance(9);})()")
         ach=await E("Object.keys(LQ_JUNGLE.profile.data.achievements)"); ok("live achievement 'Coin Collector' unlocks during the run",'coins_50' in ach,str(ach))
         # game over -> review, achievements, save
+        await E("LQ_JUNGLE.setSetting('teacherChase', false); LQ_JUNGLE.setSetting('readTime', 'off')")        # (an earlier step of this suite resets the profile)
         await E("LQ_JUNGLE.stats.lives=1; LQ_JUNGLE.player.invulnerable=0; LQ_JUNGLE.obstacles.clear(); LQ_JUNGLE.obstacles.spawn('rock',LQ_JUNGLE.player.x,-3); LQ_JUNGLE.advance(4)")
         ok("game over screen is shown",await E("LQ_JUNGLE.state")=="gameover")
         rv=await E("document.getElementById('overReview').innerText"); ok("end-of-run review lists the missed question with the right answer",'answer:' in rv and q['text'].split()[0] in rv, rv.replace("\n"," | ")[:150])

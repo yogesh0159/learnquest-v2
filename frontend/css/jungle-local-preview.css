@@ -134,3 +134,15 @@ body.bigtext #questionBanner #questionText { font-size:clamp(22px,3vw,36px) !imp
 .stat.free { font-weight:800; color:#8a5a00; }
 #freeGate { z-index:90; } #freeGate .card { max-width:460px; } #freeGate .btn { display:inline-block; text-decoration:none; text-align:center; }
 details.adv { margin-top:10px; font-size:14px; } details.adv > summary { cursor:pointer; font-weight:800; opacity:.8; }
+
+/* ---- reading time: the banner moves to the middle while the runner waits ---- */
+#questionBanner .rhint { display:block; font-size:14px; font-weight:800; color:#ffd23f; margin-top:2px; } #questionBanner .readbar { display:block; height:8px; border-radius:6px; background:#ffffff33; margin:8px 0 2px; overflow:hidden; } #questionBanner .readbar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#ffd23f,#6dff9a); transition:width .2s linear; }
+#questionBanner .ready { pointer-events:auto; margin-top:8px; padding:10px 34px; font-size:22px; font-weight:800; border-radius:14px; border:3px solid #3b2a12; background:linear-gradient(180deg,#ffd45a,#ffab12); color:#4a2e00; cursor:pointer; }
+#questionBanner.reading { top:max(120px,calc(env(safe-area-inset-top) + 100px)); max-width:min(860px,94vw); padding:14px 24px 16px; pointer-events:auto; z-index:40; }
+#questionBanner.reading #questionText { font-size:clamp(22px,3.6vw,40px) !important; } #questionBanner.reading .qhint { display:none; }
+body.has-question.reading-now #msgLane { opacity:.0; }
+.chip.teacherchip { background:#ffe3df; color:#b3261e; border-color:#b3261e; font-weight:800; animation:tcpulse 1s ease-in-out infinite; } @keyframes tcpulse { 50% { transform:scale(1.05); } } body.reduce-motion .chip.teacherchip { animation:none; }
+#rescue .why { margin:2px 0 6px; font-weight:800; color:#b3261e; font-size:clamp(16px,2.6vw,20px); } #rescue.explain .why { color:#8a5a00; }
+.menu-nav .navbtn { padding:5px 13px; border-radius:999px; background:#fff3c4; border:2px solid #3b2a12; color:#3b2a12; font-weight:800; font-size:14px; cursor:pointer; } .menu-nav .navbtn:hover { background:#ffe27a; }
+#gameOverScreen .menu-nav, #pauseScreen .menu-nav { margin-top:12px; }
+.sr-only { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }

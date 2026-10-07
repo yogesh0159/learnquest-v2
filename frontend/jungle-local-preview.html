@@ -25,6 +25,7 @@
       <div class="chip"><span class="ico enigma"></span><b id="hudTokens">0</b></div>
       <div class="chip"><span class="lbl" data-i18n="hud.distance">Distance</span><b id="hudDistance">0 m</b></div>
       <div class="chip hearts" id="hudHearts" aria-label="Lives"></div>
+      <div class="chip teacherchip" id="hudTeacher" hidden></div>
       <div class="chip combo" id="hudCombo" hidden></div>
       <div class="chip streak" id="hudStreak" hidden></div>
       <div class="chip multi" id="hudMulti" hidden></div>
@@ -34,7 +35,7 @@
     <div id="touchPad" aria-label="Touch controls"><button id="tLeft" aria-label="Left">&#9664;</button><button id="tRight" aria-label="Right">&#9654;</button><button id="tJump" aria-label="Jump">&#11014;</button><button id="tSlide" aria-label="Slide">&#11015;</button></div>
     <div id="msgLane" aria-live="polite"><div id="coach" hidden><span id="coachStep"></span><b id="coachText"></b><button id="coachSkip" data-i18n="coach.skip">Skip</button></div>
       <div id="toast" class="toast" hidden></div></div>
-    <div id="questionBanner" hidden><span class="qlbl" data-i18n="q.label">Question</span><span id="questionText"></span><span class="qhint" data-i18n="q.hint">Run through the lane with the answer!</span></div>
+    <div id="questionBanner" hidden><span class="qlbl" data-i18n="q.label">Question</span><span id="questionText"></span><span class="qhint" data-i18n="q.hint">Run through the lane with the answer!</span><span id="readHint" class="rhint" hidden></span><span class="readbar" id="readBar" hidden><i></i></span><button id="readyBtn" class="ready" type="button" hidden data-i18n="q.ready">Ready!</button></div>
     <div class="hint" data-i18n="hint.keys">&larr; &rarr; / A D: lanes &nbsp; &uarr; / W / Space: jump &nbsp; &darr; / S: slide &nbsp; P: pause &nbsp; M: sound &nbsp; F2: lab</div>
   </div>
 
@@ -57,10 +58,10 @@
     </div>
   </section>
 
-  <section id="pauseScreen" class="screen" hidden><div class="card"><h1 data-i18n="pause.title">Paused</h1><button id="resumeBtn" class="primary" data-i18n="pause.resume">Resume</button><p class="small"><a href="index.html" data-i18n="menu.home">Home</a></p></div></section>
+  <section id="pauseScreen" class="screen" hidden><div class="card"><h1 data-i18n="pause.title">Paused</h1><button id="resumeBtn" class="primary" data-i18n="pause.resume">Resume</button><nav class="menu-nav" aria-label="LearnQuest"><button id="menuBtn2" class="navbtn" type="button" data-i18n="over.menu">Back to menu</button><a href="index.html" data-i18n="menu.home">Home</a></nav></div></section>
 
   <section id="gameOverScreen" class="screen" hidden>
-    <div class="card"><h1 data-i18n="over.title">Great run!</h1><div id="overStats" class="stats"></div><div id="overAch"></div><div id="overReview"></div><button id="againBtn" class="primary" data-i18n="over.again">Play again</button><p class="small" data-i18n="over.enter">Press Enter to restart</p></div>
+    <div class="card"><h1 data-i18n="over.title">Great run!</h1><div id="overStats" class="stats"></div><div id="overAch"></div><div id="overReview"></div><button id="againBtn" class="primary" data-i18n="over.again">Play again</button><p class="small" data-i18n="over.enter">Press Enter to restart</p><nav class="menu-nav" aria-label="LearnQuest"><button id="menuBtn" class="navbtn" type="button" data-i18n="over.menu">Back to menu</button><a href="index.html" data-i18n="menu.home">Home</a><a href="parent.html" data-family data-i18n="menu.parents">Parents</a><a href="child-login.html" data-family data-i18n="menu.kids">Kids</a></nav></div>
   </section>
 
   <section id="errorBox" class="screen error" hidden><div class="card"><h1>Something went wrong</h1><pre id="errorText"></pre><p class="small">Open the browser console (F12) for details.</p></div></section>

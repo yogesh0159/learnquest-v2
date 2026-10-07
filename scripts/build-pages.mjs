@@ -54,8 +54,8 @@ else { const mm = JSON.parse(fs.readFileSync(mf, "utf8")); fs.writeFileSync(mf, 
   const cta = /<div class="hero-ctas">[\s\S]*?<\/div>/;
   if (!cta.test(s)) throw new Error("home page: hero buttons block not found");
   s = s.replace(cta, `<div class="hero-ctas">
-        <a class="btn btn-primary" href="jungle-local-preview.html" data-h="cta_play">\u25B6 Play Jungle Run</a>
-        <a class="btn btn-ghost" href="#how" data-h="cta_more">See how it works</a>
+        <a class="btn btn-primary" href="jungle-local-preview.html" data-h="cta_play">\u25B6 Play game</a>
+        <a class="btn btn-ghost" href="#how" data-h="cta_more">Learn more</a>
       </div>
       <p class="sub" style="margin:18px 0 0;font-size:.9rem;opacity:.85" data-h="pages_note">Playing on the free web page: your progress is saved on this device.</p>`);
   s = s.replace(/\s*<a [^>]*data-family[^>]*>[^<]*<\/a>/g, "").replace(/\s*<p [^>]*data-family[^>]*>[\s\S]*?<\/p>/g, "");     // accounts (Parents / Kids / free-runs note) need the backend

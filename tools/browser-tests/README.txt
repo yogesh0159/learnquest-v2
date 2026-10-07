@@ -48,3 +48,7 @@ Update 18 (GitHub Pages): t_pages.py a|b  the built site served like GitHub Page
 Update 19 (premium experience): t_free.py a|b  three free runs and the account gate (a: no server = guest, b: full backend -> parent sign-up)
      t_b9.py a|b|c  the Subway-style teacher (first stumble = close, second = grabbed + escape question, wrong answer = grabbed + shows the answer)
      t_home.py a|b|c|d  home page (static / lite 3D / full 3D / iPhone);  t_pages.py (GitHub Pages layout, now without self-check and account pages)
+
+Update 20 (feedback round): t_read.py a|b|c  the question reading pause;  t_nav.py  Back to menu / Home on the game-over and pause screens
+     t_b9.py  now covers the teacher out of sight when far, the warning chip, the visible grab and the reason panel.
+     Suites about other topics (t_b1, t_b2) switch the teacher and the reading pause off so their timing stays exact.

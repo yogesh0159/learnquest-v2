@@ -17,7 +17,7 @@ export const TRAILS = Object.freeze([
 
 const DEFAULTS = () => ({
   totalCoins: 0, best: 0, bestDistance: 0, games: 0, bestStreak: 0, correctTotal: 0, wrongTotal: 0, achievements: {}, tutorialDone: false, subjectStats: {},
-  settings: { character: "boy", grade: 1, subjects: ["math"], tts: false, reducedMotion: null, bigText: false, trail: "none", language: "", graphics: "auto", nativeCore: true, teacherChase: true },
+  settings: { character: "boy", grade: 1, subjects: ["math"], tts: false, reducedMotion: null, bigText: false, trail: "none", language: "", graphics: "auto", nativeCore: true, teacherChase: true, readTime: "normal" },
 });
 
 export class Profile {
@@ -40,7 +40,7 @@ export class Profile {
     if (!s.subjects.length) s.subjects = ["math"];
     if (!TRAILS.some((t) => t.id === s.trail) || !this.trailUnlocked(s.trail)) s.trail = "none";
     if (!["boy", "girl"].includes(s.character)) s.character = "boy";
-    s.nativeCore = s.nativeCore !== false; s.teacherChase = s.teacherChase !== false;
+    s.nativeCore = s.nativeCore !== false; s.teacherChase = s.teacherChase !== false; if (!["off", "short", "normal", "long"].includes(s.readTime)) s.readTime = "normal";
     if (!["auto", "ultra", "high", "balanced", "low", "minimal"].includes(s.graphics)) s.graphics = "auto";
     if (!(s.language in LANGS)) s.language = "";            // "" = decide from the URL / browser language
   }

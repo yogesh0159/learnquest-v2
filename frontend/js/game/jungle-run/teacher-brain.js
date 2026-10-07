@@ -1,8 +1,8 @@
 /**
  * The teacher's behaviour (pure logic, no graphics) - the Temple Run / Subway Surfers chase, made friendly and educational.
  *
- *   far     she runs a few steps behind the child
- *   close   after a mistake she is right behind him for a while
+ *   far     out of sight behind the camera (the screen shows a small "teacher is behind you" hint only when she is close)
+ *   close   after a stumble she runs into view, right behind him, for 18 seconds
  *   caught  she has grabbed the runner (the game stops for a moment)
  *
  *   hit an obstacle .......... far -> close (for `closeSeconds`);  already close -> CAUGHT  (escape question: right = heart back)
@@ -11,9 +11,9 @@
  *   it adapts: a child who answers well gets a quicker teacher, one who struggles a patient one.
  */
 export const TEACHER_TUNING = Object.freeze({
-  farZ: 3.2, closeZ: 1.75, caughtZ: 0.85,       // metres behind the runner
-  farSide: 1.15, closeSide: 0.45, caughtSide: 0.9, // how far to the side she runs (so the child stays visible)
-  closeSeconds: 14, afterCatchClose: 8,         // how long she stays right behind after a stumble / after letting go
+  farZ: 9.5, closeZ: 1.8, caughtZ: 0.9,         // metres behind the runner: far = behind the camera (out of sight, like the guards in Temple Run), close = right behind him
+  farSide: 0, closeSide: 0.3, caughtSide: 0.85,    // how far to the side she runs (a little, so the child stays visible)
+  closeSeconds: 18, afterCatchClose: 8,         // how long she stays right behind after a stumble / after letting go
   correctShortens: 6, graceAtStart: 5,          // a right answer takes 6 s off; no catch in the first 5 s
   lineGap: 4.5,                                 // seconds between spoken lines
 });

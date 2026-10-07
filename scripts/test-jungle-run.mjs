@@ -311,8 +311,8 @@ test("a wrong answer grabs him at once, even when she is far", () => {
 });
 test("she stays close only for a while, then drops back; a right answer takes time off and an Enigma sends her back at once", () => {
   const b = mkBrain(); b.event("hit"); assert.equal(b.state, "close");
-  for (let i = 0; i < 160; i++) b.update(0.1, {}); assert.equal(b.state, "far");                      // 14 s later
-  b.event("hit"); b.event("correct"); b.event("correct"); assert.equal(b.state, "close"); assert.ok(b.closeLeft > 0 && b.closeLeft <= 2.01); b.event("correct"); assert.equal(b.state, "far");     // each right answer takes 6 s off the 14 s: three send her back
+  for (let i = 0; i < 170; i++) b.update(0.1, {}); assert.equal(b.state, "close"); for (let i = 0; i < 20; i++) b.update(0.1, {}); assert.equal(b.state, "far");     // she stays close for 18 s
+  b.event("hit"); b.event("correct"); b.event("correct"); assert.equal(b.state, "close"); assert.ok(b.closeLeft > 0 && b.closeLeft <= 6.01); b.event("correct"); assert.equal(b.state, "far");     // each right answer takes 6 s off the 18 s: three send her back
   const c = mkBrain(); c.event("hit"); c.event("enigma"); assert.equal(c.state, "far");
   const d = mkBrain(); d.event("hit"); d.event("correct"); assert.equal(d.state, "close");             // one right answer is not enough
 });
@@ -331,9 +331,9 @@ test("she adapts: a struggling child gets a patient teacher (shorter time close)
   weak.event("hit"); strong.event("hit"); mid.event("hit"); assert.ok(weak.closeLeft < mid.closeLeft && mid.closeLeft < strong.closeLeft);
 });
 test("she keeps to the side while far (so the child stays visible) and runs right behind him when close; lines are spaced out and exist in all languages", () => {
-  const b = mkBrain(); assert.ok(b.side > 1); b.event("hit"); assert.ok(b.side < 0.6 && b.z < 2);
+  const b = mkBrain(); assert.ok(b.z > 8 && b.side === 0, "far = out of sight behind the camera"); b.event("hit"); assert.ok(b.side < 0.5 && b.z < 2.2, "close = right behind him, in view");
   const s = mkBrain({ rng: () => 0.99 }); s.t = 100; const l1 = s.event("correct").line; const l2 = s.event("correct").line; assert.ok(l1 && !l2);
-  for (const lang of ["en", "hi", "mr"]) { for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`); for (const k of ["teacher.catch.title", "teacher.catch.wrong", "teacher.catch.hit", "teacher.go", "teacher.heartBack"]) assert.ok(STRINGS[lang][k], `${lang} ${k}`); }
+  for (const lang of ["en", "hi", "mr"]) { for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`); for (const k of ["teacher.catch.title", "teacher.why.hit", "teacher.why.wrong", "teacher.ask.hit", "teacher.ask.wrong", "teacher.go", "teacher.heartBack", "hud.teacher.close", "t.teacherNear", "t.teacherAway", "t.caughtHit", "t.caughtWrong", "q.reading", "q.ready", "over.menu", "set.readtime", "read.off", "read.short", "read.normal", "read.long"]) assert.ok(STRINGS[lang][k], `${lang} ${k}`); }
 });
 
 console.log("exciting questions");
@@ -350,6 +350,15 @@ test("every question is a jungle gate with a story in English, Hindi and Marathi
 test("the story of a question never changes for the same question (no randomness), and different numbers give different stories", () => {
   const q = generateQuestion({ subject: "math", level: 2, rng: sf(9, 3) }); const tt = (k) => STRINGS.en[k] ?? k;
   assert.equal(localizeQuestion(q, tt, "en").story, localizeQuestion(q, tt, "en").story); const set = new Set(); for (let i = 0; i < 40; i++) set.add(localizeQuestion(generateQuestion({ subject: "math", level: 2, rng: sf(9, i) }), tt, "en").story.split(":")[0]); assert.ok(set.size >= 3, [...set].join());
+});
+
+console.log("reading time");
+import { readSeconds, READ_MIN, READ_MAX } from "../frontend/js/game/jungle-run/question-reading.js";
+test("reading time grows with the length of the question, is between 3 and 10 s, Grade 1 gets extra, Off means no pause, Short < Normal < Long", () => {
+  assert.equal(readSeconds(0, 2, "off"), 0); assert.ok(readSeconds(20, 2) >= READ_MIN && readSeconds(500, 2) <= READ_MAX);
+  assert.ok(readSeconds(40, 2) < readSeconds(90, 2) && readSeconds(90, 2) < readSeconds(160, 2)); assert.ok(readSeconds(90, 1) > readSeconds(90, 2));
+  assert.ok(readSeconds(90, 2, "short") < readSeconds(90, 2, "normal") && readSeconds(90, 2, "normal") < readSeconds(90, 2, "long"));
+  const story = 90; assert.ok(readSeconds(story, 2) >= 5 && readSeconds(story, 2) <= 7, String(readSeconds(story, 2)));            // a typical story question: about 5-6 seconds
 });
 
 console.log("free runs");
