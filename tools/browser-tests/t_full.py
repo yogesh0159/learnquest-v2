@@ -6,7 +6,7 @@ def ok(name,cond,detail=""):
 async def main():
     async with async_playwright() as p:
         b,pg,logs=await launch(p,800,450)
-        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=777")
+        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=777"); await pg.evaluate("LQ_JUNGLE.setSetting('readTime', 'off')")        # long unattended runs: nobody taps Ready!
         E=lambda js: pg.evaluate(js)
         await E("LQ_JUNGLE.stopLoop(); LQ_JUNGLE.start(); LQ_JUNGLE.track.reserved.clear(); LQ_JUNGLE.questions.nextIndex=1e9")   # no question board while testing collisions
         await E("LQ_JUNGLE.director.enabled=false; LQ_JUNGLE.collectibles.clear(); LQ_JUNGLE.obstacles.clear()")

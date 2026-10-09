@@ -5,7 +5,7 @@ def ok(n,c,d=""): R.append(bool(c)); print("PASS" if c else "FAIL",n,d)
 async def main():
     async with async_playwright() as p:
         b,pg,logs=await launch(p,960,540)
-        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=balanced&seed=11&character=girl"); E=pg.evaluate; await E("LQ_JUNGLE.stopLoop(); localStorage.clear()")
+        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=balanced&seed=11&character=girl&readtime=off"); E=pg.evaluate; await E("LQ_JUNGLE.stopLoop(); localStorage.clear()")
         await E("LQ_JUNGLE.start(); LQ_JUNGLE.director.enabled=false; LQ_JUNGLE.obstacles.clear(); LQ_JUNGLE.collectibles.clear(); LQ_JUNGLE.player.invulnerable=1e9; LQ_JUNGLE.advance(1)")
         info=lambda: E("({biome:LQ_JUNGLE.biome.name,fog:LQ_JUNGLE.scene.fog.color.getHexString(),sun:+LQ_JUNGLE.sun.intensity.toFixed(2),exp:+LQ_JUNGLE.renderer.toneMappingExposure.toFixed(2),torch:+LQ_JUNGLE.env.torchBoost.toFixed(2),ff:+LQ_JUNGLE.ambient.mat.opacity.toFixed(2)})")
         res={}
@@ -23,8 +23,8 @@ async def main():
         jumps=await E("""(()=>{const g=LQ_JUNGLE; let prev=null, maxJump=0; for(let d=1000;d<=1230;d+=2){ g.stats.distance=d; g.biome.update(d,true); const c=g.scene.fog.color; const v=[c.r,c.g,c.b]; if(prev) maxJump=Math.max(maxJump,Math.abs(v[0]-prev[0]),Math.abs(v[1]-prev[1]),Math.abs(v[2]-prev[2])); prev=v;} return maxJump;})()""")
         ok("biome change is a smooth fade (max fog step per 2 m is tiny)",jumps<0.02,f"{jumps:.4f}")
         # toast on entering
-        await E("LQ_JUNGLE.stats.distance=470; LQ_JUNGLE.biome.update(470,true); LQ_JUNGLE.advance(0.05); LQ_JUNGLE.stats.distance=520; LQ_JUNGLE.advance(0.2)")
-        ok("player is told when a new area begins","Golden Sunset" in await E("document.getElementById('toast').textContent"))
+        toast_txt=await E("(()=>{LQ_JUNGLE.stats.distance=470; LQ_JUNGLE.biome.update(470,true); LQ_JUNGLE.advance(0.05); LQ_JUNGLE.stats.distance=520; LQ_JUNGLE.advance(0.2); return document.getElementById('toast').textContent})()")
+        ok("player is told when a new area begins","Golden Sunset" in toast_txt,toast_txt)
         # speed lines + reduced motion
         await E("LQ_JUNGLE.speedMultiplier=2; LQ_JUNGLE.stats.distance=10; LQ_JUNGLE.advance(8)"); s1=float(await E("document.getElementById('speedLines').style.opacity||0"))
         ok("speed lines appear at high speed",s1>0.15,f"opacity {s1} at {await E('LQ_JUNGLE.speed.toFixed(1)')} m/s")

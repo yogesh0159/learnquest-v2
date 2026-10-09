@@ -5,7 +5,7 @@ def ok(n,c,d=""): res.append(c); print("PASS" if c else "FAIL",n,d)
 async def main():
     async with async_playwright() as p:
         b,pg,logs=await launch(p,640,360)
-        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=9")
+        await boot(pg,"http://127.0.0.1:5177/jungle-local-preview.html?quality=low&seed=9"); E=pg.evaluate; await pg.evaluate("LQ_JUNGLE.setSetting('readTime', 'off')")        # these checks run for a long time without tapping Ready!
         E=pg.evaluate
         await E("LQ_JUNGLE.stopLoop()")
         await pg.keyboard.press("Enter"); ok("Enter starts game",await E("LQ_JUNGLE.state")=="playing")

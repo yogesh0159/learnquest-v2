@@ -8,10 +8,10 @@ async def txt(pg,sel): return await pg.evaluate("(s)=>document.querySelector(s).
 async def main():
     async with async_playwright() as p:
         # ---- browser language decides when nothing is saved
-        b,pg,logs=await launch(p,960,540,tutorial_done=False,locale="hi-IN"); await boot(pg,URL); E=pg.evaluate; await E("LQ_JUNGLE.stopLoop()")
+        b,pg,logs=await launch(p,960,540,tutorial_done=False,locale="hi-IN"); await boot(pg,URL); E=pg.evaluate; await E("LQ_JUNGLE.setSetting('readTime', 'off')")        # this suite collects questions while running: the question pause has its own tests; await E("LQ_JUNGLE.stopLoop()")
         ok("a Hindi browser gets Hindi automatically",await E("document.documentElement.lang")=="hi" and DEV.search(await txt(pg,"#playBtn")),await txt(pg,"#playBtn"))
         await b.close()
-        b,pg,logs=await launch(p,960,540,tutorial_done=True); await boot(pg,URL+"&lang=hi"); E=pg.evaluate; await E("LQ_JUNGLE.stopLoop()")
+        b,pg,logs=await launch(p,960,540,tutorial_done=True); await boot(pg,URL+"&lang=hi"); E=pg.evaluate; await E("LQ_JUNGLE.stopLoop()"); await E("LQ_JUNGLE.setSetting('readTime', 'off')")
         ok("?lang=hi: menu is in Hindi",await txt(pg,"#menuScreen h1")=="जंगल रन" and await txt(pg,"#playBtn")=="खेलो",await txt(pg,"#menuScreen h1"))
         ok("hint line, boy/girl buttons and settings title are Hindi",all(DEV.search(x) for x in [await txt(pg,".hint"),await txt(pg,"[data-character=boy]"),await txt(pg,"#settingsBox summary")]) )
         await pg.click("#settingsBox summary"); body=await txt(pg,"#settingsBody")

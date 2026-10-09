@@ -2,8 +2,8 @@
 export class Speaker {
   constructor() { this.enabled = false; this.last = ""; this.lang = "en-US"; }
   get supported() { return typeof globalThis.speechSynthesis !== "undefined" && typeof globalThis.SpeechSynthesisUtterance !== "undefined"; }
-  speak(text) {
-    if (!this.enabled || !this.supported || !text) return false;
+  speak(text, force = false) {
+    if ((!this.enabled && !force) || !this.supported || !text) return false;
     try {
       globalThis.speechSynthesis.cancel();
       const u = new globalThis.SpeechSynthesisUtterance(text); u.rate = 0.9; u.pitch = 1.1; u.lang = this.lang;

@@ -28,6 +28,7 @@ async def main():
         # reload keeps settings
         await pg.reload(); await pg.wait_for_function("window.LQ_JUNGLE && window.LQ_JUNGLE.ready===true",timeout=120000); await E("LQ_JUNGLE.stopLoop()")
         st=await E("LQ_JUNGLE.profile.settings"); ok("settings survive a reload",st['grade']==3 and st['tts'] and st['bigText'] and sorted(st['subjects'])==['science','spelling'])
+        await E("LQ_JUNGLE.setSetting('teacherChase', false); LQ_JUNGLE.setSetting('readTime', 'off')")        # (the test helper rewrites the profile on every load)
         # questions come from selected subjects
         await pg.keyboard.press("Enter"); seen=[]; shots=0
         for run in range(3):

@@ -244,6 +244,7 @@ export class GameManager {
   }
 
   _resetRun() {
+    this.reading = null; this.hud.reading(false); this.hud.teacherChip("");            // a new run never starts inside an old question pause
     this.runSeed = (Math.random() * 1e9) | 0;
     if (this.params.get("seed")) this.runSeed = Number(this.params.get("seed")) | 0;
     this.stats = this._freshStats(); this.speed = 0; this.review = []; this.runAchievements = []; this.achTimer = 0; this.hitMark = 0; this.subjectsRight = new Set(); this.speaker.cancel();
@@ -359,22 +360,25 @@ export class GameManager {
   /* ---------------------------------------------------------------- reading time: the runner waits while the question is read */
   _beginReading(loc) {
     if (this.state !== "playing" || this.tutorial.active || !this.player.alive) return;
-    const secs = readSeconds((loc.spokenStory || loc.text || "").length, this.profile.settings.grade, this.profile.settings.readTime); if (secs <= 0) return;
-    this.reading = { left: secs, total: secs }; this.player.state = "idle"; this.player.anim?.play("IDLE", { fade: 0.25 }); this.teacher?.hideBubble(); this.hud.teacherChip("");
-    this.hud.reading(true, 0, t("q.reading", { s: Math.ceil(secs) })); this.audio.setMood("quiz"); this.events.dispatchEvent(new CustomEvent("reading", { detail: { seconds: secs } }));
+    const mode = this.params.get("readtime") || this.profile.settings.readTime;                  // ?readtime=off|ready|short|normal|long overrides the saved choice (demos, tests)
+    const secs = readSeconds((loc.spokenStory || loc.text || "").length, this.profile.settings.grade, mode); if (secs <= 0) return;
+    const timed = Number.isFinite(secs);                                                      // "ready" mode: no clock, he waits until the child taps Ready!
+    this.reading = { left: secs, total: secs, timed, say: loc.spokenStory || loc.spoken }; this.player.state = "idle"; this.player.anim?.play("IDLE", { fade: 0.25 }); this.teacher?.hideBubble(); this.hud.teacherChip("");
+    this.hud.reading(true, 0, timed ? t("q.reading", { s: Math.ceil(secs) }) : t("q.reading.ready"), timed); this.audio.setMood("quiz"); this.events.dispatchEvent(new CustomEvent("reading", { detail: { seconds: secs } }));
   }
   /** "Ready!" (button, Enter or Space): start before the time is over */
   skipReading() { if (this.reading) this._endReading(); }
+  /** "Listen": say the question aloud again (even when "read aloud" is off in Settings) */
+  listenReading() { if (this.reading?.say) this.speaker.speak(this.reading.say, true); }
   _endReading() {
     if (!this.reading) return; this.reading = null; this.hud.reading(false);
     if (this.player.alive) { this.player.startRun(); this.player.invulnerable = Math.max(this.player.invulnerable, 1.0); this.speed = Math.max(this.speed, GAME.baseSpeed * 0.5); }
     this.audio.setMood("run"); this.lastTs = performance.now();
   }
   _stepReading(dt) {
-    const r = this.reading, p = this.player; r.left -= dt; this.speed *= Math.exp(-7 * dt);
+    const r = this.reading, p = this.player; if (r.timed) r.left -= dt; this.speed *= Math.exp(-7 * dt);
     p.update(dt, 0); this.env.update(dt); this.fx.update(dt, 0); this.ambient.update(dt, 0, this.biome.state.fireflies, this.reducedMotion); this.teacher?.update(dt, { hold: true });
-    this.hud.reading(true, 1 - Math.max(0, r.left) / r.total, t("q.reading", { s: Math.max(1, Math.ceil(r.left)) }));
-    if (r.left <= 0) this._endReading();
+    if (r.timed) { this.hud.reading(true, 1 - Math.max(0, r.left) / r.total, t("q.reading", { s: Math.max(1, Math.ceil(r.left)) }), true); if (r.left <= 0) this._endReading(); }
   }
   /** back to the start screen (from "Great run!" or the pause screen) */
   toMenu() {
@@ -667,7 +671,7 @@ export class GameManager {
     if (this.questions?.question) { const l2 = localizeQuestion(this.questions.question, t, i18n.lang); this.hud.banner(l2.story || l2.text); }
     this.events.dispatchEvent(new CustomEvent("language-changed", { detail: { lang: i18n.lang } }));
   }
-  setSetting(key, value) { this.profile.set(key, value); if (key === "readTime" && this.reading && value === "off") this.skipReading(); if (key === "teacherChase") this.teacher?.setEnabled(!!value); this.applyAccessibility(); if (key === "tts" && value) this.speaker.speak(t("sp.on")); }
+  setSetting(key, value) { if (key === "readTime") this.profile.set("readTimeChosen", true); this.profile.set(key, value); if (key === "readTime" && this.reading && value === "off") this.skipReading(); if (key === "teacherChase") this.teacher?.setEnabled(!!value); this.applyAccessibility(); if (key === "tts" && value) this.speaker.speak(t("sp.on")); }
 
   /* ---------------------------------------------------------- Lab: characters */
   labCharacters() { return ["boy", "girl"].map((k) => ({ key: k, label: ASSET_REGISTRY[k].label, active: k === this.characterKey })); }

@@ -52,3 +52,6 @@ Update 19 (premium experience): t_free.py a|b  three free runs and the account g
 Update 20 (feedback round): t_read.py a|b|c  the question reading pause;  t_nav.py  Back to menu / Home on the game-over and pause screens
      t_b9.py  now covers the teacher out of sight when far, the warning chip, the visible grab and the reason panel.
      Suites about other topics (t_b1, t_b2) switch the teacher and the reading pause off so their timing stays exact.
+
+Update 21 (reading time): t_read.py a|b|c - by default the runner WAITS at a question until the child taps Ready! (no clock); Listen; timed choices; old profiles.
+     Suites that run long without tapping (t_full, t_b2, t_b3, t_b5, t_keys, t_b1) switch the pause off (setSetting readTime off or ?readtime=off).

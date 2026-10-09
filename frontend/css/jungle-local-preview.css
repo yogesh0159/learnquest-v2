@@ -146,3 +146,7 @@ body.has-question.reading-now #msgLane { opacity:.0; }
 .menu-nav .navbtn { padding:5px 13px; border-radius:999px; background:#fff3c4; border:2px solid #3b2a12; color:#3b2a12; font-weight:800; font-size:14px; cursor:pointer; } .menu-nav .navbtn:hover { background:#ffe27a; }
 #gameOverScreen .menu-nav, #pauseScreen .menu-nav { margin-top:12px; }
 .sr-only { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+#questionBanner .readbtns { display:flex; gap:10px; justify-content:center; margin-top:8px; flex-wrap:wrap; } #questionBanner .readbtns .ready, #questionBanner .readbtns .listen { margin-top:0; }
+#questionBanner .listen { pointer-events:auto; padding:10px 22px; font-size:20px; font-weight:800; border-radius:14px; border:3px solid #3b2a12; background:#e6f7e6; color:#1b4d38; cursor:pointer; }
+#questionBanner .ready { font-size:26px; padding:12px 40px; }

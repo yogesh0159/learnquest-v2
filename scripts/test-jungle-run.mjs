@@ -333,7 +333,7 @@ test("she adapts: a struggling child gets a patient teacher (shorter time close)
 test("she keeps to the side while far (so the child stays visible) and runs right behind him when close; lines are spaced out and exist in all languages", () => {
   const b = mkBrain(); assert.ok(b.z > 8 && b.side === 0, "far = out of sight behind the camera"); b.event("hit"); assert.ok(b.side < 0.5 && b.z < 2.2, "close = right behind him, in view");
   const s = mkBrain({ rng: () => 0.99 }); s.t = 100; const l1 = s.event("correct").line; const l2 = s.event("correct").line; assert.ok(l1 && !l2);
-  for (const lang of ["en", "hi", "mr"]) { for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`); for (const k of ["teacher.catch.title", "teacher.why.hit", "teacher.why.wrong", "teacher.ask.hit", "teacher.ask.wrong", "teacher.go", "teacher.heartBack", "hud.teacher.close", "t.teacherNear", "t.teacherAway", "t.caughtHit", "t.caughtWrong", "q.reading", "q.ready", "over.menu", "set.readtime", "read.off", "read.short", "read.normal", "read.long"]) assert.ok(STRINGS[lang][k], `${lang} ${k}`); }
+  for (const lang of ["en", "hi", "mr"]) { for (const [kind, n] of Object.entries(TEACHER_LINES)) for (let i = 1; i <= n; i++) assert.ok(STRINGS[lang][`teacher.l.${kind}${i}`], `${lang} teacher.l.${kind}${i}`); for (const k of ["teacher.catch.title", "teacher.why.hit", "teacher.why.wrong", "teacher.ask.hit", "teacher.ask.wrong", "teacher.go", "teacher.heartBack", "hud.teacher.close", "t.teacherNear", "t.teacherAway", "t.caughtHit", "t.caughtWrong", "q.reading", "q.reading.ready", "q.listen", "q.ready", "read.ready", "over.menu", "set.readtime", "read.off", "read.short", "read.normal", "read.long"]) assert.ok(STRINGS[lang][k], `${lang} ${k}`); }
 });
 
 console.log("exciting questions");
@@ -354,11 +354,14 @@ test("the story of a question never changes for the same question (no randomness
 
 console.log("reading time");
 import { readSeconds, READ_MIN, READ_MAX } from "../frontend/js/game/jungle-run/question-reading.js";
-test("reading time grows with the length of the question, is between 3 and 10 s, Grade 1 gets extra, Off means no pause, Short < Normal < Long", () => {
-  assert.equal(readSeconds(0, 2, "off"), 0); assert.ok(readSeconds(20, 2) >= READ_MIN && readSeconds(500, 2) <= READ_MAX);
-  assert.ok(readSeconds(40, 2) < readSeconds(90, 2) && readSeconds(90, 2) < readSeconds(160, 2)); assert.ok(readSeconds(90, 1) > readSeconds(90, 2));
+test("reading time: by default the runner WAITS until the child taps Ready! (no clock); timed choices give small children a lot of time; Off means no pause", () => {
+  assert.equal(readSeconds(90, 1), Infinity); assert.equal(readSeconds(90, 1, "ready"), Infinity); assert.equal(readSeconds(90, 1, "off"), 0); assert.equal(readSeconds(90, 1, "unknown-mode"), Infinity);
+  assert.ok(READ_MIN >= 6 && READ_MAX >= 40);
+  for (const mode of ["short", "normal", "long"]) { assert.ok(readSeconds(10, 3, mode) >= READ_MIN && readSeconds(2000, 1, mode) <= READ_MAX, mode); assert.ok(readSeconds(40, 2, mode) < readSeconds(90, 2, mode) && readSeconds(90, 2, mode) < readSeconds(160, 2, mode), mode); }
+  assert.ok(readSeconds(90, 1) === Infinity && readSeconds(90, 1, "normal") > readSeconds(90, 2, "normal") && readSeconds(90, 2, "normal") > readSeconds(90, 3, "normal"));
   assert.ok(readSeconds(90, 2, "short") < readSeconds(90, 2, "normal") && readSeconds(90, 2, "normal") < readSeconds(90, 2, "long"));
-  const story = 90; assert.ok(readSeconds(story, 2) >= 5 && readSeconds(story, 2) <= 7, String(readSeconds(story, 2)));            // a typical story question: about 5-6 seconds
+  assert.ok(readSeconds(90, 1, "normal") >= 20, "a Grade 1 child gets at least 20 s for a typical story question: " + readSeconds(90, 1, "normal"));
+  assert.ok(readSeconds(90, 1, "short") >= 12, "even the Short choice is not a 5-second race: " + readSeconds(90, 1, "short"));
 });
 
 console.log("free runs");

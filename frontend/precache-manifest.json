@@ -1,7 +1,7 @@
 {
- "version": "ec756ece3566",
+ "version": "18043d0f5bca",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3322224,
+ "shellBytes": 3325365,
  "packBytes": 54912780,
  "shell": [
   {
@@ -71,8 +71,8 @@
   },
   {
    "url": "/css/jungle-local-preview.css",
-   "hash": "0548eaeec06a",
-   "bytes": 21549
+   "hash": "b6b44a04a6e3",
+   "bytes": 22006
   },
   {
    "url": "/css/jungle-runner.css",
@@ -271,18 +271,18 @@
   },
   {
    "url": "/js/game/jungle-run/game-manager.js",
-   "hash": "143797c68986",
-   "bytes": 53144
+   "hash": "bab09705c46e",
+   "bytes": 53958
   },
   {
    "url": "/js/game/jungle-run/hud.js",
-   "hash": "0609ba486ca2",
-   "bytes": 4551
+   "hash": "27e092035213",
+   "bytes": 4661
   },
   {
    "url": "/js/game/jungle-run/i18n.js",
-   "hash": "2f06cc4e751e",
-   "bytes": 50484
+   "hash": "b88ccd836d2e",
+   "bytes": 51491
   },
   {
    "url": "/js/game/jungle-run/native-core.js",
@@ -316,8 +316,8 @@
   },
   {
    "url": "/js/game/jungle-run/profile.js",
-   "hash": "30e2a4c131a3",
-   "bytes": 4755
+   "hash": "4dbcf17139de",
+   "bytes": 4945
   },
   {
    "url": "/js/game/jungle-run/question-banks.js",
@@ -341,8 +341,8 @@
   },
   {
    "url": "/js/game/jungle-run/question-reading.js",
-   "hash": "569526b98d03",
-   "bytes": 966
+   "hash": "65f65489f98a",
+   "bytes": 1293
   },
   {
    "url": "/js/game/jungle-run/question-service.js",
@@ -376,8 +376,8 @@
   },
   {
    "url": "/js/game/jungle-run/speech.js",
-   "hash": "3af7b508b710",
-   "bytes": 785
+   "hash": "28c691ec2fd2",
+   "bytes": 812
   },
   {
    "url": "/js/game/jungle-run/teacher-brain.js",
@@ -456,8 +456,8 @@
   },
   {
    "url": "/js/jungle-local-preview.js",
-   "hash": "4b6fda860b09",
-   "bytes": 18613
+   "hash": "a5bd21a07357",
+   "bytes": 18692
   },
   {
    "url": "/js/jungle-runner.js",
@@ -511,8 +511,8 @@
   },
   {
    "url": "/jungle-local-preview.html",
-   "hash": "84420dee4bde",
-   "bytes": 8011
+   "hash": "046e89ae29d4",
+   "bytes": 8141
   },
   {
    "url": "/locales/en.json",

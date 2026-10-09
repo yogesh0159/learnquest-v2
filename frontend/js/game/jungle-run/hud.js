@@ -6,7 +6,7 @@ export class Hud {
     const $ = (id) => doc.getElementById(id);
     this.el = {
       score: $("hudScore"), coins: $("hudCoins"), tokens: $("hudTokens"), distance: $("hudDistance"), hearts: $("hudHearts"),
-      multi: $("hudMulti"), combo: $("hudCombo"), streak: $("hudStreak"), power: $("hudPower"), banner: $("questionBanner"), teacher: $("hudTeacher"), readBar: $("readBar"), readyBtn: $("readyBtn"), readHint: $("readHint"), bannerText: $("questionText"), toast: $("toast"),
+      multi: $("hudMulti"), combo: $("hudCombo"), streak: $("hudStreak"), power: $("hudPower"), banner: $("questionBanner"), teacher: $("hudTeacher"), readBar: $("readBar"), readyBtn: $("readyBtn"), listenBtn: $("listenBtn"), readHint: $("readHint"), bannerText: $("questionText"), toast: $("toast"),
       loading: $("loadingScreen"), loadBar: $("loadBar"), loadText: $("loadText"), menu: $("menuScreen"), pause: $("pauseScreen"),
       over: $("gameOverScreen"), overStats: $("overStats"), error: $("errorBox"), errorText: $("errorText"), hud: $("hud"), best: $("bestScore"), loadDevice: $("loadDevice"), coach: $("coach"), coachText: $("coachText"), coachStep: $("coachStep"), overReview: $("overReview"), overAch: $("overAch"), menuStats: $("menuStats"),
     };
@@ -42,10 +42,11 @@ export class Hud {
   /** "teacher is close" hint in the top bar */
   teacherChip(text) { const el = this.el.teacher; if (!el || this._tc === text) return; this._tc = text; el.hidden = !text; el.textContent = text || ""; }
   /** reading time: the banner grows to the middle of the screen with a countdown bar and a "Ready!" button */
-  reading(on, frac = 0, hint = "") {
+  reading(on, frac = 0, hint = "", timed = true) {
     const b = this.el.banner; if (!b) return; b.classList.toggle("reading", !!on);
-    if (this.el.readBar) { this.el.readBar.hidden = !on; this.el.readBar.firstElementChild.style.width = `${Math.round(frac * 100)}%`; }
-    if (this.el.readyBtn) this.el.readyBtn.hidden = !on; if (this.el.readHint) { this.el.readHint.hidden = !on; if (on && this._rh !== hint) { this._rh = hint; this.el.readHint.textContent = hint; } }
+    if (this.el.readBar) { this.el.readBar.hidden = !on || !timed; this.el.readBar.firstElementChild.style.width = `${Math.round(frac * 100)}%`; }
+    if (this.el.readyBtn) this.el.readyBtn.hidden = !on; if (this.el.listenBtn) this.el.listenBtn.hidden = !on;
+    if (this.el.readHint) { this.el.readHint.hidden = !on; if (on && this._rh !== hint) { this._rh = hint; this.el.readHint.textContent = hint; } }
   }
   toast(text, kind = "good", ms = 1700) {
     const t = this.el.toast; if (!t) return;

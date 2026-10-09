@@ -1,15 +1,17 @@
 /**
- * Reading time: when a question appears the runner stops and waits, so nobody has to read while running (and hit something).
- * The time depends on the question: longer story = more time; Grade 1 gets a little extra; the player can choose Off / Short / Normal / Long in Settings
- * and can always press "Ready!" (Enter / Space) to start earlier.
+ * Reading time.  When a question appears the runner stops and WAITS, so nobody has to read while running (and hit something).
+ *  - "ready" (the default): he waits until the child taps "Ready!" (or presses Enter / Space) - small children read slowly, so there is no clock at all;
+ *  - "long" / "normal" / "short": the run starts by itself after a time that depends on the question (a longer story = more time) and on the class
+ *    (Grade 1 gets 60 % more, Grade 2 30 % more); "Ready!" still starts it earlier;
+ *  - "off": no pause (for fast readers).
  */
-export const READ_MODES = Object.freeze({ off: 0, short: 0.7, normal: 1, long: 1.5 });
-export const READ_MIN = 3, READ_MAX = 10;
+export const READ_MODES = Object.freeze({ off: 0, ready: Infinity, short: 0.7, normal: 1, long: 1.6 });
+export const READ_MIN = 6, READ_MAX = 45;
 
-/** @param {number} chars length of the question text the child has to read  @param {number} grade 1..  @param {string} mode off|short|normal|long */
-export function readSeconds(chars, grade = 1, mode = "normal") {
-  const mult = READ_MODES[mode] ?? 1; if (!mult) return 0;
-  const base = 2.2 + 0.038 * Math.max(0, chars | 0);
-  const s = base * (grade <= 1 ? 1.25 : 1) * mult;
-  return Math.round(Math.min(READ_MAX * mult, Math.max(READ_MIN * Math.min(1, mult), s)) * 10) / 10;
+/** @param {number} chars length of the question text the child has to read  @param {number} grade 1..  @param {string} mode ready|long|normal|short|off  @returns {number} seconds, Infinity (wait for Ready!) or 0 (no pause) */
+export function readSeconds(chars, grade = 1, mode = "ready") {
+  const mult = READ_MODES[mode] ?? Infinity; if (mult === 0 || mult === Infinity) return mult;
+  const base = 4 + 0.14 * Math.max(0, chars | 0);
+  const s = base * (grade <= 1 ? 1.6 : grade === 2 ? 1.3 : 1) * mult;
+  return Math.round(Math.min(READ_MAX, Math.max(READ_MIN, s)) * 10) / 10;
 }

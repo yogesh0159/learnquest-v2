@@ -261,3 +261,8 @@ Finding: the GT 730 is a 2014 entry-level card, much weaker than the name "NVIDI
 - **Reading time** (`question-reading.js`): when a question appears the runner stops; the question moves to the middle with a countdown bar and a "Ready!" button (Enter / Space / tap); 3-10 s from the length of the question (Grade 1 x1.25); no hits while reading; Settings: No pause / Short / Normal / Long.
 - **Back to menu and Home** on the "Great run!" and Pause screens (`game.toMenu()`).
 - **Home page**: no big headline (a hidden "LearnQuest" heading stays for screen readers); buttons "Play game" and "Learn more" (Hindi, Marathi too); everything else unchanged.
+
+## 30. Update 21 - small children get all the time they need to read
+- **Default: no clock.** When a question appears the runner stops and waits until the child taps **Ready!** (or presses Enter / Space). A **Listen** button says the question aloud again (also when "read aloud" is off). Settings -> *Time to read questions*: Wait until I tap Ready (default) / Long / Normal / Short / No pause. The timed choices depend on the length of the question and the class (Grade 1 gets +60 %, Grade 2 +30 %): a typical story question gives a Grade 1 child about 26 s on Normal, never less than 12 s on Short. `?readtime=off|ready|short|normal|long` overrides the saved choice (demos, tests).
+- Profiles saved by the earlier version with "Normal" that nobody chose on purpose move to "wait until Ready".
+- **Bugs found and fixed:** a new run could start inside an old question pause (the reset did not clear it); choosing "Normal" was immediately undone by the migration (flag order).
