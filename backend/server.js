@@ -41,12 +41,12 @@ app.use(
         baseUri: ["'self'"],
         formAction: ["'self'"],
         frameAncestors: ["'none'"],
-        // 'wasm-unsafe-eval' only allows compiling WebAssembly (not eval()); enabled for the local explorer, production headers stay unchanged.
-        scriptSrc: ["'self'", "'unsafe-inline'", ...(process.env.LQ_EXPLORER === "1" ? ["'wasm-unsafe-eval'"] : []), "https://cdn.jsdelivr.net", "https://unpkg.com"],
+        // 'wasm-unsafe-eval' only allows compiling WebAssembly (not eval()). blob:/data: in connect-src let three.js read GLB-embedded textures; without them the 3D models render plain white.
+        scriptSrc: ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         imgSrc: ["'self'", "data:", "blob:"],
         // blob: lets three.js read GLB-embedded textures; enabled for the local explorer only so production headers stay unchanged.
-        connectSrc: ["'self'", ...(process.env.LQ_EXPLORER === "1" ? ["blob:"] : []), "https://cdn.jsdelivr.net", "https://unpkg.com"],
+        connectSrc: ["'self'", "blob:", "data:", "https://cdn.jsdelivr.net", "https://unpkg.com"],
         fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
         workerSrc: ["'self'", "blob:"],
         objectSrc: ["'none'"],

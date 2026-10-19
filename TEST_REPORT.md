@@ -287,3 +287,4 @@ Platform tests 16 (14 + 2 new Play-rule checks), validator 641, Jungle Run unit 
 * Browser (Chromium, local server): delete child, wrong password error, delete account -> `delete-account.html?done=1`, login afterwards -> 401. 0 page errors.
 * Server started from a copy holding only the Dockerfile's files, `NODE_ENV=production`: health OK, `privacy.html`, `delete-account.html`, `/vendor/three` served.
 * NOT tested: real Docker build, Railway, MySQL, the AAB build, real phones.
+* Fix after live deploy: production CSP blocked `blob:` in connect-src, so GLB-embedded textures failed and 3D models looked white. Now `blob:`/`data:` allowed in connect-src (verified: fetch of a blob URL blocked on old header, OK on new).
