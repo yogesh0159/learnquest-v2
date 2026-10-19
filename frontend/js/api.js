@@ -35,6 +35,9 @@ const api = {
   parentLogin: (payload) => apiRequest("/auth/parent/login", { method: "POST", body: payload, auth: false }),
   childCreate: (payload) => apiRequest("/auth/child/create", { method: "POST", body: payload }),
   childList: () => apiRequest("/auth/child/list"),
+  // data deletion (parent only; the wrong-password answer is 403, so it does not sign the parent out)
+  deleteChild: (childId) => apiRequest(`/parent/child/${encodeURIComponent(childId)}`, { method: "DELETE" }),
+  deleteAccount: (password) => apiRequest("/parent/account", { method: "DELETE", body: { password } }),
   childLogin: (payload) => apiRequest("/auth/child/login", { method: "POST", body: payload, auth: false }),
 
   childMe: () => apiRequest("/child/me"),

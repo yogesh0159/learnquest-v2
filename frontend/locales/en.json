@@ -96,5 +96,21 @@
   "common_loading": "Loading...",
   "common_save": "Save",
   "common_cancel": "Cancel",
-  "common_close": "Close"
+  "common_close": "Close",
+  "privacy_title": "Privacy and account",
+  "privacy_link": "Read the privacy policy",
+  "delete_child_title": "Delete a child profile",
+  "delete_child_text": "Removes the profile and all progress of the child shown above. It cannot be undone.",
+  "delete_child_btn": "Delete this child's profile and data",
+  "delete_child_sure": "Yes, delete {name} and all data",
+  "delete_child_done": "The child profile was deleted.",
+  "delete_account_title": "Delete my account",
+  "delete_account_text": "This permanently deletes your parent account, every child profile and all their progress. It cannot be undone.",
+  "delete_account_password": "Type your password to confirm",
+  "delete_account_btn": "Delete my account and all data",
+  "delete_account_done": "Your account and all data were deleted.",
+  "delete_wrong_password": "That password is not correct.",
+  "delete_cancel": "Cancel",
+  "privacy_policy_link": "Privacy policy",
+  "delete_account_link": "Delete my account"
 }

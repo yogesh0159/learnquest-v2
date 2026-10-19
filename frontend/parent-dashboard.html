@@ -121,6 +121,27 @@
           <div id="taskList" class="mt-24"></div>
         </div>
       </div>
+
+      <details class="card mt-24" id="privacyCard">
+        <summary style="cursor:pointer;font-weight:800" data-i18n="privacy_title">Privacy and account</summary>
+        <p class="mt-16"><a href="privacy.html" data-i18n="privacy_link">Read the privacy policy</a></p>
+
+        <h3 class="mt-16" data-i18n="delete_child_title">Delete a child profile</h3>
+        <p class="muted" data-i18n="delete_child_text">Removes the profile and all progress of the child shown above. It cannot be undone.</p>
+        <button class="btn btn-ghost btn-sm" id="delChildBtn" data-i18n="delete_child_btn">Delete this child's profile and data</button>
+        <button class="btn btn-sm hidden" id="delChildSure" style="background:#c0392b;color:#fff"></button>
+        <button class="btn btn-ghost btn-sm hidden" id="delChildCancel" data-i18n="delete_cancel">Cancel</button>
+        <p id="delChildMsg" class="muted hidden"></p>
+
+        <h3 class="mt-24" data-i18n="delete_account_title">Delete my account</h3>
+        <p class="muted" data-i18n="delete_account_text">This permanently deletes your parent account, every child profile and all their progress. It cannot be undone.</p>
+        <form id="delAccountForm" autocomplete="off">
+          <label for="delPassword" data-i18n="delete_account_password">Type your password to confirm</label>
+          <input type="password" id="delPassword" required autocomplete="current-password">
+          <div id="delAccountError" class="error-text hidden"></div>
+          <button type="submit" class="btn btn-sm mt-16" style="background:#c0392b;color:#fff" data-i18n="delete_account_btn">Delete my account and all data</button>
+        </form>
+      </details>
     </main>
   </div>
 
@@ -323,6 +344,32 @@
   document.addEventListener("lq:i18n-ready", () => { if (dashboardData) renderDashboard(); });
   document.addEventListener("lq:lang-changed", () => { if (dashboardData) renderDashboard(); });
   loadChildren();
+</script>
+<script>
+/* Privacy and account: delete one child, or the whole account (Google Play requires an in-app way to delete the account) */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var delBtn = $("delChildBtn"), sure = $("delChildSure"), cancel = $("delChildCancel"), msg = $("delChildMsg");
+  function resetChild() { sure.classList.add("hidden"); cancel.classList.add("hidden"); delBtn.classList.remove("hidden"); }
+  delBtn.onclick = function () {
+    var c = children.find(function (x) { return x.id === selectedChildId; }); if (!c) return;
+    sure.textContent = t("delete_child_sure", { name: c.name }); sure.classList.remove("hidden"); cancel.classList.remove("hidden"); delBtn.classList.add("hidden"); msg.classList.add("hidden");
+  };
+  cancel.onclick = resetChild;
+  sure.onclick = async function () {
+    try {
+      await api.deleteChild(selectedChildId); resetChild(); selectedChildId = null;
+      msg.textContent = t("delete_child_done"); msg.classList.remove("hidden"); await loadChildren();
+    } catch (e) { msg.textContent = e.message; msg.classList.remove("hidden"); resetChild(); }
+  };
+  $("delAccountForm").addEventListener("submit", async function (e) {
+    e.preventDefault(); var err = $("delAccountError"); err.classList.add("hidden");
+    try {
+      await api.deleteAccount($("delPassword").value);
+      clearSession(); window.location.href = "delete-account.html?done=1";
+    } catch (ex) { err.textContent = ex.code === "WRONG_PASSWORD" ? t("delete_wrong_password") : ex.message; err.classList.remove("hidden"); }
+  });
+})();
 </script>
 </body>
 </html>

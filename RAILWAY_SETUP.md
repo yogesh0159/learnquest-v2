@@ -1,25 +1,35 @@
-# Railway setup — LearnQuest 3D Runner
+# Railway: put the LearnQuest server online (do this FIRST)
 
-1. Upload the contents of this `learnquest` folder to your GitHub repo's existing `/learnquest` directory.
-2. In Railway, select the **learnquest application service**.
-3. Settings → Root Directory: `/learnquest`
-4. Variables → add:
-   - `NODE_ENV` = `production`
-   - `JWT_SECRET` = a long random secret (**required** — the server now refuses to start in production without it)
-   - `MYSQL_URL` = `${{MySQL.MYSQL_URL}}`
-   - `ALLOWED_ORIGINS` (optional) — only needed if the frontend is ever hosted on a different domain than this API. Leave blank for the default same-origin setup.
-5. Confirm the Railway MySQL service is Online.
-6. Redeploy the application.
-7. Open `/api/health` on the public LearnQuest domain. It should report `"database":"mysql"` and a `dbLatencyMs` value.
-8. Open the main domain, create/login a child, enter Jungle World and start Level 1.
+The Android app and the website talk to this server for parent accounts, child profiles and progress. The repository root is the project; a `Dockerfile` and `railway.json` are included, so Railway builds it by itself.
 
-No manual SQL import is required. Startup creates the runner tables, updates seed content, and automatically applies the compatibility upgrade needed by older MySQL databases (including widening `children.pin` for bcrypt hashes).
+## 1. Create the project
+1. https://railway.com -> sign in with GitHub -> **New Project -> Deploy from GitHub repo** -> `yogesh0159/learnquest-v2`.
+2. Leave **Root Directory** empty (the repo root). Railway finds `Dockerfile` + `railway.json`.
+3. In the same project: **+ New -> Database -> Add MySQL**. (Needed: it keeps the accounts safe when the server restarts. Without a database the server refuses to start in production, on purpose.)
 
-### Upgrading an existing (already-deployed) instance
+## 2. Variables (app service -> Variables)
+| Name | Value |
+|---|---|
+| `NODE_ENV` | `production` |
+| `JWT_SECRET` | a long random text (32+ characters). Use the one in `android-keys/RAILWAY_VARIABLES.txt` if you got it, or generate your own. Never share it, never change it later (everyone gets logged out). |
+| `MYSQL_URL` | `${{MySQL.MYSQL_URL}}` (type exactly this; Railway fills it in. If your database service has another name, use that name instead of `MySQL`) |
+| `APP_ORIGINS` | `1` (lets the Android app talk to the server) |
+| `ALLOWED_ORIGINS` | only if you also use the GitHub Pages site with accounts: `https://yogesh0159.github.io` |
 
-If you're redeploying on top of a database that already has parents/children in it:
+## 3. Public address
+App service -> **Settings -> Networking -> Generate Domain**. You get `https://something.up.railway.app`.
 
-- Child PIN storage moved from plaintext to bcrypt hashes. Existing children are upgraded **automatically the first time they log in** after this deploy — no action needed. If you'd rather hash every existing child's PIN immediately (instead of waiting for their next login), run `npm run migrate` once against the same database (locally with `MYSQL_URL` set, or via a Railway one-off shell/job).
-- Set `NODE_ENV=production` and `JWT_SECRET` before redeploying — the server intentionally fails to start in production without a real `JWT_SECRET` now, instead of silently falling back to a shared default.
+## 4. Check it works
+* Open `https://something.up.railway.app/api/health` -> must show `"ok":true` and `"database":"mysql"`. If it says `sqlite`, `MYSQL_URL` is wrong.
+* Open `https://something.up.railway.app/` -> the game. Create a parent account, add a child, play.
+* Open `/privacy.html` and `/delete-account.html` -> both must load (Google Play needs these two addresses).
 
-Three.js 0.185.1 is pinned with the backend and served locally from `/vendor/three/three.module.js`. The runner also has jsDelivr/unpkg fallbacks.
+## 5. Connect the Android app
+GitHub repo -> **Settings -> Secrets and variables -> Actions -> Variables -> New variable**: `LQ_API_BASE` = `https://something.up.railway.app` (no slash at the end). Then run **Actions -> Build Android app**. See `PLAYSTORE_GUIDE.md`.
+
+## Notes
+* Railway is paid after the trial; a small server + MySQL is usually a few dollars a month. Check current prices on Railway.
+* Back up: Railway MySQL service -> Backups (enable).
+* Three.js is served by the server itself (`/vendor/three`), no outside CDN is needed.
+* Older child PINs stored in plain text are upgraded automatically on first login. `npm run migrate` hashes them all at once.
+* Delete-account is built in: Parents -> Privacy and account, and the public page `/delete-account.html`.

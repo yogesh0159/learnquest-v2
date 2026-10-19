@@ -96,5 +96,21 @@
   "common_loading": "लोड होत आहे...",
   "common_save": "जतन करा",
   "common_cancel": "रद्द करा",
-  "common_close": "बंद करा"
+  "common_close": "बंद करा",
+  "privacy_title": "गोपनीयता आणि खाते",
+  "privacy_link": "गोपनीयता धोरण वाचा",
+  "delete_child_title": "मुलाचे प्रोफाइल हटवा",
+  "delete_child_text": "वर दाखवलेल्या मुलाचे प्रोफाइल आणि सर्व प्रगती हटवते. हे परत मिळवता येत नाही.",
+  "delete_child_btn": "या मुलाचे प्रोफाइल आणि डेटा हटवा",
+  "delete_child_sure": "होय, {name} आणि सर्व डेटा हटवा",
+  "delete_child_done": "मुलाचे प्रोफाइल हटवले.",
+  "delete_account_title": "माझे खाते हटवा",
+  "delete_account_text": "हे तुमचे पालक खाते, सर्व मुलांची प्रोफाइल आणि त्यांची सर्व प्रगती कायमची हटवते. हे परत मिळवता येत नाही.",
+  "delete_account_password": "खात्री करण्यासाठी तुमचा पासवर्ड लिहा",
+  "delete_account_btn": "माझे खाते आणि सर्व डेटा हटवा",
+  "delete_account_done": "तुमचे खाते आणि सर्व डेटा हटवला.",
+  "delete_wrong_password": "हा पासवर्ड बरोबर नाही.",
+  "delete_cancel": "रद्द करा",
+  "privacy_policy_link": "गोपनीयता धोरण",
+  "delete_account_link": "माझे खाते हटवा"
 }

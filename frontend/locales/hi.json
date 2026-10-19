@@ -96,5 +96,21 @@
   "common_loading": "लोड हो रहा है...",
   "common_save": "सेव करें",
   "common_cancel": "रद्द करें",
-  "common_close": "बंद करें"
+  "common_close": "बंद करें",
+  "privacy_title": "गोपनीयता और खाता",
+  "privacy_link": "गोपनीयता नीति पढ़ें",
+  "delete_child_title": "बच्चे की प्रोफ़ाइल हटाएँ",
+  "delete_child_text": "ऊपर दिखाए गए बच्चे की प्रोफ़ाइल और सारी प्रगति हटा देता है। इसे वापस नहीं किया जा सकता।",
+  "delete_child_btn": "इस बच्चे की प्रोफ़ाइल और डेटा हटाएँ",
+  "delete_child_sure": "हाँ, {name} और सारा डेटा हटाएँ",
+  "delete_child_done": "बच्चे की प्रोफ़ाइल हटा दी गई।",
+  "delete_account_title": "मेरा खाता हटाएँ",
+  "delete_account_text": "यह आपका अभिभावक खाता, सभी बच्चों की प्रोफ़ाइल और उनकी सारी प्रगति हमेशा के लिए हटा देता है। इसे वापस नहीं किया जा सकता।",
+  "delete_account_password": "पुष्टि के लिए अपना पासवर्ड लिखें",
+  "delete_account_btn": "मेरा खाता और सारा डेटा हटाएँ",
+  "delete_account_done": "आपका खाता और सारा डेटा हटा दिया गया।",
+  "delete_wrong_password": "यह पासवर्ड सही नहीं है।",
+  "delete_cancel": "रद्द करें",
+  "privacy_policy_link": "गोपनीयता नीति",
+  "delete_account_link": "मेरा खाता हटाएँ"
 }

@@ -1,7 +1,7 @@
 {
- "version": "18043d0f5bca",
+ "version": "0ed6ea3dba2a",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3325365,
+ "shellBytes": 3343074,
  "packBytes": 54912780,
  "shell": [
   {
@@ -100,6 +100,11 @@
    "bytes": 6332
   },
   {
+   "url": "/delete-account.html",
+   "hash": "ae280cde82c5",
+   "bytes": 2879
+  },
+  {
    "url": "/explorer.html",
    "hash": "459d04381b7f",
    "bytes": 9703
@@ -111,8 +116,8 @@
   },
   {
    "url": "/js/api.js",
-   "hash": "0232ce3b9ec9",
-   "bytes": 5021
+   "hash": "bc25ddd87a8b",
+   "bytes": 5338
   },
   {
    "url": "/js/asset-gallery.js",
@@ -516,18 +521,18 @@
   },
   {
    "url": "/locales/en.json",
-   "hash": "05f20825eea9",
-   "bytes": 4364
+   "hash": "044922acd8e9",
+   "bytes": 5340
   },
   {
    "url": "/locales/hi.json",
-   "hash": "e332280c3093",
-   "bytes": 7236
+   "hash": "fbd1b2de07d4",
+   "bytes": 9071
   },
   {
    "url": "/locales/mr.json",
-   "hash": "05d3441fa580",
-   "bytes": 7161
+   "hash": "e3854addb082",
+   "bytes": 8884
   },
   {
    "url": "/manifest.webmanifest",
@@ -546,13 +551,18 @@
   },
   {
    "url": "/parent-dashboard.html",
-   "hash": "bb6b1477c69d",
-   "bytes": 17564
+   "hash": "8d90c7bfb284",
+   "bytes": 20856
   },
   {
    "url": "/parent.html",
-   "hash": "206b0ce5a25f",
-   "bytes": 6698
+   "hash": "aa6bada363d2",
+   "bytes": 6934
+  },
+  {
+   "url": "/privacy.html",
+   "hash": "769b524133e1",
+   "bytes": 6451
   },
   {
    "url": "/profile-setup.html",

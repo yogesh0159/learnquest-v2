@@ -7,7 +7,7 @@ One game, one code base (JavaScript + WebGL, with a small C/C++ WebAssembly core
 | **Website** (any browser, phone or PC) | the site itself | `frontend/` served by `backend/` | tested |
 | **Live on GitHub** (free, every push publishes) | GitHub Pages: `.github/workflows/pages.yml`, `scripts/build-pages.mjs` | `GITHUB_PAGES.md` | tested: built, served like Pages (sub-folder and root), game + offline |
 | **Installable web app** (Android Chrome, desktop Chrome / Edge, iPhone / iPad "Add to Home Screen") | PWA: `manifest.webmanifest`, `sw.js`, `js/pwa.js` | `frontend/` | tested incl. fully offline |
-| **Android app** | Capacitor | `mobile/android` | project generated and checked; **APK / AAB not built here** |
+| **Android app** | Capacitor 8 | `mobile/android` | targets **Android 16 / API 36** (Google Play rule since 31 Aug 2026); built by **GitHub Actions** (`.github/workflows/android.yml`) into an `.aab` for Play; guide: `PLAYSTORE_GUIDE.md` |
 | **iPhone / iPad app** | Capacitor | `mobile/ios` | project generated and checked; **IPA not built here (needs a Mac)** |
 | **Windows / macOS / Linux app** | Electron | `desktop/` | **runs and was tested on Linux**; Windows / macOS installers must be built on those systems |
 
@@ -25,18 +25,24 @@ The game itself decides its picture quality for each device (graphics card, memo
 * A new version is downloaded in the background; the player taps **Reload now** (a run is never interrupted).
 
 ## 3. Android app
-Needs: Node 20+, JDK 17, **Android Studio**.
+**Easiest way (no Android Studio):** push to GitHub, then Actions -> **Build Android app** -> Run workflow. It builds on GitHub's servers and gives you `LearnQuest-release.aab` (upload to Play Console), a signed `.apk` and a test `.apk`. Full steps, secrets for the upload key and the Play Console forms: **`PLAYSTORE_GUIDE.md`**; store texts, graphics and form answers: `mobile/store-listing/`.
+
+**Own computer (Windows / macOS / Linux):** Node 22+, JDK 21, Android SDK 36.
 ```
+npm install                                   (project root: the game's three.js)
 cd mobile
 npm install
-set LQ_API_BASE=https://your-server.up.railway.app      (Windows)   |   export LQ_API_BASE=...   (macOS / Linux)
-npm run android        # copies the game into the app, opens Android Studio
+set LQ_API_BASE=https://your-server.up.railway.app      (optional; empty = offline game, no accounts)
+npm run sync                                  # copies the game into the app
+cd android && gradlew bundleRelease           # -> app/build/outputs/bundle/release/app-release.aab
 ```
-In Android Studio: **Build -> Generate Signed Bundle / APK** -> upload the `.aab` to Google Play Console.
-Already set up: app id `com.learnquest.junglerun`, launcher icons (all densities, adaptive), splash, full-screen game with the screen kept on, sound without a first tap, vibration, back button (pause / resume / exit), backups off.
-You still need: a Play developer account, a signing key, the **Families / kids policy** answers, a **privacy policy URL**, store listing, and testing on real phones. Check the current "target API level" Google requires before uploading.
+(`npm run android` opens Android Studio instead.) Signing: set `LQ_KEYSTORE_FILE`, `LQ_KEYSTORE_PASSWORD`, `LQ_KEY_ALIAS`, `LQ_KEY_PASSWORD`; without them the bundle is left unsigned.
+Already set up: app id `com.learnquest.junglerun`, launcher icons (all densities, adaptive), splash, full-screen game with the screen kept on, sound without a first tap, vibration, back button (pause / resume / exit), backups off, **only three permissions** (internet, vibrate, keep awake), no Google Fonts / CDN requests inside the app, version code from the CI run number.
+You still need: a Play developer account, the Families / kids policy answers, a privacy policy URL, the closed test (12 testers, 14 days for new personal accounts) and testing on real phones.
 
 ## 4. iPhone / iPad app
+**Note:** `mobile/ios` was generated with an older Capacitor. Before the first build on the Mac run `npx cap migrate` inside `mobile/` (the packages are now Capacitor 8) or delete `mobile/ios` and run `npx cap add ios`, then re-apply the icon / splash assets (`npm run assets`).
+
 Needs: a **Mac**, Xcode 15+, CocoaPods, an Apple Developer account.
 ```
 cd mobile
@@ -60,4 +66,4 @@ The game runs from a tiny server that listens only on this computer (`127.0.0.1:
 
 ## What was checked, and what you must check
 Checked here: platform detection (6 environments), PWA install / update / full offline with the server switched off, phone layouts (iPhone portrait + landscape, Pixel), app-shell behaviour (home button pause, back button, screen kept awake, GPU context loss, iOS audio loop - simulated), Android / iOS project settings, icon sizes, app bundle contents (58 MB), the desktop app actually running (Linux) and loading all 9 models.
-**Not checked (cannot be, in this environment):** building the APK / AAB or IPA, Windows and macOS installers, real phones and tablets (heat, memory, touch feel), Safari / WebKit, store review rules.
+**Not checked (cannot be, in this environment):** building the APK / AAB (the Android SDK cannot be downloaded here; GitHub Actions builds it, see `PLAYSTORE_GUIDE.md`) or IPA, Windows and macOS installers, real phones and tablets (heat, memory, touch feel), Safari / WebKit, store review rules.

@@ -276,3 +276,14 @@ Unit 69 / validator 641 / platform config 14 / backend 70 / parity 3,784 + 1,864
 Unit 69 / validator 641 / platform config 14 / backend 70 / parity 3,784 + 1,864 + 10 / Pages checks 10 + 9 / static sweep: 75 scripts without a syntax error, 20 pages without duplicate ids or missing files.
 Browser: reading 14 + 7 + 3, teacher 16 + 7 + 4, back/home 8, free runs 13 + 4, home 15 + 7 + 9 + 6, Pages 17 + 3, gameplay 27, audio 36, input 17, biomes 12, languages 19, tutorial/touch 31, Lab 21, settings 22, performance 25 + 4, device analysis 6 + 18, native core 9, offline app 10 + 13 + 12, app lifecycle 15, phones 11 + 11 + 11, Hub 35, original pages 15, Jungle Runner 7 + 7, Maths 14, gallery 11, CSP clean.
 **Not verified:** real GPUs and phones, how real small children use the Ready button and the teacher, Hindi / Marathi wording by a native speaker, the real GitHub run.
+
+## Update 22 - Android / Google Play
+Platform tests 16 (14 + 2 new Play-rule checks), validator 641, Jungle Run unit tests 69. `npx cap sync android` ran (3 plugins, 56 MB of game files). The exact files inside the app were served and played in Chromium: the game starts, only the app's own server was contacted (0 third-party hosts), 0 script errors.
+**Not verified:** the Gradle build and the .aab / .apk themselves (no Android SDK / Maven access in this environment; GitHub Actions builds them), real phones and tablets, Google Play review.
+
+## Update 23
+* Backend: 72/72 (new: account-deletion integration tests incl. family isolation, wrong password, empty child tables, production DB guard).
+* Validator 656 checks, platform tests 16/16, jungle-run 69/69, Pages build + 9 tests: all pass.
+* Browser (Chromium, local server): delete child, wrong password error, delete account -> `delete-account.html?done=1`, login afterwards -> 401. 0 page errors.
+* Server started from a copy holding only the Dockerfile's files, `NODE_ENV=production`: health OK, `privacy.html`, `delete-account.html`, `/vendor/three` served.
+* NOT tested: real Docker build, Railway, MySQL, the AAB build, real phones.

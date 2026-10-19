@@ -2,6 +2,7 @@
   "name": "learnquest-mobile",
   "version": "1.0.0",
   "private": true,
+  "engines": { "node": ">=22" },
   "description": "LearnQuest Jungle Run - Android and iOS apps (Capacitor)",
   "scripts": {
     "sync-web": "node scripts/sync-web.mjs",
@@ -11,15 +12,15 @@
     "assets": "capacitor-assets generate --android --ios"
   },
   "dependencies": {
-    "@capacitor/android": "^6.2.0",
-    "@capacitor/app": "^6.0.2",
-    "@capacitor/core": "^6.2.0",
-    "@capacitor/ios": "^6.2.0",
-    "@capacitor/splash-screen": "^6.0.3",
-    "@capacitor/status-bar": "^6.0.2"
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.2.0"
+    "@capacitor/cli": "^8.5.3"
   }
 }

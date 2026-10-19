@@ -21,3 +21,8 @@ desktop/app/
 desktop/dist/
 desktop/node_modules/
 *.log
+
+# Android upload keys must never be committed
+*.jks
+*.keystore
+android-keys/

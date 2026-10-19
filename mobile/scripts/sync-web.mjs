@@ -18,9 +18,13 @@ for (const { url } of manifest.shell.filter((e) => e.url.startsWith("/vendor/"))
 // the server address, set BEFORE any other script runs (read by js/lq-platform.js)
 const apiBase = (process.env.LQ_API_BASE || "").trim().replace(/\/+$/, "");
 fs.writeFileSync(path.join(www, "js", "lq-native-config.js"), `window.LQ_NATIVE_CONFIG = ${JSON.stringify({ apiBase })};\n`);
+// no third-party CDN fallbacks either: the app carries its own three.js, so nothing is ever fetched from jsDelivr / unpkg
+const am = path.join(www, "js", "game", "core", "asset-manager.js");
+if (fs.existsSync(am)) fs.writeFileSync(am, fs.readFileSync(am, "utf8").replace(/\s*"https:\/\/(cdn\.jsdelivr\.net|unpkg\.com)[^"]*",?/g, ""));
 let pages = 0;
 for (const f of fs.readdirSync(www).filter((n) => n.endsWith(".html"))) {
   const p = path.join(www, f); let s = fs.readFileSync(p, "utf8");
+  s = s.replace(/<link[^>]*fonts\.(googleapis|gstatic)\.com[^>]*>\s*/g, "");                                                 // kids' app: no request to Google Fonts (the CSS has system-font fallbacks)
   s = s.replace(/<link rel="manifest"[^>]*>\s*/g, "").replace(/<script src="\/js\/pwa.js" defer><\/script>\s*/g, "");          // installable-website bits are not used inside an app
   s = s.replace("<head>", '<head>\n<script src="/js/lq-native-config.js"></script>'); fs.writeFileSync(p, s); pages++;
 }

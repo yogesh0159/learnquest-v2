@@ -1,8 +1,10 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const { nanoid } = require("nanoid");
 const db = require("../db");
 const { requireAuth } = require("../utils/auth");
 const asyncRoute = require("../utils/async-route");
+const { authLimiter } = require("../utils/rate-limit");
 
 const router = express.Router();
 
@@ -277,6 +279,38 @@ router.get("/tasks/:childId", requireAuth("parent"), asyncRoute(async (req, res)
     [req.params.childId]
   );
   res.json({ tasks });
+}));
+
+// ---------------------------------------------------------------------------
+// Data deletion (Google Play "account deletion" rule + a parent's right to remove a child's data).
+// Every table that holds personal or progress data points at children / parents with ON DELETE CASCADE,
+// and the children are removed explicitly first, so nothing is left behind even if a database ignores a cascade.
+// ---------------------------------------------------------------------------
+
+// Delete ONE child profile and everything about that child (progress, answers, runs, rewards, tasks).
+router.delete("/child/:childId", requireAuth("parent"), asyncRoute(async (req, res) => {
+  if (!(await ownsChild(req.user.id, req.params.childId))) return res.status(403).json({ error: "Not your child profile" });
+  await db.transaction(async (tx) => {
+    await tx.run("DELETE FROM children WHERE id = ? AND parent_id = ?", [req.params.childId, req.user.id]);
+  });
+  res.json({ ok: true, deleted: "child" });
+}));
+
+// Delete the WHOLE parent account: the parent, every child profile and all their data. The password is asked again
+// so that a phone left open cannot erase a family's data. A wrong password answers 403 (not 401: the web / app code
+// signs people out on 401).
+router.delete("/account", authLimiter, requireAuth("parent"), asyncRoute(async (req, res) => {
+  const password = String(req.body?.password || "");
+  const parent = await db.one("SELECT id, password_hash FROM parents WHERE id = ?", [req.user.id]);
+  if (!parent) return res.status(404).json({ error: "This account does not exist (it may already be deleted).", code: "ACCOUNT_GONE" });
+  if (!password || !(await bcrypt.compare(password, parent.password_hash))) {
+    return res.status(403).json({ error: "That password is not correct.", code: "WRONG_PASSWORD" });
+  }
+  await db.transaction(async (tx) => {
+    await tx.run("DELETE FROM children WHERE parent_id = ?", [parent.id]);
+    await tx.run("DELETE FROM parents WHERE id = ?", [parent.id]);
+  });
+  res.json({ ok: true, deleted: "account" });
 }));
 
 module.exports = router;

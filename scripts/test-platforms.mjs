@@ -58,6 +58,18 @@ test("Android project: vibrate + keep-awake permissions, full-screen activity, s
   const act = read("mobile/android/app/src/main/java/com/learnquest/junglerun/MainActivity.java"); for (const k of ["FLAG_KEEP_SCREEN_ON", "setMediaPlaybackRequiresUserGesture(false)", "hide(WindowInsetsCompat.Type.systemBars())"]) assert.ok(act.includes(k), k);
   assert.ok(fs.existsSync(path.join(root, "mobile/android/gradlew")) && fs.existsSync(path.join(root, "mobile/android/app/build.gradle")));
 });
+test("Google Play rules: targets Android 16 (API 36), AAB + upload-key signing + versionCode from CI, only the permissions the game needs", () => {
+  const vars = read("mobile/android/variables.gradle"); const num = (k) => Number((vars.match(new RegExp(k + "\\s*=\\s*(\\d+)")) || [])[1]);
+  assert.ok(num("targetSdkVersion") >= 36, "targetSdkVersion must be 36 or higher (Play rule from 31 Aug 2026)"); assert.ok(num("compileSdkVersion") >= num("targetSdkVersion")); assert.ok(num("minSdkVersion") >= 24 && num("minSdkVersion") <= 26);
+  const g = read("mobile/android/app/build.gradle"); for (const k of ["LQ_VERSION_CODE", "LQ_KEYSTORE_FILE", "signingConfigs", "enableSplit = false"]) assert.ok(g.includes(k), k);
+  const man = read("mobile/android/app/src/main/AndroidManifest.xml"); const perms = [...man.matchAll(/uses-permission android:name="([^"]+)"/g)].map((m) => m[1]).sort();
+  assert.deepEqual(perms, ["android.permission.INTERNET", "android.permission.VIBRATE", "android.permission.WAKE_LOCK"], "a kids' app asks for as little as possible: no camera, microphone, location, contacts, storage, advertising id");
+  const wf = read(".github/workflows/android.yml"); for (const k of ["bundleRelease", "android-36", "targetSdkVersion:'36'", "ANDROID_KEYSTORE_BASE64"]) assert.ok(wf.includes(k), k);
+  assert.equal(JSON.parse(read("mobile/package.json")).dependencies["@capacitor/android"].startsWith("^8"), true);
+});
+test("the app build has no third-party requests (Google Fonts, jsDelivr, unpkg are removed from the app copy)", () => {
+  const sync = read("mobile/scripts/sync-web.mjs"); for (const k of ["fonts\\.(googleapis|gstatic)", "jsdelivr", "unpkg"]) assert.ok(sync.includes(k), k);
+});
 test("Android launcher icons exist for every density (normal, round, adaptive) and iOS has its app icon and splash", () => {
   const res = path.join(root, "mobile/android/app/src/main/res"); for (const d of ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]) for (const n of ["ic_launcher", "ic_launcher_round", "ic_launcher_foreground"]) assert.ok(fs.existsSync(path.join(res, "mipmap-" + d, n + ".png")), `${n} ${d}`);
   assert.ok(fs.existsSync(path.join(root, "mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png")) || fs.readdirSync(path.join(root, "mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset")).some((f) => f.endsWith(".png")));

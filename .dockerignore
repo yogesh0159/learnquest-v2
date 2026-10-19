@@ -1,0 +1,13 @@
+node_modules
+backend/node_modules
+mobile
+desktop
+native
+tools
+original_v3_backup
+android-keys
+*.jks
+*.keystore
+.git
+.github
+*.zip

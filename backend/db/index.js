@@ -112,6 +112,11 @@ async function init() {
     console.log("🗄️ LearnQuest database: MySQL");
     console.log("✅ Database schema compatibility upgrades applied");
   } else {
+    // On a host such as Railway the app's own disk is wiped at every deploy: a SQLite file there would silently lose every
+    // family's data. In production a MySQL database (MYSQL_URL) or an explicit SQLITE_PATH (a mounted volume) is required.
+    if (process.env.NODE_ENV === "production" && !process.env.SQLITE_PATH && process.env.ALLOW_EPHEMERAL_DB !== "1") {
+      throw new Error("No database configured. In production set MYSQL_URL (Railway: add a MySQL service and use ${{MySQL.MYSQL_URL}}) or SQLITE_PATH pointing at a persistent volume.");
+    }
     const dbPath = process.env.SQLITE_PATH || path.join(__dirname, "learnquest.sqlite");
     // better-sqlite3 when it is installed and built; otherwise the native-free node:sqlite adapter (Node 22.5+/24).
     let driver = "better-sqlite3";

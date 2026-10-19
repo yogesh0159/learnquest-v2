@@ -1,23 +1,45 @@
 apply plugin: 'com.android.application'
 
+// Version for Google Play: CI passes the run number and the name; on your own computer these defaults are used.
+def lqVersionCode = Integer.parseInt(System.getenv("LQ_VERSION_CODE") ?: "1")
+def lqVersionName = System.getenv("LQ_VERSION_NAME") ?: "1.0.0"
+
 android {
-    namespace "com.learnquest.junglerun"
-    compileSdk rootProject.ext.compileSdkVersion
+    namespace = "com.learnquest.junglerun"
+    compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.learnquest.junglerun"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Play needs a bigger versionCode for every upload. CI sets LQ_VERSION_CODE (the run number); locally it falls back to 1.
+        versionCode lqVersionCode
+        versionName lqVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+    }
+    // Upload key: only used when the four LQ_* variables are set (GitHub secrets in CI, or your shell). Without them the release is left unsigned.
+    signingConfigs {
+        release {
+            def ks = System.getenv("LQ_KEYSTORE_FILE")
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("LQ_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("LQ_KEY_ALIAS")
+                keyPassword System.getenv("LQ_KEY_PASSWORD")
+            }
+        }
+    }
+    // One AAB for every language: the game has its own English / Hindi / Marathi switch inside, so Play must not strip languages.
+    bundle {
+        language { enableSplit = false }
     }
     buildTypes {
         release {
+            if (System.getenv("LQ_KEYSTORE_FILE")) { signingConfig signingConfigs.release }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
