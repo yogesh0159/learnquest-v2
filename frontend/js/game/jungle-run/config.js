@@ -41,7 +41,8 @@ export const PLAYER = Object.freeze({
 
 export const CAMERA = Object.freeze({
   fov: 60,
-  fovPortrait: 72,
+  fovPortrait: 80,
+  offsetPortrait: { x: 0, y: 4.3, z: 8.8 },
   offset: { x: 0, y: 3.55, z: 6.9 },
   lookAhead: { y: 1.15, z: -9 },
   followX: 0.55,

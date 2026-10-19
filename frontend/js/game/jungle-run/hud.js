@@ -11,6 +11,24 @@ export class Hud {
       over: $("gameOverScreen"), overStats: $("overStats"), error: $("errorBox"), errorText: $("errorText"), hud: $("hud"), best: $("bestScore"), loadDevice: $("loadDevice"), coach: $("coach"), coachText: $("coachText"), coachStep: $("coachStep"), overReview: $("overReview"), overAch: $("overAch"), menuStats: $("menuStats"),
     };
     this.last = {}; this.toastTimer = 0;
+    this._watchLayout(doc);
+  }
+  /** Chips wrap to several rows on a phone. Publish where they end (--chips-bottom) and where the power-up chips end (--hud-bottom) so the power-ups, the question banner and the messages sit BELOW them instead of on top. */
+  _watchLayout(doc) {
+    try {
+      const chips = doc.querySelector("#hud .chips"), power = this.el.power, root = doc.documentElement;
+      if (!chips || typeof ResizeObserver === "undefined") return;
+      const run = () => {
+        const cb = Math.ceil(chips.getBoundingClientRect().bottom);
+        root.style.setProperty("--chips-bottom", `${cb}px`);
+        const pb = power && !power.hidden ? Math.ceil(power.getBoundingClientRect().bottom) : 0;
+        const hb = Math.max(cb, pb); root.style.setProperty("--hud-bottom", `${hb}px`);
+        const bn = this.el.banner, bb = bn && !bn.hidden ? Math.ceil(bn.getBoundingClientRect().bottom) : 0;
+        root.style.setProperty("--msg-top", `${Math.max(hb, bb)}px`);
+      };
+      this._layout = run; const ro = new ResizeObserver(run); ro.observe(chips); if (power) ro.observe(power); if (this.el.banner) ro.observe(this.el.banner);
+      addEventListener("resize", run); run();
+    } catch (e) { /* layout hint only */ }
   }
   _set(key, el, value) { if (this.last[key] !== value && el) { el.textContent = value; this.last[key] = value; } }
   update(s) {
@@ -27,8 +45,10 @@ export class Hud {
       if (this.last.power !== key) {
         this.last.power = key; this.el.power.hidden = !key;
         this.el.power.innerHTML = (s.power || []).map((p) => `<span class="pw" style="--c:${p.color}">${p.icon} ${t(`pu.${p.id}.label`)} <b>${Math.ceil(p.left)}s</b></span>`).join("");
+        if (this._layout) this._layout();
       }
     }
+    if (this._layout && (this.last.combo !== this.last._lc || this.last.streak !== this.last._ls)) { this.last._lc = this.last.combo; this.last._ls = this.last.streak; this._layout(); }
     if (this.el.multi) { const on = s.multiplier > 1; this._set("multi", this.el.multi, on ? t("hud.multi", { n: s.multiplier, s: Math.ceil(s.multiplierLeft) }) : ""); this.el.multi.hidden = !on; }
   }
   progress(p) {

@@ -150,3 +150,48 @@ body.has-question.reading-now #msgLane { opacity:.0; }
 #questionBanner .readbtns { display:flex; gap:10px; justify-content:center; margin-top:8px; flex-wrap:wrap; } #questionBanner .readbtns .ready, #questionBanner .readbtns .listen { margin-top:0; }
 #questionBanner .listen { pointer-events:auto; padding:10px 22px; font-size:20px; font-weight:800; border-radius:14px; border:3px solid #3b2a12; background:#e6f7e6; color:#1b4d38; cursor:pointer; }
 #questionBanner .ready { font-size:26px; padding:12px 40px; }
+
+/* ---- phones: nothing may sit on top of the chip rows (hearts, combo, streak, teacher, power-ups) ----
+   hud.js publishes --chips-bottom / --hud-bottom (px). Landscape phones are also short, so the rule is by size, not only by width. */
+#hudPower { top:calc(var(--chips-bottom, 112px) + 6px); }
+@media (max-width: 760px), (max-height: 500px) {
+  #questionBanner { top:calc(var(--hud-bottom, 116px) + 8px); }
+  #questionBanner.reading { top:calc(var(--hud-bottom, 116px) + 8px); max-height:calc(100dvh - var(--hud-bottom, 116px) - 110px); overflow:auto; }
+  body.has-question #msgLane { top:calc(var(--hud-bottom, 116px) + 8px + 120px); }
+  #msgLane { top:calc(var(--hud-bottom, 116px) + 8px); }
+}
+@media (max-height: 500px) and (min-width: 761px) {
+  #hud .chips { max-width:calc(100% - 330px); } .chip { font-size:15px; padding:1px 8px; } .chip.hearts { font-size:18px; }
+  #questionBanner #questionText { font-size:clamp(14px,3vh,20px) !important; } #questionBanner .qhint { display:none; }
+  #questionBanner.reading #questionText { font-size:clamp(15px,3.4vh,22px) !important; }
+  #questionBanner .ready { padding:6px 28px; font-size:20px; } #questionBanner .listen { padding:6px 16px; font-size:16px; }
+}
+/* phones in portrait: smaller chips so the whole HUD needs fewer rows */
+@media (max-width: 480px) {
+  .chip { font-size:14px; padding:1px 8px; gap:5px; border-width:2px; border-radius:13px; } .chip .lbl { font-size:10px; }
+  .chip.hearts { font-size:17px; letter-spacing:1px; padding:0 8px; }
+  #hud .chips { gap:5px; max-width:calc(100% - 128px); }
+}
+
+/* ---- phones: a CLEAN run. Few small chips, one message at a time, a slim question strip, and the runner always in view ---- */
+@media (max-width: 760px), (max-height: 500px) {
+  .chip .lbl { display:none; }
+  .chip { font-size:14px; padding:1px 9px; gap:5px; border-width:2px; border-radius:13px; }
+  .chip.hearts { font-size:16px; letter-spacing:0; padding:0 8px; }
+  .chip.combo, .chip.streak, .chip.multi { display:none; }
+  #hud .chips { gap:5px; max-width:calc(100% - 128px); }
+  #hudPower { flex-direction:row; flex-wrap:wrap; gap:5px; max-width:calc(100% - 140px); }
+  #hudPower .pw { font-size:12px; padding:1px 8px; }
+  #questionBanner { padding:5px 12px 6px; border-width:3px; border-radius:14px; background:rgba(40,25,8,.78); }
+  #questionBanner .qlbl, #questionBanner:not(.reading) .qhint { display:none; }
+  #questionBanner #questionText { font-size:clamp(14px,4.2vw,19px) !important; }
+  #questionBanner.reading { padding:7px 12px 9px; max-height:none; overflow:visible; }
+  #questionBanner.reading #questionText { font-size:clamp(16px,4.8vw,22px) !important; }
+  #questionBanner.reading .rhint { font-size:12px; margin-top:1px; }
+  #questionBanner .readbar { margin:5px 0 0; height:6px; }
+  #questionBanner .readbtns { flex-wrap:nowrap; gap:8px; margin-top:6px; }
+  #questionBanner .ready { font-size:20px; padding:7px 22px; margin:0; } #questionBanner .listen { font-size:16px; padding:7px 12px; }
+  #msgLane, body.has-question #msgLane { top:calc(var(--msg-top, var(--hud-bottom, 116px)) + 6px); width:min(300px,72vw); gap:5px; }
+  #msgLane:has(#teacherBubble:not([hidden])) #toast { display:none; }
+  #msgLane .toast { font-size:15px; padding:4px 10px; border-width:2px; } #msgLane #teacherBubble { font-size:14px; padding:5px 10px; border-width:2px; } #msgLane #coach { font-size:13px; padding:6px 10px; }
+}

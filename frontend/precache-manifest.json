@@ -1,7 +1,7 @@
 {
- "version": "0ed6ea3dba2a",
+ "version": "13bd16188ba9",
  "assetsVersion": "3f57bd94ff04",
- "shellBytes": 3343074,
+ "shellBytes": 3348068,
  "packBytes": 54912780,
  "shell": [
   {
@@ -71,8 +71,8 @@
   },
   {
    "url": "/css/jungle-local-preview.css",
-   "hash": "b6b44a04a6e3",
-   "bytes": 22006
+   "hash": "e53bcf02a9ef",
+   "bytes": 25404
   },
   {
    "url": "/css/jungle-runner.css",
@@ -231,8 +231,8 @@
   },
   {
    "url": "/js/game/jungle-run/camera-rig.js",
-   "hash": "7e8d237deb81",
-   "bytes": 1741
+   "hash": "4d985156fb76",
+   "bytes": 1828
   },
   {
    "url": "/js/game/jungle-run/collectible-manager.js",
@@ -246,8 +246,8 @@
   },
   {
    "url": "/js/game/jungle-run/config.js",
-   "hash": "8ab8c41e3121",
-   "bytes": 7471
+   "hash": "0c9a7d5d0fde",
+   "bytes": 7515
   },
   {
    "url": "/js/game/jungle-run/debug-panel.js",
@@ -281,8 +281,8 @@
   },
   {
    "url": "/js/game/jungle-run/hud.js",
-   "hash": "27e092035213",
-   "bytes": 4661
+   "hash": "b7a391bb9b42",
+   "bytes": 6126
   },
   {
    "url": "/js/game/jungle-run/i18n.js",

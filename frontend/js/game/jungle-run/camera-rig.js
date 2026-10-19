@@ -5,16 +5,16 @@ import { CAMERA, LANES } from "./config.js";
 export class CameraRig {
   constructor(camera) {
     this.camera = camera; this.pos = new THREE.Vector3(0, CAMERA.offset.y, CAMERA.offset.z); this.look = new THREE.Vector3(0, CAMERA.lookAhead.y, CAMERA.lookAhead.z);
-    this.enabled = true; this.reduceMotion = false; this.fovKick = 0; this.tmp = new THREE.Vector3(); this.baseFov = CAMERA.fov;
+    this.enabled = true; this.reduceMotion = false; this.fovKick = 0; this.tmp = new THREE.Vector3(); this.baseFov = CAMERA.fov; this.off = CAMERA.offset;
     this.snap({ x: 0, y: 0 });
   }
   setAspect(aspect) {
-    this.baseFov = aspect < 0.85 ? CAMERA.fovPortrait : CAMERA.fov;
+    const tall = aspect < 0.85; this.baseFov = tall ? CAMERA.fovPortrait : CAMERA.fov; this.off = tall ? CAMERA.offsetPortrait : CAMERA.offset;
     this.camera.aspect = aspect; this.camera.fov = this.baseFov; this.camera.updateProjectionMatrix();
   }
   _targets(p) {
     const lift = Math.min(p.y * 0.35, 0.6);
-    const pos = this.tmp.set(p.x * CAMERA.followX + CAMERA.offset.x, CAMERA.offset.y + lift, CAMERA.offset.z);
+    const pos = this.tmp.set(p.x * CAMERA.followX + this.off.x, this.off.y + lift, this.off.z);
     const look = new THREE.Vector3(p.x * CAMERA.lookFollowX, CAMERA.lookAhead.y + p.y * 0.2, CAMERA.lookAhead.z);
     return { pos, look };
   }

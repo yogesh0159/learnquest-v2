@@ -279,3 +279,8 @@ Finding: the GT 730 is a 2014 entry-level card, much weaker than the name "NVIDI
 * Production now refuses to start without a database (`MYSQL_URL`, or `SQLITE_PATH` on a persistent volume), so accounts cannot silently vanish on restart.
 * Account deletion: `DELETE /api/parent/child/:id`, `DELETE /api/parent/account` (password required); dashboard card "Privacy and account"; public pages `privacy.html` and `delete-account.html`; en/hi/mr texts.
 * Play paperwork updated for the accounts version (listings, `forms-answers.md`, `PLAYSTORE_GUIDE.md`).
+
+## Update 24: clean phone play
+* Phone HUD: labels hidden, small chips, combo/streak chips hidden on phones, one message at a time, question as a slim strip, Listen/Ready in one row so the runner stays visible; chips/power-ups/banner/messages are placed below the measured HUD (`--chips-bottom`, `--hud-bottom`, `--msg-top` set by hud.js) so nothing overlaps.
+* Portrait camera: wider (fov 80, offset y 4.3 / z 8.8) so the three answer panels stay in view while approaching. NOT verified on the real board in the test browser; check on a phone.
+* Tests: platforms 16/16, jungle-run 69/69, backend 72/72, t_read 14/14, t_b4 31/31, t_csp clean except a missing source `girl.glb` (404, not related).
